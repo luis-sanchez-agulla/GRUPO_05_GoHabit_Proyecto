@@ -1,0 +1,5 @@
+/* Styles specific to calendario.html */
+
+body {
+    background-color: var(--background-light);
+}
