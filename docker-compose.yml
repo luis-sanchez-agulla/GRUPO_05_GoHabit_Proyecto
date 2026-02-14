@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./GoHabit-system/backend
+    ports:
+      - "8000:8000"
+    container_name: gohabit-backend
+
+  frontend:
+    build:
+      context: ./GoHabit-system/frontend
+    ports:
+      - "8080:80"
+    container_name: gohabit-frontend
+    depends_on:
+      - backend
