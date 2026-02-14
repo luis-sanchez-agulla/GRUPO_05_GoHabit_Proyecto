@@ -1,11 +1,11 @@
 # GoHabit Backend
 
-This is the backend service for the GoHabit application, built using FastAPI.
+This is the backend service for the GoHabit application, built using Spring Boot.
 
 ## Requirements
 
-- Python 3.9 or higher
-- pip
+- Java 17 or higher
+- Maven
 - Docker (optional, for containerization)
 
 ## Setup
@@ -16,23 +16,12 @@ This is the backend service for the GoHabit application, built using FastAPI.
    cd GoHabit-system/backend
    ```
 
-2. Create a virtual environment and activate it:
+2. Build and run the application using Maven:
    ```bash
-   python -m venv venv
-   source venv/bin/activate # On Windows: venv\Scripts\activate
+   mvn spring-boot:run
    ```
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Run the application:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-
-   The application will be available at `http://127.0.0.1:8000`.
+   The application will be available at `http://localhost:8000`.
 
 ## Docker Setup
 
@@ -46,7 +35,7 @@ This is the backend service for the GoHabit application, built using FastAPI.
    docker run -p 8000:8000 gohabit-backend
    ```
 
-   The application will be available at `http://127.0.0.1:8000`.
+   The application will be available at `http://localhost:8000`.
 
 ## API Endpoints
 
