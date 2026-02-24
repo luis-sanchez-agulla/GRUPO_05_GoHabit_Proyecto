@@ -5,8 +5,21 @@ services:
     build:
       context: ./GoHabit-system/backend
     ports:
-      - "8000:8000"
+      - "3000:3000"
     container_name: gohabit-backend
+    environment:
+      DATABASE_URL: "mysql://app:apppass@mysql:3306/goto"
+      JWT_SECRET: "docker-secret-cambiar-en-produccion-min-16"
+      JWT_EXPIRES_IN: "7d"
+      NODE_ENV: "production"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   frontend:
     build:
@@ -17,15 +30,15 @@ services:
     depends_on:
       - backend
       - mysql
-      
-  mysql: 
-    image: mysql:8.0 
+
+  mysql:
+    image: mysql:8.0
     container_name: gohabit-mysql
 
     ports:
-      - "3306:3306" 
+      - "3306:3306"
 
-    environment: 
+    environment:
       MYSQL_ROOT_PASSWORD: "rootpass"
       MYSQL_DATABASE: "goto"
       MYSQL_USER: "app"
@@ -33,15 +46,18 @@ services:
 
     volumes:
       - mysql_data:/var/lib/mysql # persistencia (tablas/índices/datos)
-      - ./mysql/conf.d:/etc/mysql/conf.d:ro # configuración extra (.cnf), solo lectura
+      - ./GoHabit-system/mysql/conf.d:/etc/mysql/conf.d:ro # configuración extra (.cnf), solo lectura
 
       # Añadido por Luis 
-      - ./mysql/init-db:/docker-entrypoint-initdb.d:ro
-      - ./mysql/init-scripts:/docker-entrypoint-initdb.d:ro # creacion de usuarios-roles-vistas-plugins
+      - ./GoHabit-system/mysql/init-db:/docker-entrypoint-initdb.d:ro
+      - ./GoHabit-system/mysql/init-scripts:/docker-entrypoint-initdb.d:ro # creacion de usuarios-roles-vistas-plugins
 
-    healthcheck: # indica cuándo MySQL está "listo"
-      test:
-        ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpass"]
+    healthcheck:
+      # indica cuándo MySQL está "listo"
+      test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpass" ]
       interval: 10s
       timeout: 5s
       retries: 10
+
+volumes:
+  mysql_data:

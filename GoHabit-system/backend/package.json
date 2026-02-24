@@ -1,0 +1,67 @@
+{
+  "name": "gohabit-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "eslint . --ext .ts",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
+    "db:studio": "prisma studio"
+  },
+  "_comments": {
+    "scripts_explanation": {
+      "dev": "Arranca el servidor Next.js en modo desarrollo en el puerto 3000 con hot-reload",
+      "build": "Genera el build de producción optimizado (output: standalone)",
+      "start": "Arranca el servidor en modo producción desde el build generado",
+      "lint": "Ejecuta ESLint para detectar errores de estilo y código en archivos .ts",
+      "db:generate": "Genera el cliente tipado de Prisma a partir del schema.prisma",
+      "db:push": "Sincroniza el schema de Prisma con la base de datos (sin crear migraciones)",
+      "db:migrate": "Crea y aplica migraciones SQL formales para producción",
+      "db:seed": "Ejecuta el script de seed para poblar datos iniciales de desarrollo",
+      "db:studio": "Abre Prisma Studio (GUI web para explorar la base de datos)"
+    }
+  },
+  "dependencies": {
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@prisma/client": "^6.2.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.24.0"
+  },
+  "_dependencies_explanation": {
+    "next": "Framework principal — gestiona rutas API, build y servidor",
+    "react / react-dom": "Dependencias obligatorias de Next.js (no se usa frontend visual)",
+    "@prisma/client": "Cliente ORM tipado para consultas a MySQL",
+    "bcryptjs": "Hashing seguro de contraseñas (bcrypt en JavaScript puro)",
+    "jsonwebtoken": "Generación y verificación de tokens JWT para autenticación",
+    "zod": "Validación de schemas — valida request bodies y variables de entorno"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.7",
+    "prisma": "^6.2.0",
+    "ts-node": "^10.9.2",
+    "eslint": "^9.17.0",
+    "@next/eslint-plugin-next": "^15.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0"
+  },
+  "_devDependencies_explanation": {
+    "typescript": "Lenguaje principal — tipado estático sobre JavaScript",
+    "@types/*": "Definiciones de tipos TypeScript para las librerías",
+    "prisma": "CLI de Prisma — solo se usa en desarrollo (migraciones, generate, studio)",
+    "ts-node": "Ejecuta archivos .ts directamente (usado por el seed script)",
+    "eslint + plugins": "Linting de código — reglas Next.js + TypeScript"
+  }
+}
