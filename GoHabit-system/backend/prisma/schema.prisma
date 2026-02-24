@@ -1,0 +1,229 @@
+// ════════════════════════════════════════════════════════════════
+// schema.prisma — Modelos de base de datos (fuente de verdad)
+// ════════════════════════════════════════════════════════════════
+//
+// ¿Qué es Prisma?
+// Es un ORM (Object-Relational Mapping) que traduce entre objetos
+// TypeScript y tablas MySQL. En lugar de escribir SQL manual, usamos:
+//   await prisma.user.findMany()  → SELECT * FROM users
+//   await prisma.user.create(...)  → INSERT INTO users (...)
+//
+// Este archivo ES LA FUENTE DE VERDAD del esquema de base de datos.
+// Cuando lo modificas y ejecutas `npx prisma db push`, Prisma actualiza
+// las tablas de MySQL para que coincidan con lo que defines aquí.
+//
+// Comandos útiles:
+//   npx prisma generate   → Genera el cliente TypeScript tipado
+//   npx prisma db push    → Sincroniza este schema con MySQL
+//   npx prisma studio     → Abre una GUI web para ver los datos
+//   npx prisma migrate dev → Crea migraciones SQL formales
+
+// ── Generator ──────────────────────────────────────
+// Define qué ORM genera: "prisma-client-js" es el cliente para Node.js
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ── Datasource ─────────────────────────────────────
+// Configuración de la base de datos
+// provider = "mysql" → Usamos MySQL
+// url = env("DATABASE_URL") → Lee la URL de conexión del archivo .env
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ════════════════════════════════════════════════════════════════
+// ENUMS — Valores fijos permitidos para ciertos campos
+// ════════════════════════════════════════════════════════════════
+
+// Rol de usuario: USER (normal) o ADMIN (administrador)
+enum Role {
+  USER
+  ADMIN
+}
+
+// Frecuencia de un hábito: diario, semanal o mensual
+enum HabitFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+// Estado de una solicitud de amistad
+enum FriendshipStatus {
+  PENDING    // Enviada, esperando respuesta
+  ACCEPTED   // Aceptada — son amigos
+  REJECTED   // Rechazada
+}
+
+// Prioridad de una tarea
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// Estado de una tarea
+enum TaskStatus {
+  PENDING      // Pendiente — no empezada
+  IN_PROGRESS  // En progreso — empezada
+  COMPLETED    // Completada — terminada (otorga puntos)
+  CANCELLED    // Cancelada — no cuenta para puntos
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODELOS — Cada modelo = una tabla en MySQL
+// ════════════════════════════════════════════════════════════════
+
+// ── Modelo User (tabla "users") ────────────────────
+// Almacena los datos de cada usuario registrado.
+// Es el modelo central: casi todos los demás modelos tienen una
+// relación con User (un usuario tiene hábitos, tareas, amigos, etc.)
+model User {
+  id        String   @id @default(uuid())   // Clave primaria — UUID autogenerado
+  email     String   @unique                // Email único (no puede haber duplicados)
+  password  String                          // Hash bcrypt de la contraseña (NUNCA texto plano)
+  username  String   @unique                // Nombre de usuario único
+  firstName String?  @map("first_name")     // Nombre real (? = opcional, puede ser null)
+  lastName  String?  @map("last_name")      // Apellido (opcional)
+  avatarUrl String?  @map("avatar_url")     // URL de la foto de perfil
+  role      Role     @default(USER)         // Rol: USER por defecto, ADMIN para admins
+  points    Int      @default(0)            // Puntos acumulados (progreso general)
+  coins     Int      @default(0)            // Monedas para canjear recompensas
+  level     Int      @default(1)            // Nivel actual del usuario
+  createdAt DateTime @default(now()) @map("created_at")  // Fecha de registro
+  updatedAt DateTime @updatedAt @map("updated_at")       // Se actualiza automáticamente
+
+  // ── Relaciones ──
+  // Un usuario puede tener muchos hábitos, tareas, etc.
+  habits           Habit[]             // 1:N → Un usuario tiene muchos hábitos
+  tasks            Task[]              // 1:N → Un usuario tiene muchas tareas
+  habitCompletions HabitCompletion[]   // 1:N → Registros de hábitos completados
+  userRewards      UserReward[]        // 1:N → Recompensas canjeadas
+
+  // Amistades — relación bidireccional (puedo enviar o recibir solicitudes)
+  sentRequests     Friendship[] @relation("SentRequests")      // Solicitudes que YO envié
+  receivedRequests Friendship[] @relation("ReceivedRequests")   // Solicitudes que ME enviaron
+
+  @@map("users")   // El nombre de la tabla en MySQL será "users" (minúsculas)
+}
+
+// ── Modelo Habit (tabla "habits") ──────────────────
+// Representa un hábito que el usuario quiere mantener.
+// Ejemplo: "Meditar 10 min", frecuencia DAILY, target 1 vez al día.
+model Habit {
+  id          String         @id @default(uuid())
+  userId      String         @map("user_id")              // FK → User que creó este hábito
+  title       String                                       // Nombre del hábito
+  description String?        @db.Text                      // Descripción larga (TEXT en MySQL)
+  frequency   HabitFrequency @default(DAILY)               // Con qué frecuencia se repite
+  targetCount Int            @default(1) @map("target_count")  // Veces a completar por período
+  color       String?        @default("#6366f1")           // Color para la UI
+  icon        String?        @default("star")              // Icono para la UI
+  isActive    Boolean        @default(true) @map("is_active")  // false = desactivado sin borrar
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  // Relaciones
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  completions HabitCompletion[] // 1:N → Registros de cada vez que se completó
+
+  @@index([userId])    // Índice para buscar hábitos por usuario rápidamente
+  @@map("habits")
+}
+
+// ── Modelo HabitCompletion (tabla "habit_completions") ──
+// Cada fila = una vez que el usuario completó un hábito.
+// Permite llevar el historial y calcular rachas (streaks).
+model HabitCompletion {
+  id          String   @id @default(uuid())
+  habitId     String   @map("habit_id")       // FK → Hábito que se completó
+  userId      String   @map("user_id")        // FK → Usuario que lo completó
+  completedAt DateTime @default(now()) @map("completed_at")  // Cuándo se completó
+  note        String?  @db.Text               // Nota opcional (ej: "Hoy fue difícil")
+
+  // Relaciones
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([habitId])   // Para buscar completions de un hábito específico
+  @@index([userId])    // Para buscar completions de un usuario
+  @@map("habit_completions")
+}
+
+// ── Modelo Task (tabla "tasks") ────────────────────
+// Representa una tarea puntual con fecha límite.
+// Ejemplo: "Entregar informe", prioridad HIGH, vence el 15 de marzo.
+model Task {
+  id          String       @id @default(uuid())
+  userId      String       @map("user_id")
+  title       String
+  description String?      @db.Text
+  priority    TaskPriority @default(MEDIUM)             // Prioridad de la tarea
+  status      TaskStatus   @default(PENDING)            // Estado actual
+  dueDate     DateTime?    @map("due_date")             // Fecha límite (opcional)
+  scheduledAt DateTime?    @map("scheduled_at")         // Fecha programada en el calendario
+  completedAt DateTime?    @map("completed_at")         // Cuándo se completó realmente
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([dueDate])   // Índice para ordenar/filtrar por fecha límite
+  @@map("tasks")
+}
+
+// ── Modelo Reward (tabla "rewards") ────────────────
+// Catálogo de recompensas que los usuarios pueden canjear con monedas.
+// Los admins crean/editan recompensas; los usuarios las canjean.
+model Reward {
+  id          String   @id @default(uuid())
+  name        String                                  // Nombre de la recompensa
+  description String?  @db.Text                       // Descripción
+  cost        Int                                     // Coste en monedas
+  icon        String?  @default("gift")               // Icono para la UI
+  isActive    Boolean  @default(true) @map("is_active")  // false = oculta del catálogo
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  userRewards UserReward[]  // 1:N → Registros de quién canjeó esta recompensa
+
+  @@map("rewards")
+}
+
+// ── Modelo UserReward (tabla "user_rewards") ───────
+// Tabla intermedia: registra cada vez que un usuario canjea una recompensa.
+// Es una relación N:M entre User y Reward.
+model UserReward {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")       // FK → Usuario que canjeó
+  rewardId   String   @map("reward_id")     // FK → Recompensa canjeada
+  redeemedAt DateTime @default(now()) @map("redeemed_at")  // Cuándo se canjeó
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reward Reward @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_rewards")
+}
+
+// ── Modelo Friendship (tabla "friendships") ────────
+// Gestiona las relaciones de amistad entre usuarios.
+// El flujo es: sender envía solicitud → receiver acepta o rechaza.
+// @@unique([senderId, receiverId]) evita solicitudes duplicadas.
+model Friendship {
+  id         String           @id @default(uuid())
+  senderId   String           @map("sender_id")      // FK → Quien envió la solicitud
+  receiverId String           @map("receiver_id")     // FK → Quien la recibió
+  status     FriendshipStatus @default(PENDING)       // Estado de la solicitud
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+
+  sender   User @relation("SentRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])  // No puede haber dos solicitudes entre los mismos usuarios
+  @@index([receiverId])
+  @@map("friendships")
+}
