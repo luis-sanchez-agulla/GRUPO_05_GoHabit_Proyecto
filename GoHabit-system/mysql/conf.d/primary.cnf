@@ -1,0 +1,10 @@
+[mysqld]
+
+# Configuración del servidor primario
+server_id = 1
+log_bin = mysql-bin
+binlog_format = ROW
+binlog_expire_logs_seconds = 604800
+
+# Forzar conexiones seguras TNS
+require_secure_transport = ON
