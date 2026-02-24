@@ -16,3 +16,32 @@ services:
     container_name: gohabit-frontend
     depends_on:
       - backend
+      - mysql
+      
+  mysql: 
+    image: mysql:8.0 
+    container_name: gohabit-mysql
+
+    ports:
+      - "3306:3306" 
+
+    environment: 
+      MYSQL_ROOT_PASSWORD: "rootpass"
+      MYSQL_DATABASE: "goto"
+      MYSQL_USER: "app"
+      MYSQL_PASSWORD: "apppass"
+
+    volumes:
+      - mysql_data:/var/lib/mysql # persistencia (tablas/índices/datos)
+      - ./mysql/conf.d:/etc/mysql/conf.d:ro # configuración extra (.cnf), solo lectura
+
+      # Añadido por Luis 
+      - ./mysql/init-db:/docker-entrypoint-initdb.d:ro
+      - ./mysql/init-scripts:/docker-entrypoint-initdb.d:ro # creacion de usuarios-roles-vistas-plugins
+
+    healthcheck: # indica cuándo MySQL está "listo"
+      test:
+        ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
