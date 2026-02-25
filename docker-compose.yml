@@ -27,7 +27,7 @@ services:
 
     environment: 
       MYSQL_ROOT_PASSWORD: "rootpass"
-      MYSQL_DATABASE: "goto"
+      MYSQL_DATABASE: "gohabitdb"
       MYSQL_USER: "app"
       MYSQL_PASSWORD: "apppass"
 
