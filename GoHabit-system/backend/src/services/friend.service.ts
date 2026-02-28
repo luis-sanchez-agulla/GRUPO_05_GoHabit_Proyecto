@@ -57,6 +57,10 @@ export const friendService = {
             throw new ValidationError("Cannot send friend request to yourself");
         }
 
+        // Verificar que el usuario exista
+        const user = await prisma.user.findUnique({ where: { id: receiverId } });
+        if (!user) throw new NotFoundError("User");
+
         // Verificar que no exista solicitud previa en NINGUNA dirección
         const existing = await prisma.friendship.findFirst({
             where: {
@@ -67,6 +71,7 @@ export const friendService = {
             },
         });
         if (existing) throw new ConflictError("Friendship request already exists");
+
 
         // Crear solicitud con status PENDING
         return prisma.friendship.create({

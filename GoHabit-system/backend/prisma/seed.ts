@@ -64,24 +64,6 @@ async function main() {
         },
     });
     console.log(`  ✅ Usuario de prueba creado: ${user.email}`);
-
-    // ── 3. Crear recompensas por defecto ────────────
-    const rewards = [
-        { name: "Día libre", description: "Tómate un descanso merecido", cost: 500, icon: "sun" },
-        { name: "Tema oscuro premium", description: "Desbloquea el tema oscuro", cost: 200, icon: "moon" },
-        { name: "Avatar exclusivo", description: "Avatar especial de logro", cost: 300, icon: "award" },
-    ];
-
-    for (const reward of rewards) {
-        await prisma.reward.upsert({
-            where: { id: reward.name },    // Intentar buscar por nombre como ID
-            update: {},
-            create: reward,
-        });
-    }
-    console.log(`  ✅ ${rewards.length} recompensas creadas`);
-
-    console.log("🌱 Seed completado.");
 }
 
 // Ejecutar el seed y manejar errores
