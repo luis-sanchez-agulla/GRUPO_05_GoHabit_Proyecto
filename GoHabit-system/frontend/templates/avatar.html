@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Tu Avatar - Habit Tracker</title>
+  <link rel="stylesheet" href="../css/avatar.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+</head>
+
+<body class="avatar-page">
+  <div class="avatar-container">
+    <!-- Header -->
+    <header class="avatar-header">
+      <a href="index.html" class="avatar-header__back-button">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </a>
+      <h2 class="avatar-header__title">
+        Tu Avatar
+      </h2>
+    </header>
+
+    <main class="avatar-main">
+      <!-- Tree Display Section -->
+      <div class="avatar-tree-section">
+        <div class="avatar-tree-display">
+          <div class="avatar-tree-container">
+            <!-- Representing the Tree Avatar -->
+            <div class="avatar-tree-image" data-alt="A lush green vibrant spring tree in a field" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCphDlqrvBia8ebxYuaw7h7KrkJONBB-hyxlIZYZRjnKxCTSJpxTjiojUuFQ4g8bJwXSriK5mi-WUMsa_sWJ6UOG3xQkJIM2ffw4upFx-uDgRlZeNYVtnYqnhH1Of_IuJz-x8K0BYU5-eD0a4klQejtR49PYlrE3Q-cqp5RnMOMUACU3GHZ3Agss0Ntu_qdhDaxtzxbqyzhThT6mcK78zutpL4DWhdK7HKdtOkQS5Xj7nixK6YURxzQmAiuqUoISfE6gONkxIIIsoU");'>
+            </div>
+          </div>
+          <!-- Float Badge -->
+          <div class="avatar-tree-badge">
+            <span class="avatar-tree-badge__text">
+              <span class="material-symbols-outlined avatar-tree-badge__icon">auto_awesome</span>
+              Renaciendo
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="avatar-stats-grid">
+        <div class="avatar-stat-card">
+          <p class="avatar-stat-card__label">Nivel de Árbol</p>
+          <p class="avatar-stat-card__value">12</p>
+          <div class="avatar-stat-card__progress-bar">
+            <div class="avatar-stat-card__progress-fill"></div>
+          </div>
+        </div>
+
+        <div class="avatar-stat-card">
+          <p class="avatar-stat-card__label">Días de Racha</p>
+          <div class="avatar-stat-card__value avatar-stat-card__value--with-icon">
+            <p class="avatar-stat-card__value--streak">45</p>
+            <span class="material-symbols-outlined avatar-stat-card__icon">local_fire_department</span>
+          </div>
+          <p class="avatar-stat-card__subtitle">¡Sigue así!</p>
+        </div>
+      </div>
+
+      <!-- Accessories Section -->
+      <section class="avatar-accessories-section">
+        <div class="avatar-accessories-header">
+          <h3 class="avatar-accessories-title">
+            Inventario de Accesorios
+          </h3>
+          <a href="tienda.html" class="avatar-accessories-link">
+            Ver todos
+          </a>
+        </div>
+
+        <div class="avatar-accessories-grid" id="accessoriesGrid">
+          <!-- Los accesorios se cargarán dinámicamente con JavaScript -->
+        </div>
+
+        <div id="noAccessoriesMessage" style="display: none; text-align: center; padding: 2rem; color: #666;">
+          <span class="material-symbols-outlined" style="font-size: 48px; color: #d98c71; margin-bottom: 1rem;">shopping_bag</span>
+          <p style="margin: 0; font-weight: 500;">No tienes accesorios aún</p>
+          <p style="margin: 0.5rem 0 0 0; font-size: 14px;">Visita la tienda para conseguir algunos</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="avatar-nav">
+      <div class="avatar-nav__container">
+        <a class="avatar-nav__link" href="index.html">
+          <span class="material-symbols-outlined avatar-nav__icon">home</span>
+          <p class="avatar-nav__text">Inicio</p>
+        </a>
+        <a class="avatar-nav__link" href="habitos.html">
+          <span class="material-symbols-outlined avatar-nav__icon">task_alt</span>
+          <p class="avatar-nav__text">Hábitos</p>
+        </a>
+        <a class="avatar-nav__link avatar-nav__link--active" href="avatar.html">
+          <span class="material-symbols-outlined avatar-nav__icon avatar-nav__icon--filled">park</span>
+          <p class="avatar-nav__text">Avatar</p>
+        </a>
+        <a class="avatar-nav__link" href="tienda.html">
+          <span class="material-symbols-outlined avatar-nav__icon">storefront</span>
+          <p class="avatar-nav__text">Tienda</p>
+        </a>
+        <a class="avatar-nav__link" href="perfil.html">
+          <span class="material-symbols-outlined avatar-nav__icon">person</span>
+          <p class="avatar-nav__text">Perfil</p>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    // Función para obtener objetos comprados
+    function obtenerObjetosComprados() {
+      const objetos = localStorage.getItem('objetosComprados');
+      return objetos ? JSON.parse(objetos) : [];
+    }
+
+    // Función para obtener objetos equipados
+    function obtenerObjetosEquipados() {
+      const objetos = localStorage.getItem('objetosEquipados');
+      return objetos ? JSON.parse(objetos) : [];
+    }
+
+    // Función para guardar objetos equipados
+    function guardarObjetosEquipados(objetosIds) {
+      localStorage.setItem('objetosEquipados', JSON.stringify(objetosIds));
+    }
+
+    // Función para alternar estado equipado de un objeto
+    function toggleEquipado(objetoId) {
+      let equipados = obtenerObjetosEquipados();
+      
+      if (equipados.includes(objetoId)) {
+        // Desequipar
+        equipados = equipados.filter(id => id !== objetoId);
+      } else {
+        // Equipar
+        equipados.push(objetoId);
+      }
+      
+      guardarObjetosEquipados(equipados);
+      renderizarAccesorios(); // Re-renderizar para actualizar UI
+    }
+
+    // Función para renderizar los accesorios
+    function renderizarAccesorios() {
+      const objetosComprados = obtenerObjetosComprados();
+      const objetosEquipados = obtenerObjetosEquipados();
+      const grid = document.getElementById('accessoriesGrid');
+      const noAccessoriesMessage = document.getElementById('noAccessoriesMessage');
+
+      // Limpiar grid
+      grid.innerHTML = '';
+
+      if (objetosComprados.length === 0) {
+        // Mostrar mensaje de no hay accesorios
+        noAccessoriesMessage.style.display = 'block';
+        return;
+      }
+
+      noAccessoriesMessage.style.display = 'none';
+
+      // Renderizar cada objeto
+      objetosComprados.forEach(objeto => {
+        const estaEquipado = objetosEquipados.includes(objeto.id);
+        
+        const card = document.createElement('div');
+        card.className = `avatar-accessory-card${!estaEquipado ? ' avatar-accessory-card--inactive' : ''}`;
+        
+        card.innerHTML = `
+          <div class="avatar-accessory-card__icon-container">
+            <span class="material-symbols-outlined avatar-accessory-card__icon ${objeto.iconoClase || ''}">${objeto.icono}</span>
+          </div>
+          <p class="avatar-accessory-card__name">${objeto.nombre}</p>
+          <p class="avatar-accessory-card__category">${objeto.categoria}</p>
+          <button class="avatar-accessory-card__button${!estaEquipado ? ' avatar-accessory-card__button--inactive' : ''}" data-objeto-id="${objeto.id}">
+            ${estaEquipado ? 'Equipado' : 'Equipar'}
+          </button>
+        `;
+        
+        // Agregar evento al botón
+        const boton = card.querySelector('button');
+        boton.addEventListener('click', () => {
+          toggleEquipado(objeto.id);
+        });
+        
+        grid.appendChild(card);
+      });
+    }
+
+    // Inicializar al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+      renderizarAccesorios();
+      console.log('Objetos comprados:', obtenerObjetosComprados());
+      console.log('Objetos equipados:', obtenerObjetosEquipados());
+    });
+  </script>
+</body>
+</html>

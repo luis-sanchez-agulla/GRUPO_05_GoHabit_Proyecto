@@ -1,208 +1,886 @@
 <!DOCTYPE html>
-
 <html lang="es">
-
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#4cae4f",
-                        "background-light": "#f6f7f6",
-                        "background-dark": "#151d15",
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-                },
-            },
-        }
-    </script>
-    <link rel="stylesheet" href="../css/index.css">
-    <link rel="stylesheet" href="../css/calendario.css">
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Calendario de Hábitos</title>
+  <link rel="stylesheet" href="../css/calendario.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 </head>
 
-<body class="bg-background-light dark:bg-background-dark font-display text-[#131613] min-h-screen flex flex-col">
-    <!-- Header Section -->
-    <header
-        class="bg-white dark:bg-background-dark/50 px-6 pt-8 pb-6 flex items-center justify-between border-b border-primary/10">
-        <div class="flex flex-col">
-            <h2 class="text-[#131613] dark:text-white text-2xl font-bold tracking-tight">Buenos días, Alex</h2>
-            <p class="text-primary font-medium text-sm">Has completado el 65% hoy</p>
-        </div>
-        <div class="relative size-14 flex items-center justify-center">
-            <!-- Circular Progress Background -->
-            <svg class="absolute size-full -rotate-90" viewbox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
-                    stroke="#e0e0e0" stroke-width="3"></path>
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
-                    stroke="#4cae4f" stroke-dasharray="65, 100" stroke-linecap="round" stroke-width="3"></path>
-            </svg>
-            <span class="text-xs font-bold text-primary">65%</span>
-        </div>
+<body class="calendario-page">
+  <div class="calendario-container">
+    <!-- Header -->
+    <header class="calendario-header">
+      <a href="habitos.html" class="calendario-header__back-button">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </a>
+      <h2 class="calendario-header__title">Calendario</h2>
+      <div class="calendario-header__spacer"></div>
     </header>
-    <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto pb-24">
-        <!-- Weekly Calendar Strip -->
-        <section class="px-4 py-6">
-            <div class="flex justify-between gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                <div
-                    class="flex flex-col items-center min-w-[48px] p-2 rounded-xl bg-white dark:bg-zinc-800 shadow-sm border border-transparent">
-                    <span class="text-zinc-500 text-xs font-medium">L</span>
-                    <span class="text-[#131613] dark:text-white text-base font-bold">12</span>
-                </div>
-                <div
-                    class="flex flex-col items-center min-w-[48px] p-2 rounded-xl bg-white dark:bg-zinc-800 shadow-sm border border-transparent">
-                    <span class="text-zinc-500 text-xs font-medium">M</span>
-                    <span class="text-[#131613] dark:text-white text-base font-bold">13</span>
-                </div>
-                <!-- Active Day -->
-                <div
-                    class="flex flex-col items-center min-w-[48px] p-2 rounded-xl bg-primary text-white shadow-lg shadow-primary/30 ring-2 ring-primary ring-offset-2">
-                    <span class="text-white/80 text-xs font-medium">X</span>
-                    <span class="text-white text-base font-bold">14</span>
-                </div>
-                <div
-                    class="flex flex-col items-center min-w-[48px] p-2 rounded-xl bg-white dark:bg-zinc-800 shadow-sm border border-transparent">
-                    <span class="text-zinc-500 text-xs font-medium">J</span>
-                    <span class="text-[#131613] dark:text-white text-base font-bold">15</span>
-                </div>
-                <div
-                    class="flex flex-col items-center min-w-[48px] p-2 rounded-xl bg-white dark:bg-zinc-800 shadow-sm border border-transparent">
-                    <span class="text-zinc-500 text-xs font-medium">V</span>
-                    <span class="text-[#131613] dark:text-white text-base font-bold">16</span>
-                </div>
-                <div
-                    class="flex flex-col items-center min-w-[48px] p-2 rounded-xl bg-white dark:bg-zinc-800 shadow-sm border border-transparent">
-                    <span class="text-zinc-500 text-xs font-medium">S</span>
-                    <span class="text-[#131613] dark:text-white text-base font-bold">17</span>
-                </div>
-                <div
-                    class="flex flex-col items-center min-w-[48px] p-2 rounded-xl bg-white dark:bg-zinc-800 shadow-sm border border-transparent">
-                    <span class="text-zinc-500 text-xs font-medium">D</span>
-                    <span class="text-[#131613] dark:text-white text-base font-bold">18</span>
-                </div>
-            </div>
-        </section>
-        <!-- Habit List -->
-        <section class="px-6 space-y-4">
-            <h3 class="text-[#131613] dark:text-white text-lg font-bold mb-2">Hábitos de hoy</h3>
-            <!-- Habit Item 1 -->
-            <div class="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-sm border border-primary/5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-primary/10 rounded-lg">
-                            <span class="material-symbols-outlined text-primary text-xl">self_improvement</span>
-                        </div>
-                        <div>
-                            <p class="text-[#131613] dark:text-white font-semibold">Meditar 10 min</p>
-                            <p class="text-zinc-500 text-xs">0/10 min completado</p>
-                        </div>
-                    </div>
-                    <input
-                        class="size-6 rounded-full border-2 border-primary/30 text-primary focus:ring-primary/20 cursor-pointer"
-                        type="checkbox" />
-                </div>
-                <div class="w-full bg-zinc-100 dark:bg-zinc-700 h-2 rounded-full overflow-hidden">
-                    <div class="bg-primary h-full w-[0%] transition-all duration-500"></div>
-                </div>
-            </div>
-            <!-- Habit Item 2 -->
-            <div class="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-sm border border-primary/5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-primary/10 rounded-lg">
-                            <span class="material-symbols-outlined text-primary text-xl">auto_stories</span>
-                        </div>
-                        <div>
-                            <p class="text-[#131613] dark:text-white font-semibold">Leer 20 páginas</p>
-                            <p class="text-zinc-500 text-xs">12/20 páginas completadas</p>
-                        </div>
-                    </div>
-                    <input
-                        class="size-6 rounded-full border-2 border-primary/30 text-primary focus:ring-primary/20 cursor-pointer"
-                        type="checkbox" />
-                </div>
-                <div class="w-full bg-zinc-100 dark:bg-zinc-700 h-2 rounded-full overflow-hidden">
-                    <div class="bg-primary h-full w-[60%] transition-all duration-500"></div>
-                </div>
-            </div>
-            <!-- Habit Item 3 -->
-            <div class="bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-sm border border-primary/5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-primary/10 rounded-lg">
-                            <span class="material-symbols-outlined text-primary text-xl">fitness_center</span>
-                        </div>
-                        <div>
-                            <p class="text-[#131613] dark:text-white font-semibold">Entrenamiento funcional</p>
-                            <p class="text-zinc-500 text-xs">0/1 sesión completada</p>
-                        </div>
-                    </div>
-                    <input
-                        class="size-6 rounded-full border-2 border-primary/30 text-primary focus:ring-primary/20 cursor-pointer"
-                        type="checkbox" />
-                </div>
-                <div class="w-full bg-zinc-100 dark:bg-zinc-700 h-2 rounded-full overflow-hidden">
-                    <div class="bg-primary h-full w-[0%] transition-all duration-500"></div>
-                </div>
-            </div>
-        </section>
-        <!-- Mantra Section -->
-        <section class="mt-12 mb-8 px-6 text-center">
-            <p class="text-zinc-500 dark:text-zinc-400 italic text-sm font-medium">"Los hábitos no se fuerzan, se
-                cultivan."</p>
-            <div class="mt-4 flex justify-center">
-                <div class="size-1 rounded-full bg-primary/40 mx-1"></div>
-                <div class="size-1 rounded-full bg-primary/40 mx-1"></div>
-                <div class="size-1 rounded-full bg-primary/40 mx-1"></div>
-            </div>
-        </section>
-    </main>
-    <!-- Bottom Navigation Bar -->
-    <nav
-        class="fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark border-t border-primary/10 px-4 pb-6 pt-2">
-        <div class="max-w-md mx-auto flex justify-around items-center">
-            <a class="flex flex-col items-center gap-1 group" href="calendario.html">
-                <div class="text-primary p-1">
-                    <span class="material-symbols-outlined text-2xl filled-icon">calendar_month</span>
-                </div>
-                <p class="text-primary text-[10px] font-bold leading-none">Calendario</p>
-            </a>
-            <a class="flex flex-col items-center gap-1 group" href="crecimiento.html">
-                <div class="text-zinc-400 group-hover:text-primary transition-colors p-1">
-                    <span class="material-symbols-outlined text-2xl">person</span>
-                </div>
-                <p class="text-zinc-400 group-hover:text-primary text-[10px] font-medium leading-none">Perfil</p>
-            </a>
-            <a class="flex flex-col items-center gap-1 group" href="social.html">
-                <div class="text-zinc-400 group-hover:text-primary transition-colors p-1">
-                    <span class="material-symbols-outlined text-2xl">group</span>
-                </div>
-                <p class="text-zinc-400 group-hover:text-primary text-[10px] font-medium leading-none">Social</p>
-            </a>
-            <a class="flex flex-col items-center gap-1 group" href="config.html">
-                <div class="text-zinc-400 group-hover:text-primary transition-colors p-1">
-                    <span class="material-symbols-outlined text-2xl">settings</span>
-                </div>
-                <p class="text-zinc-400 group-hover:text-primary text-[10px] font-medium leading-none">Ajustes</p>
-            </a>
-        </div>
-    </nav>
-</body>
 
+    <!-- Main Content -->
+    <main class="calendario-main">
+      <!-- View Toggle -->
+      <div class="calendario-view-toggle">
+        <button class="calendario-view-toggle__button active" data-view="day">
+          <span class="material-symbols-outlined">today</span>
+          <span>Día</span>
+        </button>
+        <button class="calendario-view-toggle__button" data-view="week">
+          <span class="material-symbols-outlined">view_week</span>
+          <span>Semana</span>
+        </button>
+        <button class="calendario-view-toggle__button" data-view="month">
+          <span class="material-symbols-outlined">calendar_month</span>
+          <span>Mes</span>
+        </button>
+      </div>
+
+      <!-- Date Navigation -->
+      <div class="calendario-navigation">
+        <button class="calendario-navigation__button" id="prevPeriod">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <h3 class="calendario-navigation__title" id="periodTitle">Febrero 2026</h3>
+        <button class="calendario-navigation__button" id="nextPeriod">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+
+      <!-- Calendar View Container -->
+      <div class="calendario-content">
+        <!-- Day View -->
+        <div class="calendario-day-view" id="dayView">
+          <div class="calendario-day-header">
+            <div class="calendario-day-header__date">Viernes, 28 de Febrero</div>
+          </div>
+          <div class="calendario-day-habits">
+            <div class="calendario-habit-card">
+              <div class="calendario-habit-card__content">
+                <h4 class="calendario-habit-card__title">Meditación matutina</h4>
+                <div class="calendario-habit-card__time">
+                  <span class="material-symbols-outlined">schedule</span>
+                  <span>8:00 AM</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="calendario-habit-card">
+              <div class="calendario-habit-card__content">
+                <h4 class="calendario-habit-card__title">Hacer ejercicio</h4>
+                <div class="calendario-habit-card__time">
+                  <span class="material-symbols-outlined">schedule</span>
+                  <span>6:00 PM</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="calendario-habit-card">
+              <div class="calendario-habit-card__content">
+                <h4 class="calendario-habit-card__title">Leer 30 minutos</h4>
+                <div class="calendario-habit-card__time">
+                  <span class="material-symbols-outlined">schedule</span>
+                  <span>10:00 PM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Week View -->
+        <div class="calendario-week-view hidden" id="weekView">
+          <div class="calendario-week-grid">
+            <div class="calendario-week-day">
+              <div class="calendario-week-day__header">
+                <span class="calendario-week-day__name">Lun</span>
+                <span class="calendario-week-day__date">24</span>
+              </div>
+              <div class="calendario-week-day__habits">
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+              </div>
+            </div>
+
+            <div class="calendario-week-day">
+              <div class="calendario-week-day__header">
+                <span class="calendario-week-day__name">Mar</span>
+                <span class="calendario-week-day__date">25</span>
+              </div>
+              <div class="calendario-week-day__habits">
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+              </div>
+            </div>
+
+            <div class="calendario-week-day">
+              <div class="calendario-week-day__header">
+                <span class="calendario-week-day__name">Mié</span>
+                <span class="calendario-week-day__date">26</span>
+              </div>
+              <div class="calendario-week-day__habits">
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+              </div>
+            </div>
+
+            <div class="calendario-week-day">
+              <div class="calendario-week-day__header">
+                <span class="calendario-week-day__name">Jue</span>
+                <span class="calendario-week-day__date">27</span>
+              </div>
+              <div class="calendario-week-day__habits">
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+              </div>
+            </div>
+
+            <div class="calendario-week-day today">
+              <div class="calendario-week-day__header">
+                <span class="calendario-week-day__name">Vie</span>
+                <span class="calendario-week-day__date">28</span>
+              </div>
+              <div class="calendario-week-day__habits">
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+              </div>
+            </div>
+
+            <div class="calendario-week-day">
+              <div class="calendario-week-day__header">
+                <span class="calendario-week-day__name">Sáb</span>
+                <span class="calendario-week-day__date">1</span>
+              </div>
+              <div class="calendario-week-day__habits">
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+              </div>
+            </div>
+
+            <div class="calendario-week-day">
+              <div class="calendario-week-day__header">
+                <span class="calendario-week-day__name">Dom</span>
+                <span class="calendario-week-day__date">2</span>
+              </div>
+              <div class="calendario-week-day__habits">
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+                <div class="calendario-habit-dot"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Week Habits Summary -->
+          <div class="calendario-week-summary">
+            <h4 class="calendario-week-summary__title">Hábitos de esta semana</h4>
+            <div class="calendario-habit-list">
+              <div class="calendario-habit-item">
+                <span class="calendario-habit-item__name">Meditación matutina</span>
+                <span class="calendario-habit-item__progress">5/7</span>
+              </div>
+              <div class="calendario-habit-item">
+                <span class="calendario-habit-item__name">Hacer ejercicio</span>
+                <span class="calendario-habit-item__progress">4/7</span>
+              </div>
+              <div class="calendario-habit-item">
+                <span class="calendario-habit-item__name">Leer 30 minutos</span>
+                <span class="calendario-habit-item__progress">5/7</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Month View -->
+        <div class="calendario-month-view hidden" id="monthView">
+          <div class="calendario-month-weekdays">
+            <div class="calendario-month-weekday">L</div>
+            <div class="calendario-month-weekday">M</div>
+            <div class="calendario-month-weekday">X</div>
+            <div class="calendario-month-weekday">J</div>
+            <div class="calendario-month-weekday">V</div>
+            <div class="calendario-month-weekday">S</div>
+            <div class="calendario-month-weekday">D</div>
+          </div>
+
+          <div class="calendario-month-grid">
+            <!-- Previous month days -->
+            <div class="calendario-month-day other-month">
+              <span class="calendario-month-day__number">27</span>
+            </div>
+            <div class="calendario-month-day other-month">
+              <span class="calendario-month-day__number">28</span>
+            </div>
+            <div class="calendario-month-day other-month">
+              <span class="calendario-month-day__number">29</span>
+            </div>
+            <div class="calendario-month-day other-month">
+              <span class="calendario-month-day__number">30</span>
+            </div>
+            <div class="calendario-month-day other-month">
+              <span class="calendario-month-day__number">31</span>
+            </div>
+
+            <!-- Current month days -->
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">1</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">2</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">3</span>
+              <div class="calendario-month-day__indicator partial"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">4</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">5</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">6</span>
+              <div class="calendario-month-day__indicator partial"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">7</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">8</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">9</span>
+              <div class="calendario-month-day__indicator partial"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">10</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">11</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">12</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">13</span>
+              <div class="calendario-month-day__indicator partial"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">14</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">15</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">16</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">17</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">18</span>
+              <div class="calendario-month-day__indicator partial"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">19</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">20</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">21</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">22</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">23</span>
+              <div class="calendario-month-day__indicator partial"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">24</span>
+              <div class="calendario-month-day__indicator partial"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">25</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">26</span>
+              <div class="calendario-month-day__indicator partial"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">27</span>
+              <div class="calendario-month-day__indicator full"></div>
+            </div>
+            <div class="calendario-month-day today">
+              <span class="calendario-month-day__number">28</span>
+              <div class="calendario-month-day__indicator partial"></div>
+            </div>
+            <div class="calendario-month-day">
+              <span class="calendario-month-day__number">29</span>
+            </div>
+
+            <!-- Next month days -->
+            <div class="calendario-month-day other-month">
+              <span class="calendario-month-day__number">1</span>
+            </div>
+            <div class="calendario-month-day other-month">
+              <span class="calendario-month-day__number">2</span>
+            </div>
+          </div>
+
+          <!-- Month Stats -->
+          <div class="calendario-month-stats">
+            <div class="calendario-month-stat">
+              <div class="calendario-month-stat__value">85%</div>
+              <div class="calendario-month-stat__label">Completado</div>
+            </div>
+            <div class="calendario-month-stat">
+              <div class="calendario-month-stat__value">23</div>
+              <div class="calendario-month-stat__label">Días activos</div>
+            </div>
+            <div class="calendario-month-stat">
+              <div class="calendario-month-stat__value">5</div>
+              <div class="calendario-month-stat__label">Racha actual</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal de detalles del día -->
+    <div class="calendario-modal" id="dayDetailsModal">
+      <div class="calendario-modal__overlay"></div>
+      <div class="calendario-modal__content">
+        <div class="calendario-modal__header">
+          <h3 class="calendario-modal__title" id="modalTitle">Detalles del día</h3>
+          <button class="calendario-modal__close" id="closeModal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="calendario-modal__body" id="modalBody">
+          <!-- Los hábitos se insertarán aquí dinámicamente -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Funciones para manejar localStorage de hábitos
+    function cargarHabitosModificados() {
+      const datos = localStorage.getItem('habitosCompletados');
+      return datos ? JSON.parse(datos) : {};
+    }
+
+    function guardarHabitosModificados(datos) {
+      localStorage.setItem('habitosCompletados', JSON.stringify(datos));
+    }
+
+    // Estado de la aplicación
+    const state = {
+      currentDate: new Date(2026, 1, 28), // 28 de Febrero 2026
+      currentView: 'day',
+      habitosModificados: cargarHabitosModificados() // Cargar desde localStorage
+    };
+
+    // Datos de ejemplo de hábitos
+    const habitosEjemplo = [
+      { id: 1, nombre: 'Meditación matutina', hora: '8:00 AM', icono: 'self_improvement' },
+      { id: 2, nombre: 'Hacer ejercicio', hora: '6:00 PM', icono: 'fitness_center' },
+      { id: 3, nombre: 'Leer 30 minutos', hora: '10:00 PM', icono: 'menu_book' },
+      { id: 4, nombre: 'Beber agua', hora: 'Todo el día', icono: 'water_drop' },
+      { id: 5, nombre: 'Cocinar saludable', hora: '2:00 PM', icono: 'restaurant' }
+    ];
+
+    // Función para obtener la clave de fecha
+    function obtenerClaveFecha(fecha) {
+      const año = fecha.getFullYear();
+      const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+      const dia = String(fecha.getDate()).padStart(2, '0');
+      return `${año}-${mes}-${dia}`;
+    }
+
+    // Generar estado aleatorio de hábitos completados
+    function generarEstadoHabitos(fecha) {
+      const claveFecha = obtenerClaveFecha(fecha);
+      const habitosModificadosFecha = state.habitosModificados[claveFecha] || {};
+      
+      const seed = fecha.getDate() + fecha.getMonth() * 31;
+      const random = Math.sin(seed) * 10000;
+      const completados = Math.floor((random - Math.floor(random)) * habitosEjemplo.length);
+      
+      return habitosEjemplo.map((h, i) => {
+        // Si el hábito fue modificado manualmente, usar ese estado
+        const completadoManual = habitosModificadosFecha[h.id];
+        const completado = completadoManual !== undefined ? completadoManual : (i < completados);
+        
+        return {
+          ...h,
+          completado
+        };
+      });
+    }
+
+    // Función para alternar el estado de un hábito
+    function toggleHabito(fecha, habitoId) {
+      const claveFecha = obtenerClaveFecha(fecha);
+      
+      // Inicializar el objeto de fecha si no existe
+      if (!state.habitosModificados[claveFecha]) {
+        state.habitosModificados[claveFecha] = {};
+      }
+      
+      // Obtener el estado actual del hábito
+      const habitos = generarEstadoHabitos(fecha);
+      const habito = habitos.find(h => h.id === habitoId);
+      
+      if (habito) {
+        // Alternar el estado
+        state.habitosModificados[claveFecha][habitoId] = !habito.completado;
+        
+        // Actualizar la vista actual
+        actualizarVista();
+        
+        return !habito.completado;
+      }
+      
+      return false;
+    }
+
+    // Elementos del DOM
+    const viewButtons = document.querySelectorAll('.calendario-view-toggle__button');
+    const dayView = document.getElementById('dayView');
+    const weekView = document.getElementById('weekView');
+    const monthView = document.getElementById('monthView');
+    const periodTitle = document.getElementById('periodTitle');
+
+    // Funciones de formato de fecha
+    const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const diasSemanaCorto = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const mesesCorto = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 
+                        'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+    function formatearFechaCompleta(fecha) {
+      return `${diasSemana[fecha.getDay()]}, ${fecha.getDate()} de ${meses[fecha.getMonth()]}`;
+    }
+
+    function formatearFechaCorta(fecha) {
+      return `${fecha.getDate()} ${mesesCorto[fecha.getMonth()]}`;
+    }
+
+    // Elementos de la modal
+    const modal = document.getElementById('dayDetailsModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    // Función para abrir la modal con detalles del día
+    function abrirModalDia(fecha) {
+      const habitos = generarEstadoHabitos(fecha);
+      const esFuturo = esFechaFutura(fecha);
+      
+      // Actualizar título
+      modalTitle.textContent = formatearFechaCompleta(fecha);
+      
+      // Generar HTML de hábitos (mostrar estado solo si no es futuro)
+      const habitosHTML = habitos.map(h => {
+        if (esFuturo) {
+          // Día futuro: solo mostrar hábito sin indicador
+          return `
+            <div class="calendario-modal-habit" data-habito-id="${h.id}">
+              <div class="calendario-modal-habit__content">
+                <h4 class="calendario-modal-habit__title">${h.nombre}</h4>
+                <div class="calendario-modal-habit__time">
+                  <span class="material-symbols-outlined">schedule</span>
+                  <span>${h.hora}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          // Día pasado o hoy: mostrar con indicador de estado
+          return `
+            <div class="calendario-modal-habit ${h.completado ? 'completed' : ''}" data-habito-id="${h.id}">
+              <div class="calendario-modal-habit__icon">
+                <span class="material-symbols-outlined ${h.completado ? 'fill' : ''}">
+                  ${h.completado ? 'check_circle' : 'radio_button_unchecked'}
+                </span>
+              </div>
+              <div class="calendario-modal-habit__content">
+                <h4 class="calendario-modal-habit__title">${h.nombre}</h4>
+                <div class="calendario-modal-habit__time">
+                  <span class="material-symbols-outlined">schedule</span>
+                  <span>${h.hora}</span>
+                </div>
+              </div>
+              <div class="calendario-modal-habit__status">
+                <span class="material-symbols-outlined ${h.completado ? 'fill' : ''}">
+                  ${h.completado ? 'check_circle' : 'radio_button_unchecked'}
+                </span>
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+      
+      modalBody.innerHTML = habitosHTML;
+      
+      // Solo visualización, no se puede marcar/desmarcar hábitos desde el calendario
+      
+      modal.classList.add('active');
+    }
+
+    // Función para cerrar la modal
+    function cerrarModal() {
+      modal.classList.remove('active');
+    }
+
+    // Event listeners para cerrar la modal
+    closeModalBtn.addEventListener('click', cerrarModal);
+    modal.querySelector('.calendario-modal__overlay').addEventListener('click', cerrarModal);
+
+    // Cerrar modal con tecla Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        cerrarModal();
+      }
+    });
+
+    function obtenerInicioSemana(fecha) {
+      const dia = new Date(fecha);
+      const diaSemana = dia.getDay();
+      const diff = diaSemana === 0 ? -6 : 1 - diaSemana; // Lunes como inicio
+      dia.setDate(dia.getDate() + diff);
+      return dia;
+    }
+
+    function obtenerFinSemana(fecha) {
+      const inicio = obtenerInicioSemana(fecha);
+      const fin = new Date(inicio);
+      fin.setDate(fin.getDate() + 6);
+      return fin;
+    }
+
+    // Función para verificar si una fecha es futura
+    function esFechaFutura(fecha) {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      const fechaComparar = new Date(fecha);
+      fechaComparar.setHours(0, 0, 0, 0);
+      return fechaComparar > hoy;
+    }
+
+    // Actualizar vista de día
+    function actualizarVistaDia() {
+      const fecha = state.currentDate;
+      const habitos = generarEstadoHabitos(fecha);
+      const esFuturo = esFechaFutura(fecha);
+      
+      periodTitle.textContent = formatearFechaCompleta(fecha);
+      
+      const habitosHTML = habitos.map(h => {
+        if (esFuturo) {
+          // Día futuro: solo mostrar hábito sin indicador
+          return `
+            <div class="calendario-habit-card" data-habito-id="${h.id}">
+              <div class="calendario-habit-card__content">
+                <h4 class="calendario-habit-card__title">${h.nombre}</h4>
+                <div class="calendario-habit-card__time">
+                  <span class="material-symbols-outlined">schedule</span>
+                  <span>${h.hora}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          // Día pasado o hoy: mostrar con indicador de estado
+          return `
+            <div class="calendario-habit-card ${h.completado ? 'completed' : ''}" data-habito-id="${h.id}">
+              <div class="calendario-habit-card__icon">
+                <span class="material-symbols-outlined ${h.completado ? 'fill' : ''}">
+                  ${h.completado ? 'check_circle' : 'radio_button_unchecked'}
+                </span>
+              </div>
+              <div class="calendario-habit-card__content">
+                <h4 class="calendario-habit-card__title">${h.nombre}</h4>
+                <div class="calendario-habit-card__time">
+                  <span class="material-symbols-outlined">schedule</span>
+                  <span>${h.hora}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+
+      dayView.querySelector('.calendario-day-habits').innerHTML = habitosHTML;
+      
+      // Solo visualización, no se puede marcar/desmarcar hábitos desde el calendario
+    }
+
+    // Actualizar vista de semana
+    function actualizarVistaSemana() {
+      const inicioSemana = obtenerInicioSemana(state.currentDate);
+      const finSemana = obtenerFinSemana(state.currentDate);
+      
+      periodTitle.textContent = `${formatearFechaCorta(inicioSemana)} - ${formatearFechaCorta(finSemana)}`;
+      
+      let diasHTML = '';
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      
+      for (let i = 0; i < 7; i++) {
+        const dia = new Date(inicioSemana);
+        dia.setDate(dia.getDate() + i);
+        const habitos = generarEstadoHabitos(dia);
+        const esHoy = dia.getTime() === hoy.getTime();
+        
+        const esFuturoDia = esFechaFutura(dia);
+        const habitosDotsHTML = habitos.slice(0, 3).map(h => 
+          `<div class="calendario-habit-dot ${!esFuturoDia && h.completado ? 'completed' : ''}"></div>`
+        ).join('');
+        
+        diasHTML += `
+          <div class="calendario-week-day ${esHoy ? 'today' : ''}" data-date="${dia.toISOString()}" style="cursor: pointer;">
+            <div class="calendario-week-day__header">
+              <span class="calendario-week-day__name">${diasSemanaCorto[dia.getDay()]}</span>
+              <span class="calendario-week-day__date">${dia.getDate()}</span>
+            </div>
+            <div class="calendario-week-day__habits">
+              ${habitosDotsHTML}
+            </div>
+          </div>
+        `;
+      }
+      
+      weekView.querySelector('.calendario-week-grid').innerHTML = diasHTML;
+      
+      // Agregar event listeners a los días
+      weekView.querySelectorAll('.calendario-week-day').forEach(dayEl => {
+        dayEl.addEventListener('click', () => {
+          const fechaStr = dayEl.getAttribute('data-date');
+          const fecha = new Date(fechaStr);
+          abrirModalDia(fecha);
+        });
+      });
+      
+      // Actualizar resumen de la semana
+      const habitosSemanaHTML = habitosEjemplo.slice(0, 3).map(h => {
+        let completados = 0;
+        for (let i = 0; i < 7; i++) {
+          const dia = new Date(inicioSemana);
+          dia.setDate(dia.getDate() + i);
+          // Solo contar si no es d��a futuro
+          if (!esFechaFutura(dia)) {
+            const habitosDia = generarEstadoHabitos(dia);
+            if (habitosDia.find(habit => habit.id === h.id)?.completado) {
+              completados++;
+            }
+          }
+        }
+        return `
+          <div class="calendario-habit-item">
+            <span class="calendario-habit-item__name">${h.nombre}</span>
+            <span class="calendario-habit-item__progress">${completados}/7</span>
+          </div>
+        `;
+      }).join('');
+      
+      weekView.querySelector('.calendario-habit-list').innerHTML = habitosSemanaHTML;
+    }
+
+    // Actualizar vista de mes
+    function actualizarVistaMes() {
+      const fecha = state.currentDate;
+      const primerDia = new Date(fecha.getFullYear(), fecha.getMonth(), 1);
+      const ultimoDia = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0);
+      
+      periodTitle.textContent = `${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
+      
+      // Calcular días a mostrar
+      const primerDiaSemana = primerDia.getDay();
+      const ajustePrimerDia = primerDiaSemana === 0 ? 6 : primerDiaSemana - 1; // Lunes como inicio
+      
+      let diasHTML = '';
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      const fechaSeleccionada = new Date(state.currentDate);
+      fechaSeleccionada.setHours(0, 0, 0, 0);
+      
+      // Días del mes anterior
+      const ultimoDiaMesAnterior = new Date(fecha.getFullYear(), fecha.getMonth(), 0);
+      for (let i = ajustePrimerDia - 1; i >= 0; i--) {
+        const dia = new Date(ultimoDiaMesAnterior);
+        dia.setDate(dia.getDate() - i);
+        diasHTML += `
+          <div class="calendario-month-day other-month">
+            <span class="calendario-month-day__number">${dia.getDate()}</span>
+          </div>
+        `;
+      }
+      
+      // Días del mes actual
+      let diasCompletos = 0;
+      let diasParciales = 0;
+      
+      for (let i = 1; i <= ultimoDia.getDate(); i++) {
+        const dia = new Date(fecha.getFullYear(), fecha.getMonth(), i);
+        const habitos = generarEstadoHabitos(dia);
+        const completados = habitos.filter(h => h.completado).length;
+        const porcentaje = completados / habitos.length;
+        const esFuturoDia = esFechaFutura(dia);
+        
+        let indicadorClass = '';
+        // Solo mostrar indicador si no es d��a futuro
+        if (!esFuturoDia) {
+          if (porcentaje >= 0.8) {
+            indicadorClass = 'full';
+            diasCompletos++;
+          } else if (porcentaje > 0.3) {
+            indicadorClass = 'partial';
+            diasParciales++;
+          }
+        }
+        
+        const esHoy = dia.getTime() === fechaSeleccionada.getTime();
+        
+        diasHTML += `
+          <div class="calendario-month-day ${esHoy ? 'today' : ''}" data-date="${dia.toISOString()}" style="cursor: pointer;">
+            <span class="calendario-month-day__number">${i}</span>
+            ${indicadorClass ? `<div class="calendario-month-day__indicator ${indicadorClass}"></div>` : ''}
+          </div>
+        `;
+      }
+      
+      // Días del siguiente mes
+      const diasMostrados = ajustePrimerDia + ultimoDia.getDate();
+      const diasRestantes = 42 - diasMostrados; // 6 filas de 7 días
+      for (let i = 1; i <= Math.min(diasRestantes, 14); i++) {
+        diasHTML += `
+          <div class="calendario-month-day other-month">
+            <span class="calendario-month-day__number">${i}</span>
+          </div>
+        `;
+      }
+      
+      monthView.querySelector('.calendario-month-grid').innerHTML = diasHTML;
+      
+      // Agregar event listeners a los días del mes actual
+      monthView.querySelectorAll('.calendario-month-day:not(.other-month)').forEach(dayEl => {
+        dayEl.addEventListener('click', () => {
+          const fechaStr = dayEl.getAttribute('data-date');
+          const fecha = new Date(fechaStr);
+          abrirModalDia(fecha);
+        });
+      });
+      
+      // Actualizar estadísticas
+      const diasActivos = diasCompletos + diasParciales;
+      const porcentajeCompletado = Math.round((diasCompletos / ultimoDia.getDate()) * 100);
+      const racha = Math.floor(Math.random() * 10) + 1; // Placeholder
+      
+      monthView.querySelector('.calendario-month-stats').innerHTML = `
+        <div class="calendario-month-stat">
+          <div class="calendario-month-stat__value">${porcentajeCompletado}%</div>
+          <div class="calendario-month-stat__label">Completado</div>
+        </div>
+        <div class="calendario-month-stat">
+          <div class="calendario-month-stat__value">${diasActivos}</div>
+          <div class="calendario-month-stat__label">Días activos</div>
+        </div>
+        <div class="calendario-month-stat">
+          <div class="calendario-month-stat__value">${racha}</div>
+          <div class="calendario-month-stat__label">Racha actual</div>
+        </div>
+      `;
+    }
+
+    // Actualizar vista actual
+    function actualizarVista() {
+      if (state.currentView === 'day') {
+        actualizarVistaDia();
+      } else if (state.currentView === 'week') {
+        actualizarVistaSemana();
+      } else if (state.currentView === 'month') {
+        actualizarVistaMes();
+      }
+    }
+
+    // Cambio de vista
+    viewButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        viewButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        dayView.classList.add('hidden');
+        weekView.classList.add('hidden');
+        monthView.classList.add('hidden');
+
+        state.currentView = button.dataset.view;
+        
+        if (state.currentView === 'day') {
+          dayView.classList.remove('hidden');
+        } else if (state.currentView === 'week') {
+          weekView.classList.remove('hidden');
+        } else if (state.currentView === 'month') {
+          monthView.classList.remove('hidden');
+        }
+        
+        actualizarVista();
+      });
+    });
+
+    // Navegación entre períodos
+    document.getElementById('prevPeriod').addEventListener('click', () => {
+      if (state.currentView === 'day') {
+        state.currentDate.setDate(state.currentDate.getDate() - 1);
+      } else if (state.currentView === 'week') {
+        state.currentDate.setDate(state.currentDate.getDate() - 7);
+      } else if (state.currentView === 'month') {
+        state.currentDate.setMonth(state.currentDate.getMonth() - 1);
+      }
+      actualizarVista();
+    });
+
+    document.getElementById('nextPeriod').addEventListener('click', () => {
+      if (state.currentView === 'day') {
+        state.currentDate.setDate(state.currentDate.getDate() + 1);
+      } else if (state.currentView === 'week') {
+        state.currentDate.setDate(state.currentDate.getDate() + 7);
+      } else if (state.currentView === 'month') {
+        state.currentDate.setMonth(state.currentDate.getMonth() + 1);
+      }
+      actualizarVista();
+    });
+
+    // Inicializar vista
+    actualizarVistaDia();
+  </script>
+</body>
 </html>

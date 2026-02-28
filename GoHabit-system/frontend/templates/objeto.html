@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/objeto.css">
+</head>
+
+<body>
+  <div class="objeto-container">
+    <!-- Header -->
+    <header class="objeto-header">
+      <a href="tienda.html" class="objeto-header__back-button">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </a>
+      <h2 class="objeto-header__title">
+        Detalles del Objeto
+      </h2>
+    </header>
+
+    <!-- Main Content Scrollable Area -->
+    <main class="objeto-main">
+      <!-- Product Image -->
+      <div class="objeto-image-section">
+        <div class="objeto-image" data-alt="A rustic bird nest made of twigs and soft feathers resting on a branch" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCTKoNLJvaeRKwp7NufIoTEKL173OwpDFN7uILhDHgbg3Ah_xv_znlyIvkGo_Gkfl90hPJTKemMC6gIZjup7kGH9RMeRQG_yfTTOiXlGU-JBvbWgpFYZ4vZvSf43JZu1Xl4IXRU3dM2oWvRgLaE4W36rDKUAYuvcEvut0YVJBx_7lGqSlL6mWosY2-j41qFNKrudp0vkFN-24liWckHUwb1Q2m6U5MklHUkUgdvBBdcd_eQ4aYGqWi--eK87e67gW9xI6-NMshNZaE");'>
+        </div>
+      </div>
+
+      <!-- Content Details -->
+      <div class="objeto-content">
+        <div class="objeto-header-section">
+          <h1 class="objeto-title">
+            Nido de Pájaros
+          </h1>
+          <span class="objeto-badge">
+            Objeto Único
+          </span>
+        </div>
+
+        <!-- Price/Seed Indicator -->
+        <div class="objeto-price">
+          <span class="material-symbols-outlined objeto-price__icon material-symbols-fill">eco</span>
+          <p class="objeto-price__text">120 Semillas</p>
+        </div>
+
+        <!-- Description -->
+        <div class="objeto-description">
+          <h3 class="objeto-description__header">Descripción</h3>
+          <p class="objeto-description__text">
+            Añade vida a tu árbol con este acogedor nido. Los pájaros empezarán a visitarte cada mañana cuando completes tus hábitos de meditación. Un accesorio perfecto para la temporada de primavera que evoluciona con tu progreso.
+          </p>
+        </div>
+
+        <!-- Stats/Features -->
+        <div class="objeto-stats">
+          <div class="objeto-stat-card">
+            <span class="material-symbols-outlined objeto-stat-card__icon">park</span>
+            <p class="objeto-stat-card__label">Ubicación</p>
+            <p class="objeto-stat-card__value">Árbol Virtual</p>
+          </div>
+          <divo class="objeto-stat-card">
+            <span class="material-symbols-outlined objeto-stat-card__icon">auto_awesome</span>
+            <p class="objeto-stat-card__label">Efecto</p>
+            <p class="objeto-stat-card__value">+5 Motivación</p>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="objeto-action">
+          <button class="objeto-action__button">
+            <span>Canjear por 120 Semillas</span>
+            <span class="material-symbols-outlined">shopping_bag</span>
+          </button>
+          <p class="objeto-action__note">Disponible por tiempo limitado en la Colección Primavera</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="objeto-nav">
+      <div class="objeto-nav__container">
+        <a class="objeto-nav__link" href="index.html">
+          <span class="material-symbols-outlined objeto-nav__icon">home</span>
+          <p class="objeto-nav__text">Inicio</p>
+        </a>
+        <a class="objeto-nav__link" href="habitos.html">
+          <span class="material-symbols-outlined objeto-nav__icon">task_alt</span>
+          <p class="objeto-nav__text">Hábitos</p>
+        </a>
+        <a class="objeto-nav__link" href="avatar.html">
+          <span class="material-symbols-outlined objeto-nav__icon">park</span>
+          <p class="objeto-nav__text">Avatar</p>
+        </a>
+        <a class="objeto-nav__link objeto-nav__link--active" href="tienda.html">
+          <span class="material-symbols-outlined objeto-nav__icon objeto-nav__icon--filled">storefront</span>
+          <p class="objeto-nav__text">Tienda</p>
+        </a>
+        <a class="objeto-nav__link" href="perfil.html">
+          <span class="material-symbols-outlined objeto-nav__icon">person</span>
+          <p class="objeto-nav__text">Perfil</p>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    // Obtener el botón de canjear
+    const botonCanjear = document.querySelector('.objeto-action__button');
+
+    // Función para obtener las semillas actuales del usuario
+    function obtenerSemillas() {
+      const semillas = localStorage.getItem('semillasUsuario');
+      return semillas ? parseInt(semillas) : 500; // 500 semillas por defecto
+    }
+
+    // Función para guardar las semillas
+    function guardarSemillas(cantidad) {
+      localStorage.setItem('semillasUsuario', cantidad);
+    }
+
+    // Función para obtener objetos comprados
+    function obtenerObjetosComprados() {
+      const objetos = localStorage.getItem('objetosComprados');
+      return objetos ? JSON.parse(objetos) : [];
+    }
+
+    // Función para agregar objeto a comprados
+    function agregarObjetoComprado(objeto) {
+      const objetos = obtenerObjetosComprados();
+      // Verificar que no exista ya
+      if (!objetos.find(o => o.id === objeto.id)) {
+        objetos.push(objeto);
+        localStorage.setItem('objetosComprados', JSON.stringify(objetos));
+      }
+    }
+
+    // Datos del objeto actual
+    const objetoActual = {
+      id: 'nido-aves',
+      nombre: 'Nido de Pájaros',
+      categoria: 'Primavera Activa',
+      icono: 'nest_found_savings',
+      iconoClase: '',
+      precio: 120
+    };
+
+    // Manejar el click en el botón de canjear
+    botonCanjear.addEventListener('click', () => {
+      const semillasActuales = obtenerSemillas();
+      const precioObjeto = objetoActual.precio;
+
+      if (semillasActuales >= precioObjeto) {
+        // Restar las semillas
+        const nuevasSemillas = semillasActuales - precioObjeto;
+        guardarSemillas(nuevasSemillas);
+
+        // Agregar objeto a comprados
+        agregarObjetoComprado(objetoActual);
+
+        // Mostrar mensaje de éxito
+        alert(`¡Compra exitosa! 🎉\n\nHas canjeado el ${objetoActual.nombre} por ${precioObjeto} semillas.\n\nSemillas restantes: ${nuevasSemillas} 🌱`);
+
+        // Redirigir a avatar después de la compra
+        setTimeout(() => {
+          window.location.href = 'avatar.html';
+        }, 500);
+      } else {
+        // No tiene suficientes semillas
+        const faltantes = precioObjeto - semillasActuales;
+        alert(`Semillas insuficientes 😔\n\nNecesitas ${faltantes} semillas más.\n\nSemillas actuales: ${semillasActuales}\nPrecio del objeto: ${precioObjeto}`);
+      }
+    });
+
+    // Opcional: mostrar las semillas actuales en la consola para debug
+    console.log('Semillas disponibles:', obtenerSemillas());
+  </script>
+</body>
+</html>

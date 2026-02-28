@@ -1,15 +1,305 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GoHabit Frontend</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- Meta Tags -->
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Pantalla de Inicio con Árbol Avatar</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../css/index.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 </head>
 <body>
-    <h1>Welcome to GoHabit</h1>
-    <button id="welcomeButton">Get Welcome Message</button>
-    <p id="message"></p>
-    <script src="app.js"></script>
+    <div class="index-container">
+        <!-- Header Section -->
+        <header class="index-header">
+            <div>
+                <p class="index-header__greeting">Buenos días,</p>
+                <h1 class="index-header__title">¡Hola, Alex!</h1>
+            </div>
+            <div class="index-header__balance">
+                <span class="material-symbols-outlined index-header__balance-icon">eco</span>
+                <span class="index-header__balance-text">1,250</span>
+            </div>
+        </header>
+
+        <!-- Main Tree Visual (Avatar) -->
+        <div class="index-tree-section">
+            <!-- Background glow effect -->
+            <div class="index-tree-glow"></div>
+            <div class="index-tree-container">
+                <!-- Tree Image Placeholder -->
+                <div class="index-tree-image" data-alt="Beautiful growing green tree illustration representing progress" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVjO9jGOV1NPgGHkRpiszfA7j4bNqwVW2Tg76Hw1fgn_0w4gLNeXnGx-mCNh9_xY4VvLeT1IIh-orEBsrvjrlCHnxEhAUMFVwxpCYG7TpW6GtcXmLxBy2gtGgiRE4UofK7HCUMdGr4NpWVyB1IggbR76dsyHhpe-mA0O3gIYXWPFDYsxtDfDpfgIl-Euax_gp26WKVNUBr9yYf1AjStg0IrAG_bBGua3eGeAr6VDgRHX7H5NNFyNu0XGkqYj5NIisBbRv8livaJWY');">
+                </div>
+                <!-- Floating Level Badge -->
+                <div class="index-tree-badge">
+                    <span class="index-tree-badge__level">Nivel 5</span>
+                    <span class="index-tree-badge__name">Roble Joven</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="index-content">
+            <!-- Quick Task Card -->
+            <div>
+                <div class="index-task-header">
+                    <h3 class="index-task-header__title">Siguiente Hábito</h3>
+                    <a href="habitos.html" class="index-task-header__link">Ver todo</a>
+                </div>
+                <div class="index-task-card">
+                    <!-- Progress Fill Indicator -->
+                    <div class="index-task-card__indicator"></div>
+                    <div class="index-task-card__icon">
+                        <span class="material-symbols-outlined">water_drop</span>
+                    </div>
+                    <div class="index-task-card__content">
+                        <h4 class="index-task-card__title">Beber agua</h4>
+                        <div class="index-task-card__progress">
+                            <div class="index-task-card__progress-bar">
+                                <div class="index-task-card__progress-fill"></div>
+                            </div>
+                            <span class="index-task-card__progress-text">1.5 / 2L</span>
+                        </div>
+                    </div>
+                    <button class="index-task-card__button">
+                        <span class="material-symbols-outlined">check</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Daily Goals Progress -->
+            <div>
+                <h3 class="index-progress-title">Tu Progreso Diario</h3>
+                <div class="index-progress-grid">
+                    <!-- Card 1 -->
+                    <div class="index-progress-card index-progress-card--health">
+                        <div class="index-progress-card__header">
+                            <span class="material-symbols-outlined index-progress-card__icon">spa</span>
+                            <span class="index-progress-card__percentage">85%</span>
+                        </div>
+                        <div>
+                            <p class="index-progress-card__label">Salud</p>
+                            <div class="index-progress-card__bar">
+                                <div class="index-progress-card__bar-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="index-progress-card index-progress-card--mind">
+                        <div class="index-progress-card__header">
+                            <span class="material-symbols-outlined index-progress-card__icon">mindfulness</span>
+                            <span class="index-progress-card__percentage">40%</span>
+                        </div>
+                        <div>
+                            <p class="index-progress-card__label">Mente</p>
+                            <div class="index-progress-card__bar">
+                                <div class="index-progress-card__bar-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Bar -->
+        <nav class="index-nav">
+            <div class="index-nav__container">
+                <a class="index-nav__link index-nav__link--active" href="index.html">
+                    <span class="material-symbols-outlined fill index-nav__icon">home</span>
+                    <p class="index-nav__text">Inicio</p>
+                </a>
+                <a class="index-nav__link" href="habitos.html">
+                    <span class="material-symbols-outlined index-nav__icon">task_alt</span>
+                    <p class="index-nav__text">Hábitos</p>
+                </a>
+                <a class="index-nav__link" href="avatar.html">
+                    <span class="material-symbols-outlined index-nav__icon">park</span>
+                    <p class="index-nav__text">Avatar</p>
+                </a>
+                <a class="index-nav__link" href="tienda.html">
+                    <span class="material-symbols-outlined index-nav__icon">storefront</span>
+                    <p class="index-nav__text">Tienda</p>
+                </a>
+                <a class="index-nav__link" href="perfil.html">
+                    <span class="material-symbols-outlined index-nav__icon">person</span>
+                    <p class="index-nav__text">Perfil</p>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        // Funciones para manejar semillas
+        function obtenerSemillas() {
+            const semillas = localStorage.getItem('semillasUsuario');
+            return semillas ? parseInt(semillas) : 500;
+        }
+
+        function guardarSemillas(cantidad) {
+            localStorage.setItem('semillasUsuario', cantidad);
+        }
+
+        function agregarSemillas(cantidad) {
+            const semillasActuales = obtenerSemillas();
+            const nuevasSemillas = semillasActuales + cantidad;
+            guardarSemillas(nuevasSemillas);
+            return nuevasSemillas;
+        }
+
+        function restarSemillas(cantidad) {
+            const semillasActuales = obtenerSemillas();
+            const nuevasSemillas = Math.max(0, semillasActuales - cantidad);
+            guardarSemillas(nuevasSemillas);
+            return nuevasSemillas;
+        }
+
+        // Funciones para manejar estado de hábitos
+        function obtenerClaveFechaHoy() {
+            const hoy = new Date();
+            const año = hoy.getFullYear();
+            const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoy.getDate()).padStart(2, '0');
+            return `${año}-${mes}-${dia}`;
+        }
+
+        function cargarEstadoHabitos() {
+            const datos = localStorage.getItem('habitosCompletados');
+            return datos ? JSON.parse(datos) : {};
+        }
+
+        function guardarEstadoHabito(habitoId, completado) {
+            const claveFecha = obtenerClaveFechaHoy();
+            const estadoHabitos = cargarEstadoHabitos();
+            
+            if (!estadoHabitos[claveFecha]) {
+                estadoHabitos[claveFecha] = {};
+            }
+            
+            estadoHabitos[claveFecha][habitoId] = completado;
+            localStorage.setItem('habitosCompletados', JSON.stringify(estadoHabitos));
+        }
+
+        function obtenerEstadoHabitoHoy(habitoId) {
+            const claveFecha = obtenerClaveFechaHoy();
+            const estadoHabitos = cargarEstadoHabitos();
+            return estadoHabitos[claveFecha]?.[habitoId] || false;
+        }
+
+        // Función para mostrar notificación
+        function mostrarNotificacion(mensaje, esPositivo = true) {
+            const notificacion = document.createElement('div');
+            const color = esPositivo ? '#728764' : '#d98c71';
+            notificacion.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%);
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-weight: 600;
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            notificacion.innerHTML = `
+                <span class="material-symbols-outlined" style="color: ${esPositivo ? '#f4e287' : '#fff'};">eco</span>
+                <span>${mensaje}</span>
+            `;
+            
+            document.body.appendChild(notificacion);
+            
+            setTimeout(() => {
+                notificacion.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notificacion.remove(), 300);
+            }, 3000);
+        }
+
+        // Manejar el botón de completar hábito
+        const botonCheck = document.querySelector('.index-task-card__button');
+        const taskCard = document.querySelector('.index-task-card');
+        const habitoId = 1; // ID del hábito "Beber agua"
+
+        // Función para actualizar la UI del botón
+        function actualizarBotonUI(completado) {
+            if (completado) {
+                botonCheck.innerHTML = '<span class="material-symbols-outlined">check</span>';
+                botonCheck.style.background = '#728764';
+                botonCheck.style.color = 'white';
+            } else {
+                botonCheck.innerHTML = '<span class="material-symbols-outlined">radio_button_unchecked</span>';
+                botonCheck.style.background = '';
+                botonCheck.style.color = '';
+            }
+        }
+
+        // Inicializar estado desde localStorage
+        let habitoCompletado = obtenerEstadoHabitoHoy(habitoId);
+        
+        // Aplicar estado visual inicial
+        actualizarBotonUI(habitoCompletado);
+
+        botonCheck.addEventListener('click', () => {
+            const semillasGanadas = 10;
+            
+            if (!habitoCompletado) {
+                // Marcar como completado
+                habitoCompletado = true;
+                guardarEstadoHabito(habitoId, true);
+                actualizarBotonUI(true);
+                
+                // Dar recompensa de semillas
+                const totalSemillas = agregarSemillas(semillasGanadas);
+                mostrarNotificacion(`+${semillasGanadas} semillas 🌱`, true);
+                console.log(`Hábito completado! Total semillas: ${totalSemillas}`);
+            } else {
+                // Desmarcar
+                habitoCompletado = false;
+                guardarEstadoHabito(habitoId, false);
+                actualizarBotonUI(false);
+                
+                // Restar semillas
+                const totalSemillas = restarSemillas(semillasGanadas);
+                mostrarNotificacion(`-${semillasGanadas} semillas`, false);
+                console.log(`Hábito desmarcado. Total semillas: ${totalSemillas}`);
+            }
+        });
+
+        // Agregar estilos para animaciones
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>

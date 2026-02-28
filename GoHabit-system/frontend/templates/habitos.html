@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Dashboard de Hábitos y Crecimiento</title>
+  <link rel="stylesheet" href="../css/habitos.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+</head>
+
+<body class="habitos-page">
+  <div class="habitos-container">
+    <!-- Main Content Area -->
+    <main class="habitos-main">
+      <div class="habitos-header">
+        <h1 class="habitos-header__title">Tus Hábitos</h1>
+        <div class="habitos-header__actions">
+          <a href="calendario.html" class="habitos-header__button">
+            <span class="material-symbols-outlined">calendar_today</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Header / Tree Landscape Section -->
+      <!-- Habits List Section -->
+      <!-- Tree Visual Section -->
+      <div class="habitos-tree-section">
+        <!-- Tree Placeholder/Visual -->
+        <div class="habitos-tree-visual">
+          <div class="habitos-tree-icon-container">
+            <!-- This represents the tree/growth visual mentioned -->
+            <span class="material-symbols-outlined habitos-tree-icon">park</span>
+            <div class="habitos-tree-badge">
+              <span class="material-symbols-outlined habitos-tree-badge-icon">eco</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Level Indicator Overlay -->
+        <div class="habitos-level-container">
+          <div class="habitos-level-card">
+            <p class="habitos-level-label">Nivel Actual</p>
+            <p class="habitos-level-number">Nivel 12</p>
+          </div>
+        </div>
+
+        <!-- XP Progress Bar -->
+        <div class="habitos-xp-container">
+          <div class="habitos-xp-header">
+            <span class="habitos-xp-label">Progreso del Roble</span>
+            <span class="habitos-xp-value">750 / 1000 XP</span>
+          </div>
+          <div class="habitos-xp-bar">
+            <div class="habitos-xp-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="habitos-content">
+        <div class="habitos-section-header">
+          <h2 class="habitos-section-title">Objetivos de hoy</h2>
+          <a href="habitos.html" class="habitos-view-all-link">Ver todo</a>
+        </div>
+        <div class="habitos-cards-container">
+          <!-- Habit Card 1 (Completed) -->
+          <div class="habit-card">
+            <div class="habit-card__icon-container habit-card__icon-container--primary">
+              <span class="material-symbols-outlined">water_drop</span>
+            </div>
+            <div class="habit-card__content">
+              <h3 class="habit-card__title">Beber 2L de agua</h3>
+              <p class="habit-card__category">Hidratación</p>
+            </div>
+            <label class="habit-checkbox">
+              <input checked="" class="habit-checkbox__input" type="checkbox"/>
+              <div class="habit-checkbox__box">
+                <span class="material-symbols-outlined habit-checkbox__icon">check</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Habit Card 2 -->
+          <div class="habit-card">
+            <div class="habit-card__icon-container habit-card__icon-container--purple">
+              <span class="material-symbols-outlined">menu_book</span>
+            </div>
+            <div class="habit-card__content">
+              <h3 class="habit-card__title">Leer 15 páginas</h3>
+              <p class="habit-card__category">Mente</p>
+            </div>
+            <label class="habit-checkbox">
+              <input class="habit-checkbox__input" type="checkbox"/>
+              <div class="habit-checkbox__box">
+                <span class="material-symbols-outlined habit-checkbox__icon">check</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Habit Card 3 -->
+          <div class="habit-card">
+            <div class="habit-card__icon-container habit-card__icon-container--orange">
+              <span class="material-symbols-outlined">self_improvement</span>
+            </div>
+            <div class="habit-card__content">
+              <h3 class="habit-card__title">Meditar 10 min</h3>
+              <p class="habit-card__category">Espiritualidad</p>
+            </div>
+            <label class="habit-checkbox">
+              <input class="habit-checkbox__input" type="checkbox"/>
+              <div class="habit-checkbox__box">
+                <span class="material-symbols-outlined habit-checkbox__icon">check</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Habit Card 4 -->
+          <div class="habit-card">
+            <div class="habit-card__icon-container habit-card__icon-container--blue">
+              <span class="material-symbols-outlined">directions_walk</span>
+            </div>
+            <div class="habit-card__content">
+              <h3 class="habit-card__title">Caminar 5000 pasos</h3>
+              <p class="habit-card__category">Salud</p>
+            </div>
+            <label class="habit-checkbox">
+              <input class="habit-checkbox__input" type="checkbox"/>
+              <div class="habit-checkbox__box">
+                <span class="material-symbols-outlined habit-checkbox__icon">check</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Bottom Spacer for Floating Button visibility -->
+        <div class="habitos-add-container">
+          <a href="anadirHabito.html" class="habitos-add-button">
+            <span class="material-symbols-outlined">add_circle</span>
+            <span>Añadir hábito</span>
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Floating Action Button -->
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="habitos-nav">
+      <div class="habitos-nav__container">
+        <a class="habitos-nav__link" href="index.html">
+          <span class="material-symbols-outlined habitos-nav__icon">home</span>
+          <p class="habitos-nav__text">Inicio</p>
+        </a>
+        <a class="habitos-nav__link habitos-nav__link--active" href="habitos.html">
+          <span class="material-symbols-outlined habitos-nav__icon habitos-nav__icon--filled">task_alt</span>
+          <p class="habitos-nav__text">Hábitos</p>
+        </a>
+        <a class="habitos-nav__link" href="avatar.html">
+          <span class="material-symbols-outlined habitos-nav__icon">park</span>
+          <p class="habitos-nav__text">Avatar</p>
+        </a>
+        <a class="habitos-nav__link" href="tienda.html">
+          <span class="material-symbols-outlined habitos-nav__icon">storefront</span>
+          <p class="habitos-nav__text">Tienda</p>
+        </a>
+        <a class="habitos-nav__link" href="perfil.html">
+          <span class="material-symbols-outlined habitos-nav__icon">person</span>
+          <p class="habitos-nav__text">Perfil</p>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    // Funciones para manejar semillas
+    function obtenerSemillas() {
+      const semillas = localStorage.getItem('semillasUsuario');
+      return semillas ? parseInt(semillas) : 500;
+    }
+
+    function guardarSemillas(cantidad) {
+      localStorage.setItem('semillasUsuario', cantidad);
+    }
+
+    function agregarSemillas(cantidad) {
+      const semillasActuales = obtenerSemillas();
+      const nuevasSemillas = semillasActuales + cantidad;
+      guardarSemillas(nuevasSemillas);
+      return nuevasSemillas;
+    }
+
+    function restarSemillas(cantidad) {
+      const semillasActuales = obtenerSemillas();
+      const nuevasSemillas = Math.max(0, semillasActuales - cantidad);
+      guardarSemillas(nuevasSemillas);
+      return nuevasSemillas;
+    }
+
+    // Funciones para manejar estado de hábitos
+    function obtenerClaveFechaHoy() {
+      const hoy = new Date();
+      const año = hoy.getFullYear();
+      const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+      const dia = String(hoy.getDate()).padStart(2, '0');
+      return `${año}-${mes}-${dia}`;
+    }
+
+    function cargarEstadoHabitos() {
+      const datos = localStorage.getItem('habitosCompletados');
+      return datos ? JSON.parse(datos) : {};
+    }
+
+    function guardarEstadoHabito(habitoId, completado) {
+      const claveFecha = obtenerClaveFechaHoy();
+      const estadoHabitos = cargarEstadoHabitos();
+      
+      if (!estadoHabitos[claveFecha]) {
+        estadoHabitos[claveFecha] = {};
+      }
+      
+      estadoHabitos[claveFecha][habitoId] = completado;
+      localStorage.setItem('habitosCompletados', JSON.stringify(estadoHabitos));
+    }
+
+    function obtenerEstadoHabitoHoy(habitoId) {
+      const claveFecha = obtenerClaveFechaHoy();
+      const estadoHabitos = cargarEstadoHabitos();
+      return estadoHabitos[claveFecha]?.[habitoId] || false;
+    }
+
+    // Función para mostrar notificación de semillas
+    function mostrarNotificacionSemillas(cantidad, esPositivo = true) {
+      const notificacion = document.createElement('div');
+      notificacion.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, ${esPositivo ? '#728764' : '#d98c71'} 0%, ${esPositivo ? '#5a6d4f' : '#c77a5f'} 100%);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+      `;
+      
+      notificacion.innerHTML = `
+        <span class="material-symbols-outlined" style="color: #f4e287;">eco</span>
+        <span>${esPositivo ? '+' : ''}${cantidad} semillas 🌱</span>
+      `;
+      
+      document.body.appendChild(notificacion);
+      
+      setTimeout(() => {
+        notificacion.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => notificacion.remove(), 300);
+      }, 3000);
+    }
+
+    // Manejar los checkboxes de hábitos
+    const checkboxes = document.querySelectorAll('.habit-checkbox__input');
+    
+    // Inicializar checkboxes con el estado guardado
+    checkboxes.forEach((checkbox, index) => {
+      const habitoId = index + 1; // IDs 1-4 para los 4 hábitos
+      const estaCompletado = obtenerEstadoHabitoHoy(habitoId);
+      checkbox.checked = estaCompletado;
+    });
+    
+    checkboxes.forEach((checkbox, index) => {
+      checkbox.addEventListener('change', (e) => {
+        const habitoId = index + 1; // IDs 1-4 para los 4 hábitos
+        const semillasGanadas = 10;
+        
+        if (e.target.checked) {
+          // Marcar como completado y dar semillas
+          guardarEstadoHabito(habitoId, true);
+          const totalSemillas = agregarSemillas(semillasGanadas);
+          mostrarNotificacionSemillas(semillasGanadas, true);
+          console.log(`Hábito ${habitoId} completado! Total semillas: ${totalSemillas}`);
+        } else {
+          // Desmarcar y quitar semillas
+          guardarEstadoHabito(habitoId, false);
+          const totalSemillas = restarSemillas(semillasGanadas);
+          mostrarNotificacionSemillas(-semillasGanadas, false);
+          console.log(`Hábito ${habitoId} desmarcado. Total semillas: ${totalSemillas}`);
+        }
+      });
+    });
+
+    // Agregar estilos para animaciones
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Añadir Nuevo Hábito</title>
+  <link rel="stylesheet" href="../css/anadirHabito.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+</head>
+
+<body class="anadir-habito-page">
+  <div class="anadir-habito-container">
+    <!-- Header -->
+    <header class="anadir-habito-header">
+      <a href="habitos.html" class="anadir-habito-header__back-button">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </a>
+      <h2 class="anadir-habito-header__title">Nuevo Hábito</h2>
+      <div class="anadir-habito-header__spacer"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="anadir-habito-main">
+      <form class="anadir-habito-form" id="habitForm">
+        
+        <!-- Nombre del Hábito -->
+        <div class="form-group">
+          <label class="form-label" for="nombreHabito">Nombre del Hábito</label>
+          <input 
+            type="text" 
+            id="nombreHabito" 
+            class="form-input" 
+            placeholder="Ej. Meditación diaria"
+            required
+          />
+        </div>
+
+        <!-- Categoría -->
+        <div class="form-group">
+          <label class="form-label">Categoría</label>
+          <div class="category-grid">
+            <button type="button" class="category-button active" data-category="salud">
+              <span class="material-symbols-outlined">favorite</span>
+              <span>Salud</span>
+            </button>
+            <button type="button" class="category-button" data-category="mente">
+              <span class="material-symbols-outlined">psychology</span>
+              <span>Mente</span>
+            </button>
+            <button type="button" class="category-button" data-category="deporte">
+              <span class="material-symbols-outlined">fitness_center</span>
+              <span>Deporte</span>
+            </button>
+            <button type="button" class="category-button" data-category="espiritu">
+              <span class="material-symbols-outlined">auto_awesome</span>
+              <span>Espíritu</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Frecuencia -->
+        <div class="form-group">
+          <label class="form-label">Frecuencia</label>
+          <div class="frequency-selector">
+            <button type="button" class="frequency-day active" data-day="1">L</button>
+            <button type="button" class="frequency-day active" data-day="2">M</button>
+            <button type="button" class="frequency-day active" data-day="3">X</button>
+            <button type="button" class="frequency-day active" data-day="4">J</button>
+            <button type="button" class="frequency-day active" data-day="5">V</button>
+            <button type="button" class="frequency-day" data-day="6">S</button>
+            <button type="button" class="frequency-day" data-day="0">D</button>
+          </div>
+        </div>
+
+        <!-- Meta Diaria -->
+        <div class="form-group">
+          <label class="form-label">Meta Diaria</label>
+          <div class="goal-input-group">
+            <input 
+              type="number" 
+              id="metaValor" 
+              class="goal-input" 
+              placeholder="10"
+              min="1"
+              value="10"
+            />
+            <select id="metaUnidad" class="goal-select">
+              <option value="minutos">Minutos</option>
+              <option value="veces">Veces</option>
+              <option value="paginas">Páginas</option>
+              <option value="kilometros">Kilómetros</option>
+              <option value="litros">Litros</option>
+              <option value="horas">Horas</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Recordatorio -->
+        <div class="form-group">
+          <div class="toggle-group">
+            <div class="toggle-label">
+              <span class="material-symbols-outlined">notifications</span>
+              <span>Recordatorio</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" class="toggle-switch__input" id="recordatorio" checked/>
+              <span class="toggle-switch__slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Botón Guardar -->
+        <button type="submit" class="submit-button">
+          Guardar Hábito
+        </button>
+      </form>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="bottom-nav__item">
+        <span class="material-symbols-outlined">home</span>
+        <span class="bottom-nav__label">Inicio</span>
+      </a>
+      <a href="habitos.html" class="bottom-nav__item bottom-nav__item--active">
+        <span class="material-symbols-outlined fill">check_circle</span>
+        <span class="bottom-nav__label">Hábitos</span>
+      </a>
+      <a href="avatar.html" class="bottom-nav__item">
+        <span class="material-symbols-outlined">person</span>
+        <span class="bottom-nav__label">Avatar</span>
+      </a>
+      <a href="tienda.html" class="bottom-nav__item">
+        <span class="material-symbols-outlined">shopping_bag</span>
+        <span class="bottom-nav__label">Tienda</span>
+      </a>
+      <a href="perfil.html" class="bottom-nav__item">
+        <span class="material-symbols-outlined">account_circle</span>
+        <span class="bottom-nav__label">Perfil</span>
+      </a>
+    </nav>
+  </div>
+
+  <script>
+    // Manejo del formulario
+    const form = document.getElementById('habitForm');
+    const categoryButtons = document.querySelectorAll('.category-button');
+    const frequencyDays = document.querySelectorAll('.frequency-day');
+
+    // Estado del formulario
+    const formState = {
+      nombre: '',
+      categoria: 'salud',
+      frecuencia: [1, 2, 3, 4, 5], // Días seleccionados (0=Domingo, 6=Sábado)
+      metaValor: 10,
+      metaUnidad: 'minutos',
+      recordatorio: true
+    };
+
+    // Manejo de selección de categoría
+    categoryButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        categoryButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        formState.categoria = button.getAttribute('data-category');
+      });
+    });
+
+    // Manejo de selección de días
+    frequencyDays.forEach(button => {
+      button.addEventListener('click', () => {
+        button.classList.toggle('active');
+        const day = parseInt(button.getAttribute('data-day'));
+        
+        if (formState.frecuencia.includes(day)) {
+          formState.frecuencia = formState.frecuencia.filter(d => d !== day);
+        } else {
+          formState.frecuencia.push(day);
+        }
+      });
+    });
+
+    // Manejo del envío del formulario
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      formState.nombre = document.getElementById('nombreHabito').value;
+      formState.metaValor = parseInt(document.getElementById('metaValor').value);
+      formState.metaUnidad = document.getElementById('metaUnidad').value;
+      formState.recordatorio = document.getElementById('recordatorio').checked;
+
+      // Validar que se haya seleccionado al menos un día
+      if (formState.frecuencia.length === 0) {
+        alert('Por favor selecciona al menos un día de la semana');
+        return;
+      }
+
+      console.log('Nuevo hábito:', formState);
+      
+      // Aquí se enviaría a la base de datos
+      // Por ahora, solo mostramos un mensaje y redirigimos
+      alert('¡Hábito creado exitosamente!');
+      
+      // Redirigir a la página de hábitos
+      window.location.href = 'habitos.html';
+    });
+
+    // Actualizar estado cuando cambian los inputs
+    document.getElementById('metaValor').addEventListener('input', (e) => {
+      formState.metaValor = parseInt(e.target.value) || 0;
+    });
+
+    document.getElementById('metaUnidad').addEventListener('change', (e) => {
+      formState.metaUnidad = e.target.value;
+    });
+
+    document.getElementById('recordatorio').addEventListener('change', (e) => {
+      formState.recordatorio = e.target.checked;
+    });
+  </script>
+</body>
+</html>

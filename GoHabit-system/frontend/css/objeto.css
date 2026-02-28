@@ -1,0 +1,433 @@
+/* objeto.css - Custom styles for product detail page */
+
+/* ==================== CSS Variables ==================== */
+:root {
+  --primary: #728764;
+  --primary-dark: #4a5d3f;
+  --secondary: #d98c71;
+  --cream: #f7f8f6;
+  --background-dark: #1f241b;
+  --surface-light: #ffffff;
+  --surface-dark: #2a3025;
+  --text-main: #141711;
+  --text-light: #728764;
+}
+
+/* ==================== Base Styles ==================== */
+body {
+  min-height: max(884px, 100dvh);
+  background-color: var(--cream);
+  font-family: 'Inter', sans-serif;
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+}
+
+body.dark {
+  background-color: var(--background-dark);
+  color: #f1f5f9;
+}
+
+/* Material Icons Configuration */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.material-symbols-fill {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ==================== Main Container ==================== */
+.objeto-container {
+  position: relative;
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  max-width: 28rem;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: white;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+body.dark .objeto-container {
+  background-color: var(--background-dark);
+}
+
+@media (min-width: 1024px) {
+  .objeto-container {
+    max-width: 64rem;
+  }
+}
+
+/* ==================== Header ==================== */
+.objeto-header {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  padding: 1rem;
+  padding-bottom: 0.5rem;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(114, 135, 100, 0.1);
+}
+
+body.dark .objeto-header {
+  background-color: var(--background-dark);
+}
+
+@media (min-width: 640px) {
+  .objeto-header {
+    padding: 1.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .objeto-header {
+    padding: 2rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.objeto-header__back-button {
+  color: #0f172a;
+  display: flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+}
+
+body.dark .objeto-header__back-button {
+  color: #f1f5f9;
+}
+
+.objeto-header__back-button:hover {
+  background-color: rgba(114, 135, 100, 0.1);
+}
+
+.objeto-header__title {
+  color: #0f172a;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  flex: 1;
+  text-align: center;
+  padding-right: 2.5rem;
+}
+
+body.dark .objeto-header__title {
+  color: #f1f5f9;
+}
+
+/* ==================== Main Content ==================== */
+.objeto-main {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 6rem;
+}
+
+/* ==================== Product Image ==================== */
+.objeto-image-section {
+  padding: 1rem;
+}
+
+.objeto-image {
+  width: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  aspect-ratio: 1 / 1;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(114, 135, 100, 0.1);
+}
+
+/* ==================== Content Details ==================== */
+.objeto-content {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .objeto-content {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .objeto-content {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+.objeto-header-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+}
+
+.objeto-title {
+  color: #0f172a;
+  letter-spacing: -0.025em;
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+body.dark .objeto-title {
+  color: #f1f5f9;
+}
+
+.objeto-badge {
+  background-color: rgba(114, 135, 100, 0.1);
+  color: var(--primary);
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ==================== Price Section ==================== */
+.objeto-price {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  background-color: rgba(114, 135, 100, 0.05);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(114, 135, 100, 0.1);
+}
+
+.objeto-price__icon {
+  color: var(--primary);
+}
+
+.objeto-price__text {
+  color: #0f172a;
+  font-size: 1.125rem;
+  font-weight: 700;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.dark .objeto-price__text {
+  color: #f1f5f9;
+}
+
+/* ==================== Description Section ==================== */
+.objeto-description {
+  margin-top: 1.5rem;
+}
+
+.objeto-description__header {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+}
+
+body.dark .objeto-description__header {
+  color: #94a3b8;
+}
+
+.objeto-description__text {
+  color: #334155;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+body.dark .objeto-description__text {
+  color: #cbd5e1;
+}
+
+/* ==================== Stats/Features Grid ==================== */
+.objeto-stats {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .objeto-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.objeto-stat-card {
+  padding: 1rem;
+  background-color: var(--surface-light);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(114, 135, 100, 0.05);
+}
+
+body.dark .objeto-stat-card {
+  background-color: rgba(30, 41, 59, 0.5);
+}
+
+.objeto-stat-card__icon {
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.objeto-stat-card__label {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+body.dark .objeto-stat-card__label {
+  color: #94a3b8;
+}
+
+.objeto-stat-card__value {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* ==================== Action Button ==================== */
+.objeto-action {
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.objeto-action__button {
+  width: 100%;
+  background-color: var(--primary);
+  color: white;
+  font-weight: 700;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(114, 135, 100, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.objeto-action__button:hover {
+  background-color: rgba(114, 135, 100, 0.9);
+}
+
+.objeto-action__button:active {
+  transform: scale(0.95);
+}
+
+.objeto-action__note {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 1rem;
+}
+
+body.dark .objeto-action__note {
+  color: #64748b;
+}
+
+/* ==================== Bottom Navigation Bar ==================== */
+.objeto-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px solid rgba(114, 135, 100, 0.1);
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
+  padding-top: 0.5rem;
+  max-width: 28rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body.dark .objeto-nav {
+  background-color: rgba(31, 36, 27, 0.95);
+}
+
+@media (min-width: 1024px) {
+  .objeto-nav {
+    max-width: 64rem;
+  }
+}
+
+.objeto-nav__container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.5rem;
+}
+
+.objeto-nav__link {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  color: #94a3b8;
+  transition: color 0.3s;
+  text-decoration: none;
+}
+
+body.dark .objeto-nav__link {
+  color: #64748b;
+}
+
+.objeto-nav__link:hover {
+  color: var(--primary);
+}
+
+.objeto-nav__link--active {
+  color: var(--primary);
+}
+
+.objeto-nav__icon {
+  font-size: 24px;
+}
+
+.objeto-nav__icon--filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.objeto-nav__text {
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.objeto-nav__link--active .objeto-nav__text {
+  font-weight: 700;
+}
