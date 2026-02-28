@@ -38,6 +38,12 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copiamos todo el código fuente
 COPY . .
 
+# Variables para build de Next.js (necesarias porque se evalúan rutas API)
+ENV DATABASE_URL="mysql://app:apppass@mysql:3306/goto"
+ENV JWT_SECRET="build-only-secret-min-16"
+ENV JWT_EXPIRES_IN="7d"
+ENV NODE_ENV="production"
+
 # Regeneramos Prisma (ahora con el schema.prisma disponible)
 RUN npx prisma generate
 # Compilamos Next.js → genera .next/standalone
@@ -58,11 +64,9 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Copiamos solo los archivos necesarios del build:
-# - public/         → archivos estáticos (vacío en nuestro caso)
 # - .next/standalone → servidor compilado + dependencias mínimas
 # - .next/static    → assets estáticos generados por Next.js
 # - prisma/         → schema necesario para las queries en runtime
-COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma

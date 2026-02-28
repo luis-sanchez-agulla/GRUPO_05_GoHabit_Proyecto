@@ -55,7 +55,7 @@ type AuthenticatedHandler = (
  * @returns       - Nueva función que primero verifica el token y luego llama al handler
  */
 export function withAuth(handler: AuthenticatedHandler) {
-    return async (req: NextRequest, routeContext?: { params?: Promise<Record<string, string>> }) => {
+    return async (req: NextRequest, routeContext: { params: Promise<Record<string, string>> }) => {
         try {
             // 1. Leer el header Authorization de la petición HTTP
             const authHeader = req.headers.get("authorization");
@@ -79,7 +79,7 @@ export function withAuth(handler: AuthenticatedHandler) {
 
             // 6. Resolver los params de ruta si existen (ej: [habitId] → "abc123")
             // En Next.js 15, params es una Promise que hay que resolver con await
-            const resolvedParams = routeContext?.params ? await routeContext.params : undefined;
+            const resolvedParams = await routeContext.params;
 
             // 7. Ejecutar el handler real con el usuario autenticado
             return handler(req, { user, params: resolvedParams });

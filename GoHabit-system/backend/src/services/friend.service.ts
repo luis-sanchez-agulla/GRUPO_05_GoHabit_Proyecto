@@ -37,7 +37,7 @@ export const friendService = {
 
         // Para cada amistad, devolver el OTRO usuario (no yo mismo)
         // Si yo soy el sender, devuelvo el receiver y viceversa
-        return friendships.map((f) =>
+        return friendships.map((f: (typeof friendships)[number]) =>
             f.senderId === userId ? f.receiver : f.sender
         );
     },
