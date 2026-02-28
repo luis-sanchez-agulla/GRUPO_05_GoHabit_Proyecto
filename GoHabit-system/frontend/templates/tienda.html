@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Tienda de Primavera - Habit Tracker</title>
+  <link rel="stylesheet" href="../css/tienda.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+</head>
+
+<body class="tienda-page">
+  <div class="tienda-container">
+    <!-- Header -->
+    <header class="tienda-header">
+      <a href="index.html" class="tienda-header__back-button">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </a>
+      <h1 class="tienda-header__title">Tienda de Primavera</h1>
+      <div class="tienda-header__balance">
+        <span class="material-symbols-outlined tienda-header__balance-icon">eco</span>
+        <span class="tienda-header__balance-text">550 Semillas</span>
+      </div>
+    </header>
+    <!-- Main Content -->
+    <main class="tienda-main">
+      <!-- Hero Banner -->
+      <div class="tienda-hero-section">
+        <div class="tienda-hero">
+          <div class="tienda-hero__content">
+            <h2 class="tienda-hero__title">Colección de Primavera</h2>
+            <p class="tienda-hero__subtitle">Personaliza tu árbol con objetos únicos</p>
+          </div>
+          <span class="material-symbols-outlined tienda-hero__icon">park</span>
+        </div>
+      </div>
+      <h2 class="tienda-products-title">Accesorios para tu Árbol</h2>
+      <!-- Grid of Items -->
+      <div class="tienda-products-grid">
+        <!-- Item 1: Nido de Pájaros -->
+        <div class="product-card">
+          <div class="product-card__image" data-alt="A cozy bird nest with blue eggs on a branch">
+            <span class="material-symbols-outlined product-card__icon">nest_eco</span>
+            <div class="product-card__image-overlay"></div>
+          </div>
+          <div class="product-card__info">
+            <p class="product-card__name">Nido de Pájaros</p>
+            <div class="product-card__price-container">
+              <span class="material-symbols-outlined product-card__price-icon">eco</span>
+              <p class="product-card__price">120 Semillas</p>
+            </div>
+          </div>
+          <a href="objeto.html" class="product-card__button">
+            <span class="material-symbols-outlined product-card__button-icon">shopping_cart</span>
+            Comprar
+          </a>
+        </div>
+        <!-- Item 2: Flores de Cerezo -->
+        <div class="product-card">
+          <div class="product-card__image" data-alt="Beautiful pink cherry blossom petals falling">
+            <span class="material-symbols-outlined product-card__icon">local_florist</span>
+            <div class="product-card__image-overlay"></div>
+          </div>
+          <div class="product-card__info">
+            <p class="product-card__name">Flores de Cerezo</p>
+            <div class="product-card__price-container">
+              <span class="material-symbols-outlined product-card__price-icon">eco</span>
+              <p class="product-card__price">200 Semillas</p>
+            </div>
+          </div>
+          <a href="objeto.html" class="product-card__button">
+            <span class="material-symbols-outlined product-card__button-icon">shopping_cart</span>
+            Comprar
+          </a>
+        </div>
+        <!-- Item 3: Valla de Madera -->
+        <div class="product-card">
+          <div class="product-card__image" data-alt="A rustic wooden garden fence with fresh grass">
+            <span class="material-symbols-outlined product-card__icon">fence</span>
+            <div class="product-card__image-overlay"></div>
+          </div>
+          <div class="product-card__info">
+            <p class="product-card__name">Valla de Madera</p>
+            <div class="product-card__price-container">
+              <span class="material-symbols-outlined product-card__price-icon">eco</span>
+              <p class="product-card__price">150 Semillas</p>
+            </div>
+          </div>
+          <a href="objeto.html" class="product-card__button">
+            <span class="material-symbols-outlined product-card__button-icon">shopping_cart</span>
+            Comprar
+          </a>
+        </div>
+        <!-- Item 4: Coming Soon Placeholder -->
+        <div class="product-card product-card--coming-soon">
+          <div class="product-card__image">
+            <span class="material-symbols-outlined product-card__icon">lock</span>
+          </div>
+          <div class="product-card__info">
+            <p class="product-card__coming-soon-text">Más objetos pronto...</p>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Bottom Navigation Bar -->
+    <nav class="tienda-nav">
+      <div class="tienda-nav__container">
+        <a class="tienda-nav__link" href="index.html">
+          <span class="material-symbols-outlined tienda-nav__icon">home</span>
+          <p class="tienda-nav__text">Inicio</p>
+        </a>
+        <a class="tienda-nav__link" href="habitos.html">
+          <span class="material-symbols-outlined tienda-nav__icon">task_alt</span>
+          <p class="tienda-nav__text">Hábitos</p>
+        </a>
+        <a class="tienda-nav__link" href="avatar.html">
+          <span class="material-symbols-outlined tienda-nav__icon">park</span>
+          <p class="tienda-nav__text">Avatar</p>
+        </a>
+        <a class="tienda-nav__link tienda-nav__link--active" href="tienda.html">
+          <span class="material-symbols-outlined tienda-nav__icon tienda-nav__icon--filled">storefront</span>
+          <p class="tienda-nav__text">Tienda</p>
+        </a>
+        <a class="tienda-nav__link" href="perfil.html">
+          <span class="material-symbols-outlined tienda-nav__icon">person</span>
+          <p class="tienda-nav__text">Perfil</p>
+        </a>
+      </div>
+    </nav>
+  </div>
+</body>
+</html>

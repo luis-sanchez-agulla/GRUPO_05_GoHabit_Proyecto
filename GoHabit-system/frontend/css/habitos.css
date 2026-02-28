@@ -1,0 +1,642 @@
+/* habitos.css - Custom styles for habits page */
+
+/* ==================== CSS Variables ==================== */
+:root {
+  --primary: #728764;
+  --primary-dark: #4a5d3f;
+  --secondary: #d98c71;
+  --cream: #f7f8f6;
+  --background-dark: #1f241b;
+  --surface-light: #ffffff;
+  --surface-dark: #2a3025;
+  --text-main: #141711;
+  --text-light: #728764;
+  --forest-green: #2E4F32;
+}
+
+/* ==================== Base Styles ==================== */
+
+/* Material Icons Configuration */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.material-symbols-outlined.fill {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Estilos base para la página */
+body.habitos-page {
+  background-color: var(--cream);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text-main);
+  min-height: 100vh;
+  min-height: max(884px, 100dvh);
+}
+
+/* Dark mode */
+body.habitos-page.dark {
+  background-color: var(--background-dark);
+  color: #f1f5f9;
+}
+
+/* Contenedor principal */
+.habitos-container {
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+@media (min-width: 1024px) {
+  .habitos-container {
+    max-width: 64rem;
+  }
+}
+
+/* ================================================
+   HEADER / TOP BAR
+   ================================================ */
+
+.habitos-header {
+  padding: 1rem;
+  padding-top: 2rem;
+  padding-bottom: 1.5rem;
+  background-color: white;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .habitos-header {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .habitos-header {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+.habitos-header__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.habitos-header__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.habitos-header__button {
+  padding: 0.5rem;
+  border-radius: 9999px;
+  background-color: #f8fafc;
+  color: #475569;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.habitos-header__button:hover {
+  background-color: #e2e8f0;
+}
+
+/* ================================================
+   MAIN CONTENT AREA
+   ================================================ */
+
+.habitos-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-y: auto;
+  padding-bottom: 8rem;
+}
+
+@media (min-width: 1024px) {
+  .habitos-main {
+    padding-bottom: 7rem;
+  }
+}
+
+/* Scrollbar oculto */
+.habitos-main::-webkit-scrollbar {
+  display: none;
+}
+
+.habitos-main {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ================================================
+   TREE VISUAL SECTION
+   ================================================ */
+
+.habitos-tree-section {
+  position: relative;
+  height: 16rem;
+  width: 100%;
+  background: linear-gradient(to bottom, rgba(46, 79, 50, 0.1), var(--cream));
+  overflow: hidden;
+}
+
+body.dark .habitos-tree-section {
+  background: linear-gradient(to bottom, rgba(46, 79, 50, 0.05), var(--background-dark));
+}
+
+.habitos-tree-visual {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 2rem;
+}
+
+.habitos-tree-icon-container {
+  position: relative;
+}
+
+.habitos-tree-icon {
+  font-size: 9rem;
+  color: var(--primary);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.habitos-tree-badge {
+  position: absolute;
+  top: -1rem;
+  right: -1rem;
+  background-color: white;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(46, 79, 50, 0.2);
+}
+
+body.dark .habitos-tree-badge {
+  background-color: #1e293b;
+}
+
+.habitos-tree-badge-icon {
+  color: var(--primary);
+  font-size: 1.5rem;
+}
+
+/* ================================================
+   LEVEL INDICATOR
+   ================================================ */
+
+.habitos-level-container {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+}
+
+.habitos-level-card {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+body.dark .habitos-level-card {
+  background-color: rgba(30, 41, 59, 0.8);
+}
+
+.habitos-level-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.habitos-level-number {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #1e293b;
+}
+
+body.dark .habitos-level-number {
+  color: white;
+}
+
+/* ================================================
+   XP PROGRESS BAR
+   ================================================ */
+
+.habitos-xp-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 0 1.5rem 1rem;
+}
+
+.habitos-xp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.habitos-xp-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+body.dark .habitos-xp-label {
+  color: #94a3b8;
+}
+
+.habitos-xp-value {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.habitos-xp-bar {
+  height: 0.5rem;
+  width: 100%;
+  background-color: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+body.dark .habitos-xp-bar {
+  background-color: #334155;
+}
+
+.habitos-xp-fill {
+  height: 100%;
+  background-color: var(--primary);
+  width: 75%;
+  border-radius: 9999px;
+  box-shadow: 0 0 10px rgba(114, 135, 100, 0.4);
+}
+
+/* ================================================
+   CONTENT SECTION
+   ================================================ */
+
+.habitos-content {
+  padding: 2rem 1rem;
+  position: relative;
+  z-index: 20;
+}
+
+@media (min-width: 640px) {
+  .habitos-content {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .habitos-content {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+.habitos-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+.habitos-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+body.dark .habitos-section-title {
+  color: white;
+}
+
+.habitos-view-all-link {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.habitos-view-all-link:hover {
+  color: #4a5d3f;
+}
+
+/* ================================================
+   HABIT CARDS
+   ================================================ */
+
+.habitos-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.habit-card {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+body.dark .habit-card {
+  background-color: rgba(30, 41, 59, 0.5);
+  border-color: rgba(51, 65, 85, 0.5);
+}
+
+.habit-card:active {
+  transform: scale(0.99);
+}
+
+/* Completado */
+.habit-card--completed .habit-card__title {
+  text-decoration: line-through;
+  text-decoration-color: #94a3b8;
+  opacity: 0.6;
+}
+
+body.dark .habit-card--completed .habit-card__title {
+  text-decoration-color: #64748b;
+}
+
+/* Iconos de hábitos con colores diferentes */
+.habit-card__icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 3rem;
+  width: 3rem;
+  border-radius: 0.75rem;
+  margin-right: 1rem;
+}
+
+.habit-card__icon-container--primary {
+  background-color: rgba(46, 79, 50, 0.1);
+  color: var(--primary);
+}
+
+body.dark .habit-card__icon-container--primary {
+  background-color: rgba(46, 79, 50, 0.2);
+}
+
+.habit-card__icon-container--purple {
+  background-color: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+}
+
+body.dark .habit-card__icon-container--purple {
+  background-color: rgba(168, 85, 247, 0.2);
+}
+
+.habit-card__icon-container--orange {
+  background-color: rgba(249, 115, 22, 0.1);
+  color: #f97316;
+}
+
+body.dark .habit-card__icon-container--orange {
+  background-color: rgba(249, 115, 22, 0.2);
+}
+
+.habit-card__icon-container--blue {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+body.dark .habit-card__icon-container--blue {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.habit-card__content {
+  flex: 1;
+}
+
+.habit-card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+body.dark .habit-card__title {
+  color: #f1f5f9;
+}
+
+.habit-card__category {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+body.dark .habit-card__category {
+  color: #94a3b8;
+}
+
+/* ================================================
+   CHECKBOX PERSONALIZADO
+   ================================================ */
+
+.habit-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.habit-checkbox__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.habit-checkbox__box {
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 9999px;
+  border: 2px solid #cbd5e1;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+}
+
+body.dark .habit-checkbox__box {
+  border-color: #475569;
+}
+
+.habit-checkbox__input:checked ~ .habit-checkbox__box {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.habit-checkbox__icon {
+  color: white;
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.habit-checkbox__input:checked ~ .habit-checkbox__box .habit-checkbox__icon {
+  opacity: 1;
+}
+
+/* ================================================
+   ADD HABIT BUTTON
+   ================================================ */
+
+.habitos-add-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 3rem;
+  padding-top: 1.5rem;
+}
+
+.habitos-add-button {
+  width: 100%;
+  max-width: 20rem;
+  padding: 1rem 1.5rem;
+  background-color: var(--primary);
+  color: white;
+  font-weight: 700;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(46, 79, 50, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.habitos-add-button:hover {
+  background-color: rgba(46, 79, 50, 0.9);
+}
+
+.habitos-add-button:active {
+  transform: scale(0.95);
+}
+
+/* ================================================
+   BOTTOM NAVIGATION
+   ================================================ */
+
+.habitos-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 28rem;
+  border-top: 1px solid rgba(46, 79, 50, 0.1);
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  padding: 0.5rem 1rem 1rem;
+  z-index: 50;
+}
+
+@media (min-width: 1024px) {
+  .habitos-nav {
+    max-width: 64rem;
+  }
+}
+
+body.dark .habitos-nav {
+  background-color: rgba(16, 34, 18, 0.95);
+}
+
+.habitos-nav__container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.5rem;
+}
+
+.habitos-nav__link {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  color: #94a3b8;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+body.dark .habitos-nav__link {
+  color: #64748b;
+}
+
+.habitos-nav__link:hover {
+  color: var(--primary);
+}
+
+body.dark .habitos-nav__link:hover {
+  color: var(--primary);
+}
+
+.habitos-nav__link--active {
+  color: var(--primary);
+}
+
+.habitos-nav__icon {
+  /* Material icons hereda el tamaño por defecto */
+}
+
+.habitos-nav__icon--filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.habitos-nav__text {
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.habitos-nav__link--active .habitos-nav__text {
+  font-weight: 700;
+}
