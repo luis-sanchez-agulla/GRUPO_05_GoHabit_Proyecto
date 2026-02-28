@@ -10,6 +10,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
     rel="stylesheet" />
+  <script src="../js/api.js"></script>
 </head>
 
 <body class="anadir-habito-page">
@@ -172,7 +173,7 @@
     });
 
     // Manejo del envío del formulario
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       formState.nombre = document.getElementById('nombreHabito').value;
@@ -186,14 +187,25 @@
         return;
       }
 
-      console.log('Nuevo hábito:', formState);
+      const isDaily = formState.frecuencia.length === 7;
+      const apiPayload = {
+        title: formState.nombre,
+        description: `Categoría: ${formState.categoria} | Meta: ${formState.metaValor} ${formState.metaUnidad}`,
+        frequency: isDaily ? 'DAILY' : 'WEEKLY',
+        targetCount: isDaily ? 1 : formState.frecuencia.length,
+        color: '#728764' // Color por defecto
+      };
 
-      // Aquí se enviaría a la base de datos
-      // Por ahora, solo mostramos un mensaje y redirigimos
-      alert('¡Hábito creado exitosamente!');
-
-      // Redirigir a la página de hábitos
-      window.location.href = 'habitos.html';
+      try {
+        await window.fetchApi('/habits', {
+          method: 'POST',
+          body: JSON.stringify(apiPayload)
+        });
+        alert('¡Hábito creado exitosamente!');
+        window.location.href = 'habitos.html';
+      } catch (err) {
+        alert('Error al crear el hábito: ' + err.message);
+      }
     });
 
     // Actualizar estado cuando cambian los inputs

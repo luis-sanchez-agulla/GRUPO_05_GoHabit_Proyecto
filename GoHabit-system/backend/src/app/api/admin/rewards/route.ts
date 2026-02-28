@@ -11,7 +11,7 @@ import { createRewardSchema, updateRewardSchema } from "@/validations/reward.sch
 import { created, success, noContent, error } from "@/lib/api-response";
 
 export const POST = withAuth(
-    withRole(["ADMIN"], async (req) => {
+    withRole(["ADMIN"], async (req, { user }) => {
         try {
             const body = await req.json();
             const data = createRewardSchema.parse(body);
@@ -24,7 +24,7 @@ export const POST = withAuth(
 );
 
 export const PUT = withAuth(
-    withRole(["ADMIN"], async (req) => {
+    withRole(["ADMIN"], async (req, { user }) => {
         try {
             const body = await req.json() as { rewardId: string;[key: string]: unknown };
             const { rewardId, ...data } = body;
@@ -38,7 +38,7 @@ export const PUT = withAuth(
 );
 
 export const DELETE = withAuth(
-    withRole(["ADMIN"], async (req) => {
+    withRole(["ADMIN"], async (req, { user }) => {
         try {
             const { rewardId } = await req.json() as { rewardId: string };
             await adminService.deleteReward(rewardId);

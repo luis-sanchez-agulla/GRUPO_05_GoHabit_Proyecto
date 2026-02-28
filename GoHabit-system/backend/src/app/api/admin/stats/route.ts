@@ -8,7 +8,7 @@ import { adminService } from "@/services/admin.service";
 import { success, error } from "@/lib/api-response";
 
 export const GET = withAuth(
-    withRole(["ADMIN"], async () => {
+    withRole(["ADMIN"], async (req, { user }) => {
         try {
             const stats = await adminService.getStats();
             return success(stats);

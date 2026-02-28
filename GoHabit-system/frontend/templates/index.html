@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
+    <script src="../js/api.js"></script>
 </head>
 
 <body>
@@ -22,11 +23,11 @@
         <header class="index-header">
             <div>
                 <p class="index-header__greeting">Buenos días,</p>
-                <h1 class="index-header__title">¡Hola, Alex!</h1>
+                <h1 class="index-header__title" id="userNameDisplay">¡Hola, Cargando...!</h1>
             </div>
             <div class="index-header__balance">
                 <span class="material-symbols-outlined index-header__balance-icon">eco</span>
-                <span class="index-header__balance-text">1,250</span>
+                <span class="index-header__balance-text" id="userSeedsDisplay">--</span>
             </div>
         </header>
 
@@ -55,24 +56,8 @@
                     <h3 class="index-task-header__title">Siguiente Hábito</h3>
                     <a href="habitos.html" class="index-task-header__link">Ver todo</a>
                 </div>
-                <div class="index-task-card">
-                    <!-- Progress Fill Indicator -->
-                    <div class="index-task-card__indicator"></div>
-                    <div class="index-task-card__icon">
-                        <span class="material-symbols-outlined">water_drop</span>
-                    </div>
-                    <div class="index-task-card__content">
-                        <h4 class="index-task-card__title">Beber agua</h4>
-                        <div class="index-task-card__progress">
-                            <div class="index-task-card__progress-bar">
-                                <div class="index-task-card__progress-fill"></div>
-                            </div>
-                            <span class="index-task-card__progress-text">1.5 / 2L</span>
-                        </div>
-                    </div>
-                    <button class="index-task-card__button">
-                        <span class="material-symbols-outlined">check</span>
-                    </button>
+                <div class="index-task-card" id="nextHabitContainer">
+                    <p style="text-align: center; color: #666; width: 100%; padding: 20px;">Cargando...</p>
                 </div>
             </div>
 
@@ -139,62 +124,6 @@
     </div>
 
     <script>
-        // Funciones para manejar semillas
-        function obtenerSemillas() {
-            const semillas = localStorage.getItem('semillasUsuario');
-            return semillas ? parseInt(semillas) : 500;
-        }
-
-        function guardarSemillas(cantidad) {
-            localStorage.setItem('semillasUsuario', cantidad);
-        }
-
-        function agregarSemillas(cantidad) {
-            const semillasActuales = obtenerSemillas();
-            const nuevasSemillas = semillasActuales + cantidad;
-            guardarSemillas(nuevasSemillas);
-            return nuevasSemillas;
-        }
-
-        function restarSemillas(cantidad) {
-            const semillasActuales = obtenerSemillas();
-            const nuevasSemillas = Math.max(0, semillasActuales - cantidad);
-            guardarSemillas(nuevasSemillas);
-            return nuevasSemillas;
-        }
-
-        // Funciones para manejar estado de hábitos
-        function obtenerClaveFechaHoy() {
-            const hoy = new Date();
-            const año = hoy.getFullYear();
-            const mes = String(hoy.getMonth() + 1).padStart(2, '0');
-            const dia = String(hoy.getDate()).padStart(2, '0');
-            return `${año}-${mes}-${dia}`;
-        }
-
-        function cargarEstadoHabitos() {
-            const datos = localStorage.getItem('habitosCompletados');
-            return datos ? JSON.parse(datos) : {};
-        }
-
-        function guardarEstadoHabito(habitoId, completado) {
-            const claveFecha = obtenerClaveFechaHoy();
-            const estadoHabitos = cargarEstadoHabitos();
-
-            if (!estadoHabitos[claveFecha]) {
-                estadoHabitos[claveFecha] = {};
-            }
-
-            estadoHabitos[claveFecha][habitoId] = completado;
-            localStorage.setItem('habitosCompletados', JSON.stringify(estadoHabitos));
-        }
-
-        function obtenerEstadoHabitoHoy(habitoId) {
-            const claveFecha = obtenerClaveFechaHoy();
-            const estadoHabitos = cargarEstadoHabitos();
-            return estadoHabitos[claveFecha]?.[habitoId] || false;
-        }
-
         // Función para mostrar notificación
         function mostrarNotificacion(mensaje, esPositivo = true) {
             const notificacion = document.createElement('div');
@@ -229,79 +158,115 @@
             }, 3000);
         }
 
-        // Manejar el botón de completar hábito
-        const botonCheck = document.querySelector('.index-task-card__button');
-        const taskCard = document.querySelector('.index-task-card');
-        const habitoId = 1; // ID del hábito "Beber agua"
+        // Obtener la fecha de hoy "YYYY-MM-DD"
+        function obtenerClaveFechaHoy() {
+            const hoy = new Date();
+            const año = hoy.getFullYear();
+            const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoy.getDate()).padStart(2, '0');
+            return `${año}-${mes}-${dia}`;
+        }
 
-        // Función para actualizar la UI del botón
-        function actualizarBotonUI(completado) {
-            if (completado) {
-                botonCheck.innerHTML = '<span class="material-symbols-outlined">check</span>';
-                botonCheck.style.background = '#728764';
-                botonCheck.style.color = 'white';
-            } else {
-                botonCheck.innerHTML = '<span class="material-symbols-outlined">radio_button_unchecked</span>';
-                botonCheck.style.background = '';
-                botonCheck.style.color = '';
+        // Cargar datos de la pantalla inicial
+        async function cargarDashboard() {
+            try {
+                // 1. Obtener perfil
+                const meRes = await fetchApi('/auth/me');
+                if (meRes.data) {
+                    const user = meRes.data;
+                    document.getElementById('userNameDisplay').textContent = `¡Hola, ${user.firstName || user.username || 'Usuario'}!`;
+                    // Si el backend no devuelve xp o semillas, usamos un fallback de "1,250"
+                    document.getElementById('userSeedsDisplay').textContent = user.seeds || '1,250';
+                }
+
+                // 2. Obtener hábitos para mostrar el "siguiente hábito"
+                const habitsRes = await fetchApi('/habits');
+                const habits = habitsRes.data || [];
+                const hoy = obtenerClaveFechaHoy();
+
+                // Buscar el primer hábito que no esté completado hoy
+                const siguienteHabito = habits.find(h => {
+                    const completions = h.completions || [];
+                    return !completions.some(c => c.completedAt.startsWith(hoy));
+                });
+
+                const container = document.getElementById('nextHabitContainer');
+                if (!siguienteHabito) {
+                    container.innerHTML = '<p style="text-align:center; padding: 20px; width: 100%;">¡Todo completado por hoy!</p>';
+                } else {
+                    container.innerHTML = `
+                        <!-- Progress Fill Indicator -->
+                        <div class="index-task-card__indicator"></div>
+                        <div class="index-task-card__icon" style="background: ${siguienteHabito.color || '#e8f3e5'};">
+                            <span class="material-symbols-outlined" style="color: darken(${siguienteHabito.color}, 20%);">${siguienteHabito.icon || 'water_drop'}</span>
+                        </div>
+                        <div class="index-task-card__content">
+                            <h4 class="index-task-card__title">${siguienteHabito.title}</h4>
+                            <div class="index-task-card__progress">
+                                <div class="index-task-card__progress-bar">
+                                    <div class="index-task-card__progress-fill" style="width: 0%;"></div>
+                                </div>
+                                <span class="index-task-card__progress-text">0 / ${siguienteHabito.targetCount || 1}</span>
+                            </div>
+                        </div>
+                        <button class="index-task-card__button" id="btnCompletarSiguiente" data-id="${siguienteHabito.id}">
+                            <span class="material-symbols-outlined">radio_button_unchecked</span>
+                        </button>
+                    `;
+
+                    // Asignar evento al botón de completar
+                    document.getElementById('btnCompletarSiguiente').addEventListener('click', async (e) => {
+                        const btn = e.currentTarget;
+                        const hId = btn.getAttribute('data-id');
+                        try {
+                            btn.innerHTML = '<span class="material-symbols-outlined">rotate_right</span>';
+                            await fetchApi(`/habits/${hId}/completions`, { method: 'POST' });
+
+                            btn.innerHTML = '<span class="material-symbols-outlined">check</span>';
+                            btn.style.background = '#728764';
+                            btn.style.color = 'white';
+                            mostrarNotificacion('+10 semillas 🌱', true);
+                            setTimeout(() => {
+                                cargarDashboard(); // Recargar para mostrar el próximo
+                            }, 1000);
+                        } catch (err) {
+                            alert('Error al completar: ' + err.message);
+                            btn.innerHTML = '<span class="material-symbols-outlined">radio_button_unchecked</span>';
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error('Error al cargar dashboard:', err);
+                document.getElementById('userNameDisplay').textContent = "¡Hola!";
+                document.getElementById('nextHabitContainer').innerHTML = '<p style="color:red; text-align:center;">Error de conexión.</p>';
             }
         }
 
-        // Inicializar estado desde localStorage
-        let habitoCompletado = obtenerEstadoHabitoHoy(habitoId);
-
-        // Aplicar estado visual inicial
-        actualizarBotonUI(habitoCompletado);
-
-        botonCheck.addEventListener('click', () => {
-            const semillasGanadas = 10;
-
-            if (!habitoCompletado) {
-                // Marcar como completado
-                habitoCompletado = true;
-                guardarEstadoHabito(habitoId, true);
-                actualizarBotonUI(true);
-
-                // Dar recompensa de semillas
-                const totalSemillas = agregarSemillas(semillasGanadas);
-                mostrarNotificacion(`+${semillasGanadas} semillas 🌱`, true);
-                console.log(`Hábito completado! Total semillas: ${totalSemillas}`);
-            } else {
-                // Desmarcar
-                habitoCompletado = false;
-                guardarEstadoHabito(habitoId, false);
-                actualizarBotonUI(false);
-
-                // Restar semillas
-                const totalSemillas = restarSemillas(semillasGanadas);
-                mostrarNotificacion(`-${semillasGanadas} semillas`, false);
-                console.log(`Hábito desmarcado. Total semillas: ${totalSemillas}`);
-            }
-        });
+        window.addEventListener('DOMContentLoaded', cargarDashboard);
 
         // Agregar estilos para animaciones
         const style = document.createElement('style');
         style.textContent = `
-            @keyframes slideIn {
+                    @keyframes slideIn {
                 from {
-                    transform: translateX(400px);
-                    opacity: 0;
-                }
+                            transform: translateX(400px);
+                            opacity: 0;
+                        }
                 to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-            @keyframes slideOut {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes slideOut {
                 from {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
                 to {
-                    transform: translateX(400px);
-                    opacity: 0;
-                }
-            }
+                            transform: translateX(400px);
+                            opacity: 0;
+                        }
+                    }
         `;
         document.head.appendChild(style);
     </script>

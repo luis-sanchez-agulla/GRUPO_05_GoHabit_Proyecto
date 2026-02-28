@@ -10,8 +10,8 @@ INSTALL PLUGIN rpl_semi_sync_replica SONAME 'semisync_replica.so';
 SET GLOBAL rpl_semi_sync_replica_enabled = ON;
 
 -- Reiniciar replicación para que tome efecto
-STOP REPLICA;
-START REPLICA;
+-- STOP REPLICA;
+-- START REPLICA;
 
 -- Plugin de autenticar contraseña
 INSTALL PLUGIN validate_password SONAME 'validate_password.so';

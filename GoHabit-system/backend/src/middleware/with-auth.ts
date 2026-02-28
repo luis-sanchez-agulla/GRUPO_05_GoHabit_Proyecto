@@ -54,8 +54,8 @@ type AuthenticatedHandler = (
  * @param handler - Función que maneja la petición (solo se ejecuta si el token es válido)
  * @returns       - Nueva función que primero verifica el token y luego llama al handler
  */
-export function withAuth(handler: AuthenticatedHandler) {
-    return async (req: NextRequest, routeContext?: { params?: Promise<Record<string, string>> }) => {
+export function withAuth(handler: AuthenticatedHandler): (req: NextRequest, routeContext: any) => Promise<NextResponse> {
+    return async (req: NextRequest, routeContext?: any) => {
         try {
             // 1. Leer el header Authorization de la petición HTTP
             const authHeader = req.headers.get("authorization");
