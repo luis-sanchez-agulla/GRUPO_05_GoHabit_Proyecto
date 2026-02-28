@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Tu Avatar - Habit Tracker</title>
   <link rel="stylesheet" href="../css/avatar.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
 </head>
 
 <body class="avatar-page">
@@ -27,7 +30,8 @@
         <div class="avatar-tree-display">
           <div class="avatar-tree-container">
             <!-- Representing the Tree Avatar -->
-            <div class="avatar-tree-image" data-alt="A lush green vibrant spring tree in a field" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCphDlqrvBia8ebxYuaw7h7KrkJONBB-hyxlIZYZRjnKxCTSJpxTjiojUuFQ4g8bJwXSriK5mi-WUMsa_sWJ6UOG3xQkJIM2ffw4upFx-uDgRlZeNYVtnYqnhH1Of_IuJz-x8K0BYU5-eD0a4klQejtR49PYlrE3Q-cqp5RnMOMUACU3GHZ3Agss0Ntu_qdhDaxtzxbqyzhThT6mcK78zutpL4DWhdK7HKdtOkQS5Xj7nixK6YURxzQmAiuqUoISfE6gONkxIIIsoU");'>
+            <div class="avatar-tree-image" data-alt="A lush green vibrant spring tree in a field"
+              style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCphDlqrvBia8ebxYuaw7h7KrkJONBB-hyxlIZYZRjnKxCTSJpxTjiojUuFQ4g8bJwXSriK5mi-WUMsa_sWJ6UOG3xQkJIM2ffw4upFx-uDgRlZeNYVtnYqnhH1Of_IuJz-x8K0BYU5-eD0a4klQejtR49PYlrE3Q-cqp5RnMOMUACU3GHZ3Agss0Ntu_qdhDaxtzxbqyzhThT6mcK78zutpL4DWhdK7HKdtOkQS5Xj7nixK6YURxzQmAiuqUoISfE6gONkxIIIsoU");'>
             </div>
           </div>
           <!-- Float Badge -->
@@ -76,7 +80,8 @@
         </div>
 
         <div id="noAccessoriesMessage" style="display: none; text-align: center; padding: 2rem; color: #666;">
-          <span class="material-symbols-outlined" style="font-size: 48px; color: #d98c71; margin-bottom: 1rem;">shopping_bag</span>
+          <span class="material-symbols-outlined"
+            style="font-size: 48px; color: #d98c71; margin-bottom: 1rem;">shopping_bag</span>
           <p style="margin: 0; font-weight: 500;">No tienes accesorios aún</p>
           <p style="margin: 0.5rem 0 0 0; font-size: 14px;">Visita la tienda para conseguir algunos</p>
         </div>
@@ -131,7 +136,7 @@
     // Función para alternar estado equipado de un objeto
     function toggleEquipado(objetoId) {
       let equipados = obtenerObjetosEquipados();
-      
+
       if (equipados.includes(objetoId)) {
         // Desequipar
         equipados = equipados.filter(id => id !== objetoId);
@@ -139,7 +144,7 @@
         // Equipar
         equipados.push(objetoId);
       }
-      
+
       guardarObjetosEquipados(equipados);
       renderizarAccesorios(); // Re-renderizar para actualizar UI
     }
@@ -165,10 +170,10 @@
       // Renderizar cada objeto
       objetosComprados.forEach(objeto => {
         const estaEquipado = objetosEquipados.includes(objeto.id);
-        
+
         const card = document.createElement('div');
         card.className = `avatar-accessory-card${!estaEquipado ? ' avatar-accessory-card--inactive' : ''}`;
-        
+
         card.innerHTML = `
           <div class="avatar-accessory-card__icon-container">
             <span class="material-symbols-outlined avatar-accessory-card__icon ${objeto.iconoClase || ''}">${objeto.icono}</span>
@@ -179,13 +184,13 @@
             ${estaEquipado ? 'Equipado' : 'Equipar'}
           </button>
         `;
-        
+
         // Agregar evento al botón
         const boton = card.querySelector('button');
         boton.addEventListener('click', () => {
           toggleEquipado(objeto.id);
         });
-        
+
         grid.appendChild(card);
       });
     }
@@ -198,4 +203,5 @@
     });
   </script>
 </body>
+
 </html>

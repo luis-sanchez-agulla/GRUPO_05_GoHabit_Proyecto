@@ -122,7 +122,8 @@ body.dark .anadir-habito-header__title {
 /* ==================== Main Content ==================== */
 .anadir-habito-main {
   flex: 1;
-  padding: 1.5rem 1rem 6rem 1rem; /* Bottom padding para la nav bar */
+  padding: 1.5rem 1rem 6rem 1rem;
+  /* Bottom padding para la nav bar */
   overflow-y: auto;
 }
 
@@ -402,11 +403,11 @@ body.dark .toggle-label {
   border-radius: 50%;
 }
 
-.toggle-switch__input:checked + .toggle-switch__slider {
+.toggle-switch__input:checked+.toggle-switch__slider {
   background-color: var(--primary);
 }
 
-.toggle-switch__input:checked + .toggle-switch__slider:before {
+.toggle-switch__input:checked+.toggle-switch__slider:before {
   transform: translateX(1.25rem);
 }
 

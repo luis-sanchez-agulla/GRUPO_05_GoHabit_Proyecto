@@ -9,7 +9,7 @@ import { adminService } from "@/services/admin.service";
 import { success, error } from "@/lib/api-response";
 
 export const GET = withAuth(
-    withRole(["ADMIN"], async (req) => {
+    withRole(["ADMIN"], async (req, { user }) => {
         try {
             const { searchParams } = new URL(req.url);
             const page = Number(searchParams.get("page")) || 1;
@@ -24,7 +24,7 @@ export const GET = withAuth(
 );
 
 export const PUT = withAuth(
-    withRole(["ADMIN"], async (req) => {
+    withRole(["ADMIN"], async (req, { user }) => {
         try {
             const { userId, role } = await req.json() as { userId: string; role: "USER" | "ADMIN" };
             const updated = await adminService.updateUserRole(userId, role);

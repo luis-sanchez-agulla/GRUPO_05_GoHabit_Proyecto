@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Añadir Nuevo Hábito</title>
   <link rel="stylesheet" href="../css/anadirHabito.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <script src="../js/api.js"></script>
 </head>
 
 <body class="anadir-habito-page">
@@ -23,17 +27,11 @@
     <!-- Main Content -->
     <main class="anadir-habito-main">
       <form class="anadir-habito-form" id="habitForm">
-        
+
         <!-- Nombre del Hábito -->
         <div class="form-group">
           <label class="form-label" for="nombreHabito">Nombre del Hábito</label>
-          <input 
-            type="text" 
-            id="nombreHabito" 
-            class="form-input" 
-            placeholder="Ej. Meditación diaria"
-            required
-          />
+          <input type="text" id="nombreHabito" class="form-input" placeholder="Ej. Meditación diaria" required />
         </div>
 
         <!-- Categoría -->
@@ -77,14 +75,7 @@
         <div class="form-group">
           <label class="form-label">Meta Diaria</label>
           <div class="goal-input-group">
-            <input 
-              type="number" 
-              id="metaValor" 
-              class="goal-input" 
-              placeholder="10"
-              min="1"
-              value="10"
-            />
+            <input type="number" id="metaValor" class="goal-input" placeholder="10" min="1" value="10" />
             <select id="metaUnidad" class="goal-select">
               <option value="minutos">Minutos</option>
               <option value="veces">Veces</option>
@@ -104,7 +95,7 @@
               <span>Recordatorio</span>
             </div>
             <label class="toggle-switch">
-              <input type="checkbox" class="toggle-switch__input" id="recordatorio" checked/>
+              <input type="checkbox" class="toggle-switch__input" id="recordatorio" checked />
               <span class="toggle-switch__slider"></span>
             </label>
           </div>
@@ -172,7 +163,7 @@
       button.addEventListener('click', () => {
         button.classList.toggle('active');
         const day = parseInt(button.getAttribute('data-day'));
-        
+
         if (formState.frecuencia.includes(day)) {
           formState.frecuencia = formState.frecuencia.filter(d => d !== day);
         } else {
@@ -182,9 +173,9 @@
     });
 
     // Manejo del envío del formulario
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       formState.nombre = document.getElementById('nombreHabito').value;
       formState.metaValor = parseInt(document.getElementById('metaValor').value);
       formState.metaUnidad = document.getElementById('metaUnidad').value;
@@ -196,14 +187,25 @@
         return;
       }
 
-      console.log('Nuevo hábito:', formState);
-      
-      // Aquí se enviaría a la base de datos
-      // Por ahora, solo mostramos un mensaje y redirigimos
-      alert('¡Hábito creado exitosamente!');
-      
-      // Redirigir a la página de hábitos
-      window.location.href = 'habitos.html';
+      const isDaily = formState.frecuencia.length === 7;
+      const apiPayload = {
+        title: formState.nombre,
+        description: `Categoría: ${formState.categoria} | Meta: ${formState.metaValor} ${formState.metaUnidad}`,
+        frequency: isDaily ? 'DAILY' : 'WEEKLY',
+        targetCount: isDaily ? 1 : formState.frecuencia.length,
+        color: '#728764' // Color por defecto
+      };
+
+      try {
+        await window.fetchApi('/habits', {
+          method: 'POST',
+          body: JSON.stringify(apiPayload)
+        });
+        alert('¡Hábito creado exitosamente!');
+        window.location.href = 'habitos.html';
+      } catch (err) {
+        alert('Error al crear el hábito: ' + err.message);
+      }
     });
 
     // Actualizar estado cuando cambian los inputs
@@ -220,4 +222,5 @@
     });
   </script>
 </body>
+
 </html>

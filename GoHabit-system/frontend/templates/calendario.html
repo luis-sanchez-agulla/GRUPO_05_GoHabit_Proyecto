@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Calendario de Hábitos</title>
   <link rel="stylesheet" href="../css/calendario.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
 </head>
 
 <body class="calendario-page">
@@ -428,16 +431,16 @@
     function generarEstadoHabitos(fecha) {
       const claveFecha = obtenerClaveFecha(fecha);
       const habitosModificadosFecha = state.habitosModificados[claveFecha] || {};
-      
+
       const seed = fecha.getDate() + fecha.getMonth() * 31;
       const random = Math.sin(seed) * 10000;
       const completados = Math.floor((random - Math.floor(random)) * habitosEjemplo.length);
-      
+
       return habitosEjemplo.map((h, i) => {
         // Si el hábito fue modificado manualmente, usar ese estado
         const completadoManual = habitosModificadosFecha[h.id];
         const completado = completadoManual !== undefined ? completadoManual : (i < completados);
-        
+
         return {
           ...h,
           completado
@@ -448,26 +451,26 @@
     // Función para alternar el estado de un hábito
     function toggleHabito(fecha, habitoId) {
       const claveFecha = obtenerClaveFecha(fecha);
-      
+
       // Inicializar el objeto de fecha si no existe
       if (!state.habitosModificados[claveFecha]) {
         state.habitosModificados[claveFecha] = {};
       }
-      
+
       // Obtener el estado actual del hábito
       const habitos = generarEstadoHabitos(fecha);
       const habito = habitos.find(h => h.id === habitoId);
-      
+
       if (habito) {
         // Alternar el estado
         state.habitosModificados[claveFecha][habitoId] = !habito.completado;
-        
+
         // Actualizar la vista actual
         actualizarVista();
-        
+
         return !habito.completado;
       }
-      
+
       return false;
     }
 
@@ -481,10 +484,10 @@
     // Funciones de formato de fecha
     const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const diasSemanaCorto = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    const mesesCorto = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 
-                        'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const mesesCorto = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+      'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
     function formatearFechaCompleta(fecha) {
       return `${diasSemana[fecha.getDay()]}, ${fecha.getDate()} de ${meses[fecha.getMonth()]}`;
@@ -504,10 +507,10 @@
     function abrirModalDia(fecha) {
       const habitos = generarEstadoHabitos(fecha);
       const esFuturo = esFechaFutura(fecha);
-      
+
       // Actualizar título
       modalTitle.textContent = formatearFechaCompleta(fecha);
-      
+
       // Generar HTML de hábitos (mostrar estado solo si no es futuro)
       const habitosHTML = habitos.map(h => {
         if (esFuturo) {
@@ -548,11 +551,11 @@
           `;
         }
       }).join('');
-      
+
       modalBody.innerHTML = habitosHTML;
-      
+
       // Solo visualización, no se puede marcar/desmarcar hábitos desde el calendario
-      
+
       modal.classList.add('active');
     }
 
@@ -601,9 +604,9 @@
       const fecha = state.currentDate;
       const habitos = generarEstadoHabitos(fecha);
       const esFuturo = esFechaFutura(fecha);
-      
+
       periodTitle.textContent = formatearFechaCompleta(fecha);
-      
+
       const habitosHTML = habitos.map(h => {
         if (esFuturo) {
           // Día futuro: solo mostrar hábito sin indicador
@@ -640,7 +643,7 @@
       }).join('');
 
       dayView.querySelector('.calendario-day-habits').innerHTML = habitosHTML;
-      
+
       // Solo visualización, no se puede marcar/desmarcar hábitos desde el calendario
     }
 
@@ -648,24 +651,24 @@
     function actualizarVistaSemana() {
       const inicioSemana = obtenerInicioSemana(state.currentDate);
       const finSemana = obtenerFinSemana(state.currentDate);
-      
+
       periodTitle.textContent = `${formatearFechaCorta(inicioSemana)} - ${formatearFechaCorta(finSemana)}`;
-      
+
       let diasHTML = '';
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
-      
+
       for (let i = 0; i < 7; i++) {
         const dia = new Date(inicioSemana);
         dia.setDate(dia.getDate() + i);
         const habitos = generarEstadoHabitos(dia);
         const esHoy = dia.getTime() === hoy.getTime();
-        
+
         const esFuturoDia = esFechaFutura(dia);
-        const habitosDotsHTML = habitos.slice(0, 3).map(h => 
+        const habitosDotsHTML = habitos.slice(0, 3).map(h =>
           `<div class="calendario-habit-dot ${!esFuturoDia && h.completado ? 'completed' : ''}"></div>`
         ).join('');
-        
+
         diasHTML += `
           <div class="calendario-week-day ${esHoy ? 'today' : ''}" data-date="${dia.toISOString()}" style="cursor: pointer;">
             <div class="calendario-week-day__header">
@@ -678,9 +681,9 @@
           </div>
         `;
       }
-      
+
       weekView.querySelector('.calendario-week-grid').innerHTML = diasHTML;
-      
+
       // Agregar event listeners a los días
       weekView.querySelectorAll('.calendario-week-day').forEach(dayEl => {
         dayEl.addEventListener('click', () => {
@@ -689,7 +692,7 @@
           abrirModalDia(fecha);
         });
       });
-      
+
       // Actualizar resumen de la semana
       const habitosSemanaHTML = habitosEjemplo.slice(0, 3).map(h => {
         let completados = 0;
@@ -711,7 +714,7 @@
           </div>
         `;
       }).join('');
-      
+
       weekView.querySelector('.calendario-habit-list').innerHTML = habitosSemanaHTML;
     }
 
@@ -720,19 +723,19 @@
       const fecha = state.currentDate;
       const primerDia = new Date(fecha.getFullYear(), fecha.getMonth(), 1);
       const ultimoDia = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0);
-      
+
       periodTitle.textContent = `${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
-      
+
       // Calcular días a mostrar
       const primerDiaSemana = primerDia.getDay();
       const ajustePrimerDia = primerDiaSemana === 0 ? 6 : primerDiaSemana - 1; // Lunes como inicio
-      
+
       let diasHTML = '';
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
       const fechaSeleccionada = new Date(state.currentDate);
       fechaSeleccionada.setHours(0, 0, 0, 0);
-      
+
       // Días del mes anterior
       const ultimoDiaMesAnterior = new Date(fecha.getFullYear(), fecha.getMonth(), 0);
       for (let i = ajustePrimerDia - 1; i >= 0; i--) {
@@ -744,18 +747,18 @@
           </div>
         `;
       }
-      
+
       // Días del mes actual
       let diasCompletos = 0;
       let diasParciales = 0;
-      
+
       for (let i = 1; i <= ultimoDia.getDate(); i++) {
         const dia = new Date(fecha.getFullYear(), fecha.getMonth(), i);
         const habitos = generarEstadoHabitos(dia);
         const completados = habitos.filter(h => h.completado).length;
         const porcentaje = completados / habitos.length;
         const esFuturoDia = esFechaFutura(dia);
-        
+
         let indicadorClass = '';
         // Solo mostrar indicador si no es d��a futuro
         if (!esFuturoDia) {
@@ -767,9 +770,9 @@
             diasParciales++;
           }
         }
-        
+
         const esHoy = dia.getTime() === fechaSeleccionada.getTime();
-        
+
         diasHTML += `
           <div class="calendario-month-day ${esHoy ? 'today' : ''}" data-date="${dia.toISOString()}" style="cursor: pointer;">
             <span class="calendario-month-day__number">${i}</span>
@@ -777,7 +780,7 @@
           </div>
         `;
       }
-      
+
       // Días del siguiente mes
       const diasMostrados = ajustePrimerDia + ultimoDia.getDate();
       const diasRestantes = 42 - diasMostrados; // 6 filas de 7 días
@@ -788,9 +791,9 @@
           </div>
         `;
       }
-      
+
       monthView.querySelector('.calendario-month-grid').innerHTML = diasHTML;
-      
+
       // Agregar event listeners a los días del mes actual
       monthView.querySelectorAll('.calendario-month-day:not(.other-month)').forEach(dayEl => {
         dayEl.addEventListener('click', () => {
@@ -799,12 +802,12 @@
           abrirModalDia(fecha);
         });
       });
-      
+
       // Actualizar estadísticas
       const diasActivos = diasCompletos + diasParciales;
       const porcentajeCompletado = Math.round((diasCompletos / ultimoDia.getDate()) * 100);
       const racha = Math.floor(Math.random() * 10) + 1; // Placeholder
-      
+
       monthView.querySelector('.calendario-month-stats').innerHTML = `
         <div class="calendario-month-stat">
           <div class="calendario-month-stat__value">${porcentajeCompletado}%</div>
@@ -843,7 +846,7 @@
         monthView.classList.add('hidden');
 
         state.currentView = button.dataset.view;
-        
+
         if (state.currentView === 'day') {
           dayView.classList.remove('hidden');
         } else if (state.currentView === 'week') {
@@ -851,7 +854,7 @@
         } else if (state.currentView === 'month') {
           monthView.classList.remove('hidden');
         }
-        
+
         actualizarVista();
       });
     });
@@ -883,4 +886,5 @@
     actualizarVistaDia();
   </script>
 </body>
+
 </html>
