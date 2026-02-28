@@ -60,8 +60,8 @@ type ValidatedHandler<T> = (
  * @param handler - Handler que recibe los datos ya validados y tipados
  * @returns       - Nueva función que valida el body antes de ejecutar
  */
-export function withValidation<T>(schema: ZodSchema<T>, handler: ValidatedHandler<T>): (req: NextRequest, routeContext: any) => Promise<NextResponse> {
-    return async (req: NextRequest, routeContext?: any) => {
+export function withValidation<T>(schema: ZodSchema<T>, handler: ValidatedHandler<T>) {
+    return async (req: NextRequest, routeContext: { params: Promise<Record<string, string>> }) => {
         try {
             // 1. Leer el body JSON de la petición
             const body = await req.json();
@@ -71,7 +71,7 @@ export function withValidation<T>(schema: ZodSchema<T>, handler: ValidatedHandle
             const data = schema.parse(body);
 
             // 3. Resolver params dinámicos de la ruta (igual que en withAuth)
-            const resolvedParams = routeContext?.params ? await routeContext.params : undefined;
+            const resolvedParams = await routeContext.params;
 
             // 4. Ejecutar el handler con los datos validados
             return handler(req, { data, params: resolvedParams });

@@ -11,6 +11,7 @@
 import { prisma } from "@/lib/prisma";
 import { NotFoundError } from "@/lib/errors";
 import { POINTS, COINS } from "@/lib/constants";
+import type { Prisma } from "@prisma/client";
 import type { CreateTaskInput, UpdateTaskInput } from "@/validations/task.schema";
 
 export const taskService = {
@@ -69,7 +70,7 @@ export const taskService = {
 
         // Caso especial: marcar como COMPLETED → otorgar puntos
         if (data.status === "COMPLETED" && task.status !== "COMPLETED") {
-            return prisma.$transaction(async (tx) => {
+            return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
                 // 1. Actualizar la tarea + registrar la fecha de completion
                 const updated = await tx.task.update({
                     where: { id: taskId },

@@ -12,6 +12,7 @@
 import { prisma } from "@/lib/prisma";
 import { NotFoundError } from "@/lib/errors";
 import { POINTS, COINS } from "@/lib/constants";   // Cuántos puntos/monedas otorgar
+import type { Prisma } from "@prisma/client";
 import type { CreateHabitInput, UpdateHabitInput } from "@/validations/habit.schema";
 
 export const habitService = {
@@ -106,7 +107,7 @@ export const habitService = {
         if (!habit) throw new NotFoundError("Habit");
 
         // Transacción: ambas operaciones se ejecutan juntas o ninguna
-        return prisma.$transaction(async (tx) => {
+        return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             // 1. Crear el registro de completion
             const completion = await tx.habitCompletion.create({
                 data: { habitId, userId, note },

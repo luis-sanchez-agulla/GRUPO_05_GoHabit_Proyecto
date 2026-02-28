@@ -11,6 +11,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { NotFoundError, ValidationError } from "@/lib/errors";
+import type { Prisma } from "@prisma/client";
 
 export const rewardService = {
     /**
@@ -55,7 +56,7 @@ export const rewardService = {
         }
 
         // 3. Transacción: registrar canje + restar monedas
-        return prisma.$transaction(async (tx) => {
+        return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             // Crear registro de canje
             const userReward = await tx.userReward.create({
                 data: { userId, rewardId },

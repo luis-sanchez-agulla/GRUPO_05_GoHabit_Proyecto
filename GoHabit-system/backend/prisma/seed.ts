@@ -17,7 +17,7 @@
  * Así puedes ejecutar el seed varias veces sin problemas.
  */
 
-import { PrismaClient, Role } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 // Crear una instancia de Prisma solo para el seed (no usa el singleton)
@@ -38,7 +38,7 @@ async function main() {
             password: adminPassword,
             firstName: "Admin",
             lastName: "GoHabit",
-            role: Role.ADMIN,                      // Rol ADMIN
+            role: "ADMIN",                      // Rol ADMIN
             points: 0,
             coins: 0,
             level: 1,
@@ -57,7 +57,7 @@ async function main() {
             password: userPassword,
             firstName: "Test",
             lastName: "User",
-            role: Role.USER,
+            role: "USER",
             points: 100,   // Empezar con algunos puntos para probar
             coins: 50,     // Empezar con monedas para probar canje
             level: 2,
