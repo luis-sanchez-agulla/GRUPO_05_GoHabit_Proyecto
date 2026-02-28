@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <!-- Meta Tags -->
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Pantalla de Inicio con Árbol Avatar</title>
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="../css/index.css">
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
 </head>
+
 <body>
     <div class="index-container">
         <!-- Header Section -->
@@ -33,7 +36,8 @@
             <div class="index-tree-glow"></div>
             <div class="index-tree-container">
                 <!-- Tree Image Placeholder -->
-                <div class="index-tree-image" data-alt="Beautiful growing green tree illustration representing progress" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVjO9jGOV1NPgGHkRpiszfA7j4bNqwVW2Tg76Hw1fgn_0w4gLNeXnGx-mCNh9_xY4VvLeT1IIh-orEBsrvjrlCHnxEhAUMFVwxpCYG7TpW6GtcXmLxBy2gtGgiRE4UofK7HCUMdGr4NpWVyB1IggbR76dsyHhpe-mA0O3gIYXWPFDYsxtDfDpfgIl-Euax_gp26WKVNUBr9yYf1AjStg0IrAG_bBGua3eGeAr6VDgRHX7H5NNFyNu0XGkqYj5NIisBbRv8livaJWY');">
+                <div class="index-tree-image" data-alt="Beautiful growing green tree illustration representing progress"
+                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVjO9jGOV1NPgGHkRpiszfA7j4bNqwVW2Tg76Hw1fgn_0w4gLNeXnGx-mCNh9_xY4VvLeT1IIh-orEBsrvjrlCHnxEhAUMFVwxpCYG7TpW6GtcXmLxBy2gtGgiRE4UofK7HCUMdGr4NpWVyB1IggbR76dsyHhpe-mA0O3gIYXWPFDYsxtDfDpfgIl-Euax_gp26WKVNUBr9yYf1AjStg0IrAG_bBGua3eGeAr6VDgRHX7H5NNFyNu0XGkqYj5NIisBbRv8livaJWY');">
                 </div>
                 <!-- Floating Level Badge -->
                 <div class="index-tree-badge">
@@ -176,11 +180,11 @@
         function guardarEstadoHabito(habitoId, completado) {
             const claveFecha = obtenerClaveFechaHoy();
             const estadoHabitos = cargarEstadoHabitos();
-            
+
             if (!estadoHabitos[claveFecha]) {
                 estadoHabitos[claveFecha] = {};
             }
-            
+
             estadoHabitos[claveFecha][habitoId] = completado;
             localStorage.setItem('habitosCompletados', JSON.stringify(estadoHabitos));
         }
@@ -211,14 +215,14 @@
                 z-index: 10000;
                 animation: slideIn 0.3s ease-out;
             `;
-            
+
             notificacion.innerHTML = `
                 <span class="material-symbols-outlined" style="color: ${esPositivo ? '#f4e287' : '#fff'};">eco</span>
                 <span>${mensaje}</span>
             `;
-            
+
             document.body.appendChild(notificacion);
-            
+
             setTimeout(() => {
                 notificacion.style.animation = 'slideOut 0.3s ease-in';
                 setTimeout(() => notificacion.remove(), 300);
@@ -245,19 +249,19 @@
 
         // Inicializar estado desde localStorage
         let habitoCompletado = obtenerEstadoHabitoHoy(habitoId);
-        
+
         // Aplicar estado visual inicial
         actualizarBotonUI(habitoCompletado);
 
         botonCheck.addEventListener('click', () => {
             const semillasGanadas = 10;
-            
+
             if (!habitoCompletado) {
                 // Marcar como completado
                 habitoCompletado = true;
                 guardarEstadoHabito(habitoId, true);
                 actualizarBotonUI(true);
-                
+
                 // Dar recompensa de semillas
                 const totalSemillas = agregarSemillas(semillasGanadas);
                 mostrarNotificacion(`+${semillasGanadas} semillas 🌱`, true);
@@ -267,7 +271,7 @@
                 habitoCompletado = false;
                 guardarEstadoHabito(habitoId, false);
                 actualizarBotonUI(false);
-                
+
                 // Restar semillas
                 const totalSemillas = restarSemillas(semillasGanadas);
                 mostrarNotificacion(`-${semillasGanadas} semillas`, false);
@@ -302,4 +306,5 @@
         document.head.appendChild(style);
     </script>
 </body>
+
 </html>

@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Dashboard de Hábitos y Crecimiento</title>
   <link rel="stylesheet" href="../css/habitos.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
 </head>
 
 <body class="habitos-page">
@@ -73,7 +76,7 @@
               <p class="habit-card__category">Hidratación</p>
             </div>
             <label class="habit-checkbox">
-              <input checked="" class="habit-checkbox__input" type="checkbox"/>
+              <input checked="" class="habit-checkbox__input" type="checkbox" />
               <div class="habit-checkbox__box">
                 <span class="material-symbols-outlined habit-checkbox__icon">check</span>
               </div>
@@ -90,7 +93,7 @@
               <p class="habit-card__category">Mente</p>
             </div>
             <label class="habit-checkbox">
-              <input class="habit-checkbox__input" type="checkbox"/>
+              <input class="habit-checkbox__input" type="checkbox" />
               <div class="habit-checkbox__box">
                 <span class="material-symbols-outlined habit-checkbox__icon">check</span>
               </div>
@@ -107,7 +110,7 @@
               <p class="habit-card__category">Espiritualidad</p>
             </div>
             <label class="habit-checkbox">
-              <input class="habit-checkbox__input" type="checkbox"/>
+              <input class="habit-checkbox__input" type="checkbox" />
               <div class="habit-checkbox__box">
                 <span class="material-symbols-outlined habit-checkbox__icon">check</span>
               </div>
@@ -124,7 +127,7 @@
               <p class="habit-card__category">Salud</p>
             </div>
             <label class="habit-checkbox">
-              <input class="habit-checkbox__input" type="checkbox"/>
+              <input class="habit-checkbox__input" type="checkbox" />
               <div class="habit-checkbox__box">
                 <span class="material-symbols-outlined habit-checkbox__icon">check</span>
               </div>
@@ -213,11 +216,11 @@
     function guardarEstadoHabito(habitoId, completado) {
       const claveFecha = obtenerClaveFechaHoy();
       const estadoHabitos = cargarEstadoHabitos();
-      
+
       if (!estadoHabitos[claveFecha]) {
         estadoHabitos[claveFecha] = {};
       }
-      
+
       estadoHabitos[claveFecha][habitoId] = completado;
       localStorage.setItem('habitosCompletados', JSON.stringify(estadoHabitos));
     }
@@ -247,14 +250,14 @@
         z-index: 10000;
         animation: slideIn 0.3s ease-out;
       `;
-      
+
       notificacion.innerHTML = `
         <span class="material-symbols-outlined" style="color: #f4e287;">eco</span>
         <span>${esPositivo ? '+' : ''}${cantidad} semillas 🌱</span>
       `;
-      
+
       document.body.appendChild(notificacion);
-      
+
       setTimeout(() => {
         notificacion.style.animation = 'slideOut 0.3s ease-in';
         setTimeout(() => notificacion.remove(), 300);
@@ -263,19 +266,19 @@
 
     // Manejar los checkboxes de hábitos
     const checkboxes = document.querySelectorAll('.habit-checkbox__input');
-    
+
     // Inicializar checkboxes con el estado guardado
     checkboxes.forEach((checkbox, index) => {
       const habitoId = index + 1; // IDs 1-4 para los 4 hábitos
       const estaCompletado = obtenerEstadoHabitoHoy(habitoId);
       checkbox.checked = estaCompletado;
     });
-    
+
     checkboxes.forEach((checkbox, index) => {
       checkbox.addEventListener('change', (e) => {
         const habitoId = index + 1; // IDs 1-4 para los 4 hábitos
         const semillasGanadas = 10;
-        
+
         if (e.target.checked) {
           // Marcar como completado y dar semillas
           guardarEstadoHabito(habitoId, true);
@@ -319,4 +322,5 @@
     document.head.appendChild(style);
   </script>
 </body>
+
 </html>

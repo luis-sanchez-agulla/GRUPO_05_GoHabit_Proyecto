@@ -1,131 +1,138 @@
 <!DOCTYPE html>
 <html class="light" lang="es">
-  <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-    <title>Perfil de Usuario</title>
-    <link rel="stylesheet" href="../css/perfil.css">
-  </head>
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <title>Perfil de Usuario</title>
+  <link rel="stylesheet" href="../css/perfil.css">
+</head>
+
 <body>
-<div class="perfil-container">
-<!-- Header / Top Bar -->
-<header class="perfil-header">
-<a href="index.html" class="perfil-header__button">
-<span class="material-symbols-outlined">arrow_back</span>
-</a>
-<h2 class="perfil-header__title">Perfil</h2>
-<div class="perfil-header__button">
-<span class="material-symbols-outlined">settings</span>
-</div>
-</header>
-<main class="perfil-main">
-<!-- Profile Header Section -->
-<section class="perfil-profile-section">
-<div class="perfil-avatar-wrapper">
-<div class="perfil-avatar" data-alt="Professional headshot of a smiling man named Juan Perez" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCWNdqHwtkDMyJ-GAgFvztWIwHq-6L1gYmO9SKgjT-uvZpQSRFEksEIWunusIjl6chIHrJmAe80zSz7OTZ8xpZUNcAZEa3p6RBdlQCGmrPWN6uXrSLE-02UZ2buVElTaZ6r3dP8eIUEr0CpAG65uGX2EGby_dVFqHQG3J1MwbtH9p94zgTRzyx5DCf9FhG6J4vWj4AArUJAHrivfBfbje6W9i2duMvQJbWGaUmOnuotX3j3VTs2o258h4Wvv3Nltpng5HSMuLj_ooo");'>
-</div>
-<div class="perfil-avatar-edit">
-<span class="material-symbols-outlined perfil-avatar-edit__icon">edit</span>
-</div>
-</div>
-<div class="perfil-user-info">
-<h1 class="perfil-user-info__name">Juan Pérez</h1>
-<p class="perfil-user-info__email">juan.perez@email.com</p>
-</div>
-</section>
-<!-- Stats Grid Section -->
-<section class="perfil-stats-section">
-<div class="perfil-stats-grid">
-<!-- Level Card -->
-<div class="perfil-stat-card">
-<div class="perfil-stat-card__header">
-<div class="perfil-stat-card__icon-wrapper perfil-stat-card__icon-wrapper--green">
-<span class="material-symbols-outlined">park</span>
-</div>
-<p class="perfil-stat-card__label">Nivel de Árbol</p>
-</div>
-<div class="perfil-stat-card__content">
-<p class="perfil-stat-card__value">12</p>
-<p class="perfil-stat-card__badge perfil-stat-card__badge--green">+2 este mes</p>
-</div>
-</div>
-<!-- Streak Card -->
-<div class="perfil-stat-card">
-<div class="perfil-stat-card__header">
-<div class="perfil-stat-card__icon-wrapper perfil-stat-card__icon-wrapper--primary">
-<span class="material-symbols-outlined">local_fire_department</span>
-</div>
-<p class="perfil-stat-card__label">Días de Racha</p>
-</div>
-<div class="perfil-stat-card__content">
-<p class="perfil-stat-card__value">15</p>
-<p class="perfil-stat-card__badge perfil-stat-card__badge--primary">¡Sigue así!</p>
-</div>
-</div>
-<!-- Total Habits Card -->
-<div class="perfil-stat-card">
-<div class="perfil-stat-card__header">
-<div class="perfil-stat-card__icon-wrapper perfil-stat-card__icon-wrapper--blue">
-<span class="material-symbols-outlined">task_alt</span>
-</div>
-<p class="perfil-stat-card__label">Hábitos Totales</p>
-</div>
-<div class="perfil-stat-card__content">
-<p class="perfil-stat-card__value">75</p>
-<p class="perfil-stat-card__badge perfil-stat-card__badge--blue">Completados</p>
-</div>
-</div>
-</div>
-</section>
-<!-- Progress Header -->
-<section class="perfil-progress-section">
-<div class="perfil-progress-header">
-<h3 class="perfil-progress-header__title">Mi Progreso</h3>
-<a href="habitos.html" class="perfil-progress-header__link">Ver detalles</a>
-</div>
-<!-- Progress Visualization Mock -->
-<div class="perfil-progress-chart">
-<div class="perfil-progress-chart__bars">
-<div class="perfil-progress-chart__bar perfil-progress-chart__bar--inactive"></div>
-<div class="perfil-progress-chart__bar perfil-progress-chart__bar--inactive"></div>
-<div class="perfil-progress-chart__bar perfil-progress-chart__bar--inactive"></div>
-<div class="perfil-progress-chart__bar perfil-progress-chart__bar--active"></div>
-<div class="perfil-progress-chart__bar perfil-progress-chart__bar--inactive"></div>
-<div class="perfil-progress-chart__bar perfil-progress-chart__bar--inactive"></div>
-<div class="perfil-progress-chart__bar perfil-progress-chart__bar--inactive"></div>
-</div>
-<div class="perfil-progress-chart__labels">
-<span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
-</div>
-</div>
-</section>
-</main>
-<!-- Bottom Navigation Bar -->
-<nav class="perfil-nav">
-<div class="perfil-nav__container">
-<a class="perfil-nav__link" href="index.html">
-<span class="material-symbols-outlined perfil-nav__icon">home</span>
-<p class="perfil-nav__text">Inicio</p>
-</a>
-<a class="perfil-nav__link" href="habitos.html">
-<span class="material-symbols-outlined perfil-nav__icon">task_alt</span>
-<p class="perfil-nav__text">Hábitos</p>
-</a>
-<a class="perfil-nav__link" href="avatar.html">
-<span class="material-symbols-outlined perfil-nav__icon">park</span>
-<p class="perfil-nav__text">Avatar</p>
-</a>
-<a class="perfil-nav__link" href="tienda.html">
-<span class="material-symbols-outlined perfil-nav__icon">storefront</span>
-<p class="perfil-nav__text">Tienda</p>
-</a>
-<a class="perfil-nav__link perfil-nav__link--active" href="perfil.html">
-<span class="material-symbols-outlined perfil-nav__icon perfil-nav__icon--filled">person</span>
-<p class="perfil-nav__text">Perfil</p>
-</a>
-</div>
-</nav>
-</div>
-</body></html>
+  <div class="perfil-container">
+    <!-- Header / Top Bar -->
+    <header class="perfil-header">
+      <a href="index.html" class="perfil-header__button">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </a>
+      <h2 class="perfil-header__title">Perfil</h2>
+      <div class="perfil-header__button">
+        <span class="material-symbols-outlined">settings</span>
+      </div>
+    </header>
+    <main class="perfil-main">
+      <!-- Profile Header Section -->
+      <section class="perfil-profile-section">
+        <div class="perfil-avatar-wrapper">
+          <div class="perfil-avatar" data-alt="Professional headshot of a smiling man named Juan Perez"
+            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCWNdqHwtkDMyJ-GAgFvztWIwHq-6L1gYmO9SKgjT-uvZpQSRFEksEIWunusIjl6chIHrJmAe80zSz7OTZ8xpZUNcAZEa3p6RBdlQCGmrPWN6uXrSLE-02UZ2buVElTaZ6r3dP8eIUEr0CpAG65uGX2EGby_dVFqHQG3J1MwbtH9p94zgTRzyx5DCf9FhG6J4vWj4AArUJAHrivfBfbje6W9i2duMvQJbWGaUmOnuotX3j3VTs2o258h4Wvv3Nltpng5HSMuLj_ooo");'>
+          </div>
+          <div class="perfil-avatar-edit">
+            <span class="material-symbols-outlined perfil-avatar-edit__icon">edit</span>
+          </div>
+        </div>
+        <div class="perfil-user-info">
+          <h1 class="perfil-user-info__name">Juan Pérez</h1>
+          <p class="perfil-user-info__email">juan.perez@email.com</p>
+        </div>
+      </section>
+      <!-- Stats Grid Section -->
+      <section class="perfil-stats-section">
+        <div class="perfil-stats-grid">
+          <!-- Level Card -->
+          <div class="perfil-stat-card">
+            <div class="perfil-stat-card__header">
+              <div class="perfil-stat-card__icon-wrapper perfil-stat-card__icon-wrapper--green">
+                <span class="material-symbols-outlined">park</span>
+              </div>
+              <p class="perfil-stat-card__label">Nivel de Árbol</p>
+            </div>
+            <div class="perfil-stat-card__content">
+              <p class="perfil-stat-card__value">12</p>
+              <p class="perfil-stat-card__badge perfil-stat-card__badge--green">+2 este mes</p>
+            </div>
+          </div>
+          <!-- Streak Card -->
+          <div class="perfil-stat-card">
+            <div class="perfil-stat-card__header">
+              <div class="perfil-stat-card__icon-wrapper perfil-stat-card__icon-wrapper--primary">
+                <span class="material-symbols-outlined">local_fire_department</span>
+              </div>
+              <p class="perfil-stat-card__label">Días de Racha</p>
+            </div>
+            <div class="perfil-stat-card__content">
+              <p class="perfil-stat-card__value">15</p>
+              <p class="perfil-stat-card__badge perfil-stat-card__badge--primary">¡Sigue así!</p>
+            </div>
+          </div>
+          <!-- Total Habits Card -->
+          <div class="perfil-stat-card">
+            <div class="perfil-stat-card__header">
+              <div class="perfil-stat-card__icon-wrapper perfil-stat-card__icon-wrapper--blue">
+                <span class="material-symbols-outlined">task_alt</span>
+              </div>
+              <p class="perfil-stat-card__label">Hábitos Totales</p>
+            </div>
+            <div class="perfil-stat-card__content">
+              <p class="perfil-stat-card__value">75</p>
+              <p class="perfil-stat-card__badge perfil-stat-card__badge--blue">Completados</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Progress Header -->
+      <section class="perfil-progress-section">
+        <div class="perfil-progress-header">
+          <h3 class="perfil-progress-header__title">Mi Progreso</h3>
+          <a href="habitos.html" class="perfil-progress-header__link">Ver detalles</a>
+        </div>
+        <!-- Progress Visualization Mock -->
+        <div class="perfil-progress-chart">
+          <div class="perfil-progress-chart__bars">
+            <div class="perfil-progress-chart__bar perfil-progress-chart__bar--inactive"></div>
+            <div class="perfil-progress-chart__bar perfil-progress-chart__bar--inactive"></div>
+            <div class="perfil-progress-chart__bar perfil-progress-chart__bar--inactive"></div>
+            <div class="perfil-progress-chart__bar perfil-progress-chart__bar--active"></div>
+            <div class="perfil-progress-chart__bar perfil-progress-chart__bar--inactive"></div>
+            <div class="perfil-progress-chart__bar perfil-progress-chart__bar--inactive"></div>
+            <div class="perfil-progress-chart__bar perfil-progress-chart__bar--inactive"></div>
+          </div>
+          <div class="perfil-progress-chart__labels">
+            <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- Bottom Navigation Bar -->
+    <nav class="perfil-nav">
+      <div class="perfil-nav__container">
+        <a class="perfil-nav__link" href="index.html">
+          <span class="material-symbols-outlined perfil-nav__icon">home</span>
+          <p class="perfil-nav__text">Inicio</p>
+        </a>
+        <a class="perfil-nav__link" href="habitos.html">
+          <span class="material-symbols-outlined perfil-nav__icon">task_alt</span>
+          <p class="perfil-nav__text">Hábitos</p>
+        </a>
+        <a class="perfil-nav__link" href="avatar.html">
+          <span class="material-symbols-outlined perfil-nav__icon">park</span>
+          <p class="perfil-nav__text">Avatar</p>
+        </a>
+        <a class="perfil-nav__link" href="tienda.html">
+          <span class="material-symbols-outlined perfil-nav__icon">storefront</span>
+          <p class="perfil-nav__text">Tienda</p>
+        </a>
+        <a class="perfil-nav__link perfil-nav__link--active" href="perfil.html">
+          <span class="material-symbols-outlined perfil-nav__icon perfil-nav__icon--filled">person</span>
+          <p class="perfil-nav__text">Perfil</p>
+        </a>
+      </div>
+    </nav>
+  </div>
+</body>
+
+</html>
