@@ -1,27 +1,101 @@
+# custom.cnf
+# Configuración optimizada de MySQL para GoHabit
+# Funciona tanto en desarrollo (PC) como en producción (Raspberry Pi)
+
 [mysqld]
+
+# ═══════════════════════════════════════════════════════════
+# VALIDACIÓN Y SEGURIDAD
+# ═══════════════════════════════════════════════════════════
+
 # Validación estricta de datos
-sql_mode=STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+sql_mode = STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
 
-# Logs
-log_error_verbosity=3
-slow_query_log=1
-long_query_time=0.5
-#log_bin=ON
-#sync_binlog=1
-    #  Se borran los logs cada cierto tiempo para no sobre cargar el disco (una semana)
-#binlog_expire_logs_seconds=604800
+# Validación de contraseñas
+validate_password.length = 8
+validate_password.policy = MEDIUM
+validate_password.mixed_case_count = 1
 
+# ═══════════════════════════════════════════════════════════
+# CONEXIONES Y RECURSOS
+# ═══════════════════════════════════════════════════════════
 
-# RAM 
-    # Rendimiento (ajustar según RAM disponible)
-innodb_buffer_pool_size=256M
-    # Descentralizar en un futuro, para que si se cae uno el otro pueda dar soporte
-max_connections=200
+# Conexiones simultáneas: balanceado para desarrollo y Raspberry
+# (200 era mucho para Raspberry, 50 era poco para desarrollo)
+max_connections = 100
 
-# Validacion de contraseñas
-    #longitud minima 8
-validate_password.length=8
-    # Nivel de exigencia
-validate_password.policy=MEDIUM
-    # Mayúsculas y minúsculas requeridas
-validate_password.mixed_case_count=1
+# Tamaño de stack por thread
+thread_stack = 192K
+
+# ═══════════════════════════════════════════════════════════
+# INNODB Y MEMORIA
+# ═══════════════════════════════════════════════════════════
+
+# Buffer pool: 256MB es óptimo para 4GB RAM
+# Si tienes 8GB puedes subir a 512M
+innodb_buffer_pool_size = 256M
+
+# Tamaño de archivos de log
+innodb_log_file_size = 100M
+
+# Flush mode: 2 = mejor rendimiento, flush cada segundo
+# Si necesitas máxima durabilidad (ej: banco), cambiar a 1
+innodb_flush_log_at_trx_commit = 2
+
+# ═══════════════════════════════════════════════════════════
+# LOGS Y AUDITORÍA
+# ═══════════════════════════════════════════════════════════
+
+# Error logs con verbosidad máxima
+log_error_verbosity = 3
+
+# Slow query log: DESACTIVADO por defecto (ahorra I/O)
+# Activar solo en desarrollo si necesitas debuggear queries lentas:
+# slow_query_log = 1
+# long_query_time = 0.5
+slow_query_log = 0
+
+# Binary logs: DESACTIVADOS (no necesitamos replicación)
+# Ahorra mucho espacio en disco (especialmente en Raspberry)
+# Si en el futuro necesitas replicación master-slave, descomentar:
+# log_bin = mysql-bin
+# binlog_format = ROW
+# binlog_expire_logs_seconds = 604800
+skip_log_bin
+
+# ═══════════════════════════════════════════════════════════
+# OPTIMIZACIONES DE RED
+# ═══════════════════════════════════════════════════════════
+
+# No resolver DNS (conexiones más rápidas)
+skip_name_resolve = 1
+
+# ═══════════════════════════════════════════════════════════
+# CHARSET
+# ═══════════════════════════════════════════════════════════
+
+character_set_server = utf8mb4
+collation_server = utf8mb4_unicode_ci
+
+# ═══════════════════════════════════════════════════════════
+# NOTAS DE CONFIGURACIÓN
+# ═══════════════════════════════════════════════════════════
+#
+# Este archivo combina optimizaciones para:
+# - Desarrollo en PC (suficientes conexiones y logs)
+# - Producción en Raspberry Pi (bajo consumo de recursos)
+#
+# Ajustes según tu escenario:
+#
+# 📊 DESARROLLO (debuggear queries):
+#   slow_query_log = 1
+#   long_query_time = 0.5
+#
+# 🍓 RASPBERRY PI con 8GB RAM:
+#   innodb_buffer_pool_size = 512M
+#
+# 🔁 REPLICACIÓN MASTER-SLAVE:
+#   Comentar skip_log_bin
+#   Descomentar log_bin, binlog_format, binlog_expire_logs_seconds
+#
+# ═══════════════════════════════════════════════════════════
