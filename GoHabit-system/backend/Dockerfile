@@ -14,68 +14,67 @@
 # Para ejecutar:  docker run -p 3000:3000 gohabit-backend
 
 # ── Stage 1: Instalar dependencias ──────────────────
-# Usa Node 20 en Alpine Linux (imagen ligera ~50MB)
-FROM node:20-alpine AS deps
+FROM node:20-bookworm-slim AS deps
 WORKDIR /app
 
-# Copiamos solo package.json primero para aprovechar la caché de Docker.
-# Si package.json no cambia, Docker reutiliza esta capa sin reinstalar.
+# Instalar dependencias del sistema necesarias para Prisma
+RUN apt-get update && apt-get install -y \
+    openssl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiar archivos de definición de paquetes
 COPY package.json package-lock.json* ./
 
-# npm ci instala versiones EXACTAS del lockfile (más seguro que npm install)
-RUN npm ci --ignore-scripts
+# Instalamos dependencias (incluyendo prisma)
+# Usamos install en lugar de ci para ser más flexibles con el lockfile generado en Windows
+RUN npm install
 
-# Generamos el cliente Prisma (necesario para que TypeScript compile)
-RUN npx prisma generate || true
-
-# ── Stage 2: Build ──────────────────────────────────
-# Compilamos el proyecto Next.js
-FROM node:20-alpine AS builder
+# Stage 2: Builder
+FROM node:20-bookworm-slim AS builder
 WORKDIR /app
 
-# Traemos node_modules de la etapa anterior
+# Instalar openssl aquí también
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
+# Copiar node_modules de la etapa anterior
 COPY --from=deps /app/node_modules ./node_modules
-# Copiamos todo el código fuente
+# Copiar el código fuente
 COPY . .
 
-# Variables para build de Next.js (necesarias porque se evalúan rutas API)
-ENV DATABASE_URL="mysql://app:apppass@mysql:3306/goto"
-ENV JWT_SECRET="build-only-secret-min-16"
-ENV JWT_EXPIRES_IN="7d"
-ENV NODE_ENV="production"
-
-# Regeneramos Prisma (ahora con el schema.prisma disponible)
+# Generar el cliente de Prisma
+# Usamos npx para asegurar que usa el binario local de node_modules
 RUN npx prisma generate
-# Compilamos Next.js → genera .next/standalone
+
+# Variables para Next.js build
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+# Compilar la aplicación standalone
 RUN npm run build
 
-# ── Stage 3: Producción ────────────────────────────
-# Imagen final mínima — solo contiene lo necesario para ejecutar
-FROM node:20-alpine AS runner
+# Stage 3: Runner
+FROM node:20-bookworm-slim AS runner
 WORKDIR /app
 
-# Variables de entorno de producción
+# Instalar openssl en el runtime
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Creamos un usuario no-root por seguridad
-# (evita que el proceso tenga permisos de administrador)
+# Usuario de seguridad
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copiamos solo los archivos necesarios del build:
-# - .next/standalone → servidor compilado + dependencias mínimas
-# - .next/static    → assets estáticos generados por Next.js
-# - prisma/         → schema necesario para las queries en runtime
+# Copiar archivos necesarios para el runtime
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
 
-# Ejecutamos como usuario no-root
 USER nextjs
 
-# Exponemos el puerto 3000
 EXPOSE 3000
 
-# Comando de arranque — ejecuta el servidor standalone generado
 CMD ["node", "server.js"]

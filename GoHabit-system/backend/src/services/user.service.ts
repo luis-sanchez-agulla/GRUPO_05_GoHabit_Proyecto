@@ -8,9 +8,8 @@
  * y perfil PÚBLICO (datos visibles para otros usuarios).
  */
 
-import { prisma } from "@/lib/prisma";
+import { query, execute } from "@/lib/mysql";
 import { NotFoundError, ConflictError } from "@/lib/errors";
-import type { UpdateProfileInput } from "@/validations/user.schema";
 
 export const userService = {
     /**
@@ -18,18 +17,12 @@ export const userService = {
      * Solo accesible por el propio usuario (GET /api/users, GET /api/auth/me).
      */
     async getProfile(userId: string) {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-                id: true, email: true, username: true,
-                firstName: true, lastName: true, avatarUrl: true,
-                role: true, points: true, coins: true, level: true,
-                createdAt: true,
-                // password NUNCA se incluye
-            },
-        });
-        if (!user) throw new NotFoundError("User");
-        return user;
+        const [rows]: any = await query(
+            'SELECT id, email, username, firstName, lastName, avatarUrl, role, points, coins, level, createdAt FROM users WHERE id = ?',
+            [userId]
+        );
+        if (!rows || rows.length === 0) throw new NotFoundError('User');
+        return rows[0];
     },
 
     /**
@@ -38,17 +31,12 @@ export const userService = {
      * NO incluye email, monedas, ni datos sensibles.
      */
     async getPublicProfile(userId: string) {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-                id: true, username: true,
-                firstName: true, lastName: true, avatarUrl: true,
-                level: true, points: true,
-                // Sin email, coins, role, createdAt
-            },
-        });
-        if (!user) throw new NotFoundError("User");
-        return user;
+        const [rows]: any = await query(
+            'SELECT id, username, firstName, lastName, avatarUrl, level, points FROM users WHERE id = ?',
+            [userId]
+        );
+        if (!rows || rows.length === 0) throw new NotFoundError('User');
+        return rows[0];
     },
 
     /**
@@ -57,25 +45,54 @@ export const userService = {
      *
      * @throws ConflictError si el nuevo username ya está en uso por otro
      */
-    async updateProfile(userId: string, data: UpdateProfileInput) {
-        // Si intenta cambiar el username, verificar unicidad
+    async updateProfile(userId: string, data: any) {
         if (data.username) {
-            const existing = await prisma.user.findFirst({
-                where: {
-                    username: data.username,
-                    NOT: { id: userId },  // Excluir al propio usuario
-                },
-            });
-            if (existing) throw new ConflictError("Username already taken");
+            const [existing]: any = await query(
+                'SELECT id FROM users WHERE username = ? AND id != ?',
+                [data.username, userId]
+            );
+            if (existing && existing.length > 0) throw new ConflictError('Username already taken');
         }
 
-        return prisma.user.update({
-            where: { id: userId },
-            data,  // Solo actualiza los campos proporcionados
-            select: {
-                id: true, email: true, username: true,
-                firstName: true, lastName: true, avatarUrl: true,
-            },
-        });
+        const keys = Object.keys(data);
+        if (keys.length === 0) return this.getProfile(userId);
+
+        const setClause = keys.map(key => `${key} = ?`).join(', ');
+        const values = Object.values(data);
+
+        await execute(
+            `UPDATE users SET ${setClause} WHERE id = ?`,
+            [...values, userId]
+        );
+
+        return this.getProfile(userId);
+    },
+
+    /**
+    * setXpAndCoins — Método interno para actualizar puntos, monedas y nivel del usuario.
+    * Se llama desde el servicio de tareas al completar una tarea.
+    */
+    async setXpAndCoins(userId: string, points: number, coins: number) {
+        const [rows]: any = await query(
+            'SELECT points, coins, level FROM users WHERE id = ?',
+            [userId]
+        );
+        if (!rows || rows.length === 0) throw new NotFoundError('User');
+
+        const user = rows[0];
+        const updatedPoints = user.points + points;
+        const updatedCoins = user.coins + coins;
+        const newLevel = Math.floor(updatedPoints / 100);
+
+        await execute(
+            'UPDATE users SET points = ?, coins = ?, level = ? WHERE id = ?',
+            [updatedPoints, updatedCoins, Math.max(newLevel, user.level), userId]
+        );
+
+        const [updatedRows]: any = await query(
+            'SELECT id, points, coins, level FROM users WHERE id = ?',
+            [userId]
+        );
+        return updatedRows[0];
     },
 };

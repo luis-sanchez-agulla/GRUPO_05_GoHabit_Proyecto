@@ -6,12 +6,7 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
-    "lint": "eslint . --ext .ts",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:seed": "npx tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "lint": "eslint . --ext .ts"
   },
   "_comments": {
     "scripts_explanation": {
@@ -27,9 +22,9 @@
     }
   },
   "dependencies": {
-    "@prisma/client": "^6.2.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.18.2",
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -54,7 +49,6 @@
     "@typescript-eslint/parser": "^8.18.0",
     "eslint": "^9.17.0",
     "eslint-config-next": "^15.5.12",
-    "prisma": "^6.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.0"
   },
