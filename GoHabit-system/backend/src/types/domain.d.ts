@@ -6,13 +6,13 @@
  * ¿Qué son los tipos de dominio?
  * Son interfaces TypeScript que representan los objetos del negocio
  * (hábitos, tareas, usuarios, etc.) de forma LIMPIA y desacoplada
- * de Prisma. Se usan para:
+ * del motor de base de datos. Se usan para:
  *   - Tipar las respuestas API (qué ve el cliente)
  *   - Tipar los datos de entrada (qué envía el cliente)
  *   - Definir contratos entre servicios
  *
- * ¿Por qué no usar directamente los tipos de Prisma?
- * Los modelos de Prisma incluyen campos internos (password, etc.)
+ * ¿Por qué no usar directamente los tipos de la BD?
+ * Los modelos de la BD pueden incluir campos internos (password, etc.)
  * que NO queremos exponer al cliente. Estos DTOs (Data Transfer Objects)
  * contienen solo los campos que deben ser visibles.
  */

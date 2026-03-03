@@ -8,7 +8,7 @@
  * globales y CRUD de recompensas.
  */
 
-import { prisma } from "@/lib/prisma";
+import { query, execute } from "@/lib/mysql";
 import { NotFoundError } from "@/lib/errors";
 
 export const adminService = {
@@ -19,28 +19,17 @@ export const adminService = {
      * @param limit - Usuarios por página (por defecto 20)
      *
      * Devuelve los usuarios + metadatos de paginación.
-     * El frontend usa "meta" para mostrar controles de paginación.
      */
     async getUsers(page: number = 1, limit: number = 20) {
-        const skip = (page - 1) * limit;  // Calcular cuántos saltar
+        const offset = (page - 1) * limit;
 
-        // Promise.all ejecuta AMBAS consultas en paralelo:
-        // 1. Los usuarios de esta página
-        // 2. El conteo total (para calcular totalPages)
-        const [users, total] = await Promise.all([
-            prisma.user.findMany({
-                skip,             // Saltar los de páginas anteriores
-                take: limit,      // Tomar solo "limit" usuarios
-                select: {
-                    id: true, email: true, username: true,
-                    firstName: true, lastName: true,
-                    role: true, points: true, level: true,
-                    createdAt: true,
-                },
-                orderBy: { createdAt: "desc" },  // Más recientes primero
-            }),
-            prisma.user.count(),  // Conteo total de usuarios
-        ]);
+        const [users]: any = await query(
+            'SELECT id, email, username, firstName, lastName, role, points, level, createdAt FROM users ORDER BY createdAt DESC LIMIT ? OFFSET ?',
+            [limit, offset]
+        );
+
+        const [countRow]: any = await query('SELECT COUNT(*) as total FROM users');
+        const total = countRow[0].total;
 
         return {
             users,
@@ -48,59 +37,89 @@ export const adminService = {
                 page,
                 limit,
                 total,
-                totalPages: Math.ceil(total / limit),  // Redondear hacia arriba
+                totalPages: Math.ceil(total / limit),
             },
         };
     },
 
     /**
      * updateUserRole — Cambia el rol de un usuario (USER ↔ ADMIN).
-     * Útil para promover usuarios a admin o degradarlos.
      */
     async updateUserRole(userId: string, role: "USER" | "ADMIN") {
-        const user = await prisma.user.findUnique({ where: { id: userId } });
-        if (!user) throw new NotFoundError("User");
+        const [rows]: any = await query('SELECT id FROM users WHERE id = ?', [userId]);
+        if (!rows || rows.length === 0) throw new NotFoundError("User");
 
-        return prisma.user.update({
-            where: { id: userId },
-            data: { role },
-            select: { id: true, email: true, username: true, role: true },
-        });
+        await execute('UPDATE users SET role = ? WHERE id = ?', [role, userId]);
+
+        const [updatedRows]: any = await query(
+            'SELECT id, email, username, role FROM users WHERE id = ?',
+            [userId]
+        );
+        return updatedRows[0];
     },
 
     /**
      * getStats — Estadísticas globales del sistema.
-     * Útil para un dashboard de administrador.
      */
     async getStats() {
-        const [totalUsers, totalHabits, totalTasks, totalCompletions] = await Promise.all([
-            prisma.user.count(),
-            prisma.habit.count(),
-            prisma.task.count(),
-            prisma.habitCompletion.count(),
-        ]);
+        const queries = [
+            query('SELECT COUNT(*) as count FROM users'),
+            query('SELECT COUNT(*) as count FROM habits'),
+            query('SELECT COUNT(*) as count FROM tasks'),
+            query('SELECT COUNT(*) as count FROM habit_completions'),
+        ];
 
-        return { totalUsers, totalHabits, totalTasks, totalCompletions };
+        const [users, habits, tasks, completions]: any = await Promise.all(queries);
+
+        return {
+            totalUsers: users[0][0].count,
+            totalHabits: habits[0][0].count,
+            totalTasks: tasks[0][0].count,
+            totalCompletions: completions[0][0].count,
+        };
     },
 
     // ── Gestión de recompensas (solo admin) ──────────
 
     /** createReward — Crea una nueva recompensa en el catálogo. */
     async createReward(data: { name: string; description?: string; cost: number; icon?: string }) {
-        return prisma.reward.create({ data });
+        const [result]: any = await execute(
+            'INSERT INTO rewards (name, description, cost, icon) VALUES (?, ?, ?, ?)',
+            [data.name, data.description || null, data.cost, data.icon || null]
+        );
+        const [rows]: any = await query('SELECT * FROM rewards WHERE id = ?', [result.insertId]);
+        return rows[0];
     },
 
     /** updateReward — Actualiza una recompensa existente. */
     async updateReward(rewardId: string, data: { name?: string; description?: string; cost?: number; icon?: string; isActive?: boolean }) {
-        const reward = await prisma.reward.findUnique({ where: { id: rewardId } });
-        if (!reward) throw new NotFoundError("Reward");
-        return prisma.reward.update({ where: { id: rewardId }, data });
+        const [existing]: any = await query('SELECT id FROM rewards WHERE id = ?', [rewardId]);
+        if (!existing || existing.length === 0) throw new NotFoundError("Reward");
+
+        const keys = Object.keys(data);
+        if (keys.length === 0) {
+            const [rows]: any = await query('SELECT * FROM rewards WHERE id = ?', [rewardId]);
+            return rows[0];
+        }
+
+        const setClause = keys.map(key => `${key} = ?`).join(', ');
+        const values = Object.values(data);
+
+        await execute(
+            `UPDATE rewards SET ${setClause} WHERE id = ?`,
+            [...values, rewardId]
+        );
+
+        const [updatedRows]: any = await query('SELECT * FROM rewards WHERE id = ?', [rewardId]);
+        return updatedRows[0];
     },
 
     /** deleteReward — Elimina una recompensa del catálogo. */
     async deleteReward(rewardId: string) {
-        const reward = await prisma.reward.findUnique({ where: { id: rewardId } });
-        if (!reward) throw new NotFoundError("Reward");
-        return prisma.reward.delete({ where: { id: rewardId } });
+        const [existing]: any = await query('SELECT id FROM rewards WHERE id = ?', [rewardId]);
+        if (!existing || existing.length === 0) throw new NotFoundError("Reward");
+
+        await execute('DELETE FROM rewards WHERE id = ?', [rewardId]);
+        return { id: rewardId, deleted: true };
     },
 };

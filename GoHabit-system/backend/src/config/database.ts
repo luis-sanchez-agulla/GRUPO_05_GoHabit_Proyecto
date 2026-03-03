@@ -4,7 +4,7 @@
  * ═══════════════════════════════════════════════════════════════
  *
  * Centraliza la configuración de conexión a la base de datos.
- * En la mayoría de los casos, lib/prisma.ts es suficiente para
+ * En la mayoría de los casos, lib/mysql.ts es suficiente para
  * las consultas. Este archivo existe para configuraciones avanzadas
  * como pools de conexiones, réplicas de lectura, etc.
  */

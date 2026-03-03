@@ -8,119 +8,138 @@
  * al marcar una tarea como completada.
  */
 
-import { prisma } from "@/lib/prisma";
+import { query, execute, pool } from "@/lib/mysql";
 import { NotFoundError } from "@/lib/errors";
 import { POINTS, COINS } from "@/lib/constants";
-import type { Prisma } from "@prisma/client";
-import type { CreateTaskInput, UpdateTaskInput } from "@/validations/task.schema";
 
 export const taskService = {
     /**
      * getByUser — Lista todas las tareas del usuario.
-     * Ordenadas: primero por fecha límite, luego por fecha de creación.
      */
     async getByUser(userId: string) {
-        return prisma.task.findMany({
-            where: { userId },
-            orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
-        });
+        const [tasks]: any = await query(
+            'SELECT * FROM tasks WHERE userId = ? ORDER BY dueDate ASC, createdAt DESC',
+            [userId]
+        );
+        return tasks;
     },
 
     /** getById — Obtiene una tarea específica. Verifica propiedad. */
     async getById(taskId: string, userId: string) {
-        const task = await prisma.task.findFirst({
-            where: { id: taskId, userId },
-        });
-        if (!task) throw new NotFoundError("Task");
-        return task;
+        const [tasks]: any = await query(
+            'SELECT * FROM tasks WHERE id = ? AND userId = ?',
+            [taskId, userId]
+        );
+        if (!tasks || tasks.length === 0) throw new NotFoundError('Task');
+        return tasks[0];
     },
 
     /**
      * create — Crea una nueva tarea.
-     * Convierte los strings de fecha ISO 8601 a objetos Date de JavaScript.
      */
-    async create(userId: string, data: CreateTaskInput) {
-        return prisma.task.create({
-            data: {
-                ...data,
+    async create(userId: string, data: any) {
+        const { title, description, dueDate, scheduledAt, priority, category } = data;
+        const [result]: any = await execute(
+            'INSERT INTO tasks (userId, title, description, dueDate, scheduledAt, priority, category) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [
                 userId,
-                // new Date("2025-03-15T00:00:00Z") convierte string → Date
-                dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
-                scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : undefined,
-            },
-        });
+                title,
+                description || null,
+                dueDate ? new Date(dueDate) : null,
+                scheduledAt ? new Date(scheduledAt) : null,
+                priority || 'MEDIUM',
+                category || null
+            ]
+        );
+        const [newTask]: any = await query('SELECT * FROM tasks WHERE id = ?', [result.insertId]);
+        return newTask[0];
     },
 
     /**
      * update — Actualiza una tarea existente.
-     *
-     * Lógica especial: si el status cambia a COMPLETED (y antes no lo era),
-     * se ejecuta una transacción para:
-     *   1. Actualizar la tarea (marcar completedAt)
-     *   2. Otorgar puntos y monedas al usuario
      */
-    async update(taskId: string, userId: string, data: UpdateTaskInput) {
-        const task = await prisma.task.findFirst({ where: { id: taskId, userId } });
-        if (!task) throw new NotFoundError("Task");
+    async update(taskId: string, userId: string, data: any) {
+        const [tasks]: any = await query(
+            "SELECT * FROM tasks WHERE id = ? AND userId = ?",
+            [taskId, userId]
+        );
+        if (!tasks || tasks.length === 0) throw new NotFoundError("Task");
+        const task = tasks[0];
 
         // Preparar los datos de actualización
-        const updateData: Record<string, unknown> = { ...data };
+        const updateData: Record<string, any> = { ...data };
         if (data.dueDate) updateData.dueDate = new Date(data.dueDate);
         if (data.scheduledAt) updateData.scheduledAt = new Date(data.scheduledAt);
 
         // Caso especial: marcar como COMPLETED → otorgar puntos
         if (data.status === "COMPLETED" && task.status !== "COMPLETED") {
-            return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-                // 1. Actualizar la tarea + registrar la fecha de completion
-                const updated = await tx.task.update({
-                    where: { id: taskId },
-                    data: { ...updateData, completedAt: new Date() },
-                });
+            const connection = await pool.getConnection();
+            await connection.beginTransaction();
+            try {
+                updateData.completedAt = new Date();
+
+                const keys = Object.keys(updateData);
+                const setClause = keys.map(key => `${key} = ?`).join(', ');
+                const values = Object.values(updateData);
+
+                // 1. Actualizar la tarea
+                await connection.execute(
+                    `UPDATE tasks SET ${setClause} WHERE id = ?`,
+                    [...values, taskId]
+                );
 
                 // 2. Sumar puntos y monedas al usuario
-                await tx.user.update({
-                    where: { id: userId },
-                    data: {
-                        points: { increment: POINTS.TASK_COMPLETION },  // +15 puntos
-                        coins: { increment: COINS.TASK_COMPLETION },    // +10 monedas
-                    },
-                });
+                await connection.execute(
+                    "UPDATE users SET points = points + ?, coins = coins + ? WHERE id = ?",
+                    [POINTS.TASK_COMPLETION, COINS.TASK_COMPLETION, userId]
+                );
 
-                return updated;
-            });
+                await connection.commit();
+                return this.getById(taskId, userId);
+            } catch (error) {
+                await connection.rollback();
+                throw error;
+            } finally {
+                connection.release();
+            }
+        } else {
+            // Si NO es completion, actualización normal sin transacción
+            const keys = Object.keys(updateData);
+            if (keys.length === 0) return this.getById(taskId, userId);
+
+            const setClause = keys.map(key => `${key} = ?`).join(', ');
+            const values = Object.values(updateData);
+
+            await execute(
+                `UPDATE tasks SET ${setClause} WHERE id = ?`,
+                [...values, taskId]
+            );
+            return this.getById(taskId, userId);
         }
-
-        // Si NO es completion, actualización normal sin transacción
-        return prisma.task.update({
-            where: { id: taskId },
-            data: updateData,
-        });
     },
 
     /** delete — Elimina una tarea. */
     async delete(taskId: string, userId: string) {
-        const task = await prisma.task.findFirst({ where: { id: taskId, userId } });
-        if (!task) throw new NotFoundError("Task");
-        return prisma.task.delete({ where: { id: taskId } });
+        const [tasks]: any = await query(
+            "SELECT id FROM tasks WHERE id = ? AND userId = ?",
+            [taskId, userId]
+        );
+        if (!tasks || tasks.length === 0) throw new NotFoundError("Task");
+
+        await execute("DELETE FROM tasks WHERE id = ?", [taskId]);
+        return { id: taskId, deleted: true };
     },
 
     /**
      * getCalendar — Obtiene tareas para la vista calendario.
-     * Filtra por rango de fechas (from → to) usando dueDate o scheduledAt.
-     *
-     * Ejemplo: GET /api/calendar?from=2025-03-01&to=2025-03-31
-     * → Devuelve todas las tareas con fecha en marzo 2025.
      */
     async getCalendar(userId: string, from: Date, to: Date) {
-        return prisma.task.findMany({
-            where: {
-                userId,
-                OR: [
-                    { dueDate: { gte: from, lte: to } },       // gte = ≥, lte = ≤
-                    { scheduledAt: { gte: from, lte: to } },
-                ],
-            },
-            orderBy: { dueDate: "asc" },
-        });
+        const [tasks]: any = await query(
+            `SELECT * FROM tasks WHERE userId = ? AND 
+            (dueDate BETWEEN ? AND ? OR scheduledAt BETWEEN ? AND ?)
+            ORDER BY dueDate ASC`,
+            [userId, from, to, from, to]
+        );
+        return tasks;
     },
 };

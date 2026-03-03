@@ -13,134 +13,117 @@
  * ambos se ven en la lista del otro. Por eso usamos OR en las queries.
  */
 
-import { prisma } from "@/lib/prisma";
-import { NotFoundError, ConflictError, ValidationError } from "@/lib/errors";
+import { query, execute } from "@/lib/mysql";
+import { NotFoundError } from "@/lib/errors";
 
 export const friendService = {
     /**
      * getFriends — Lista todos los amigos aceptados de un usuario.
-     * Busca friendships donde el usuario es sender O receiver (bidireccional).
-     * Devuelve los datos del OTRO usuario en cada amistad.
      */
     async getFriends(userId: string) {
-        const friendships = await prisma.friendship.findMany({
-            where: {
-                status: "ACCEPTED",                                // Solo amistades aceptadas
-                OR: [{ senderId: userId }, { receiverId: userId }], // Donde YO soy sender O receiver
-            },
-            include: {
-                // Incluir datos básicos de AMBOS usuarios
-                sender: { select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true, level: true, points: true } },
-                receiver: { select: { id: true, username: true, firstName: true, lastName: true, avatarUrl: true, level: true, points: true } },
-            },
-        });
-
-        // Para cada amistad, devolver el OTRO usuario (no yo mismo)
-        // Si yo soy el sender, devuelvo el receiver y viceversa
-        return friendships.map((f: (typeof friendships)[number]) =>
-            f.senderId === userId ? f.receiver : f.sender
+        const [friendships]: any = await query(
+            `SELECT * FROM friendships 
+             WHERE status = 'ACCEPTED' AND (senderId = ? OR receiverId = ?)`,
+            [userId, userId]
         );
+
+        const friendIds = friendships.map((f: any) => f.senderId === userId ? f.receiverId : f.senderId);
+
+        if (friendIds.length === 0) return [];
+
+        const [friendDetails]: any = await query(
+            `SELECT id, username, firstName, lastName, avatarUrl, level, points 
+             FROM users WHERE id IN (?)`,
+            [friendIds]
+        );
+
+        return friendDetails;
     },
 
     /**
      * sendRequest — Envía una solicitud de amistad.
-     *
-     * Validaciones:
-     *   - No puedes enviarte solicitud a ti mismo
-     *   - No puede haber una solicitud previa en cualquier dirección (A→B ni B→A)
-     *
-     * @throws ValidationError si es a ti mismo
-     * @throws ConflictError si ya existe una solicitud/amistad
      */
     async sendRequest(senderId: string, receiverId: string) {
-        if (senderId === receiverId) {
-            throw new ValidationError("Cannot send friend request to yourself");
-        }
+        if (senderId === receiverId) throw new Error('Cannot send a friend request to yourself');
 
-        // Verificar que el usuario exista
-        const user = await prisma.user.findUnique({ where: { id: receiverId } });
-        if (!user) throw new NotFoundError("User");
+        const [existing]: any = await query(
+            `SELECT id FROM friendships 
+             WHERE (senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?)`,
+            [senderId, receiverId, receiverId, senderId]
+        );
 
-        // Verificar que no exista solicitud previa en NINGUNA dirección
-        const existing = await prisma.friendship.findFirst({
-            where: {
-                OR: [
-                    { senderId, receiverId },                       // A → B
-                    { senderId: receiverId, receiverId: senderId }, // B → A
-                ],
-            },
-        });
-        if (existing) throw new ConflictError("Friendship request already exists");
+        if (existing && existing.length > 0) throw new Error('Friend request already exists');
 
+        await execute(
+            'INSERT INTO friendships (senderId, receiverId, status) VALUES (?, ?, ?)',
+            [senderId, receiverId, 'PENDING']
+        );
 
-        // Crear solicitud con status PENDING
-        return prisma.friendship.create({
-            data: { senderId, receiverId },
-        });
+        return { success: true };
     },
 
     /**
      * respondToRequest — Responde a una solicitud recibida (aceptar/rechazar).
-     * Solo el RECEPTOR puede responder (verificamos receiverId === userId).
-     * Solo se pueden responder solicitudes PENDING.
      */
     async respondToRequest(friendshipId: string, userId: string, status: "ACCEPTED" | "REJECTED") {
-        const friendship = await prisma.friendship.findFirst({
-            where: { id: friendshipId, receiverId: userId, status: "PENDING" },
-        });
-        if (!friendship) throw new NotFoundError("Friend request");
+        const [rows]: any = await query(
+            "SELECT id FROM friendships WHERE id = ? AND receiverId = ? AND status = ?",
+            [friendshipId, userId, "PENDING"]
+        );
+        if (!rows || rows.length === 0) throw new NotFoundError("Friend request");
 
-        return prisma.friendship.update({
-            where: { id: friendshipId },
-            data: { status },
-        });
+        await execute(
+            "UPDATE friendships SET status = ? WHERE id = ?",
+            [status, friendshipId]
+        );
+        return { success: true };
     },
 
     /**
      * removeFriend — Elimina una amistad.
-     * Cualquiera de los dos (sender o receiver) puede eliminarla.
      */
     async removeFriend(friendshipId: string, userId: string) {
-        const friendship = await prisma.friendship.findFirst({
-            where: {
-                id: friendshipId,
-                OR: [{ senderId: userId }, { receiverId: userId }],
-            },
-        });
-        if (!friendship) throw new NotFoundError("Friendship");
+        const [rows]: any = await query(
+            "SELECT id FROM friendships WHERE id = ? AND (senderId = ? OR receiverId = ?)",
+            [friendshipId, userId, userId]
+        );
+        if (!rows || rows.length === 0) throw new NotFoundError("Friendship");
 
-        return prisma.friendship.delete({ where: { id: friendshipId } });
+        await execute("DELETE FROM friendships WHERE id = ?", [friendshipId]);
+        return { success: true };
     },
 
     /**
      * compareProgress — Compara el progreso entre el usuario y un amigo.
-     * Devuelve los datos de ambos para que el frontend muestre la comparación.
      */
     async compareProgress(userId: string, friendId: string) {
-        // Promise.all ejecuta ambas consultas en paralelo
         const [userProgress, friendProgress] = await Promise.all([
-            getProgress(userId),
-            getProgress(friendId),
+            this.getProgress(userId),
+            this.getProgress(friendId),
         ]);
         return { user: userProgress, friend: friendProgress };
     },
+
+    /**
+     * getProgress — Helper interno para obtener el progreso resumido de un usuario.
+     */
+    async getProgress(userId: string) {
+        const [rows]: any = await query(
+            'SELECT id, username, points, coins, level FROM users WHERE id = ?',
+            [userId]
+        );
+        if (!rows || rows.length === 0) throw new NotFoundError("User");
+        const user = rows[0];
+
+        const [habitsCompletedResult, tasksCompletedResult]: any = await Promise.all([
+            query("SELECT COUNT(*) as count FROM habit_completions WHERE userId = ?", [userId]),
+            query("SELECT COUNT(*) as count FROM tasks WHERE userId = ? AND status = ?", [userId, "COMPLETED"]),
+        ]);
+
+        return {
+            ...user,
+            habitsCompleted: habitsCompletedResult[0][0].count,
+            tasksCompleted: tasksCompletedResult[0][0].count
+        };
+    }
 };
-
-/**
- * getProgress — Helper interno para obtener el progreso resumido de un usuario.
- * Se usa dentro de compareProgress para obtener datos de ambos usuarios.
- */
-async function getProgress(userId: string) {
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { id: true, username: true, points: true, coins: true, level: true },
-    });
-    if (!user) throw new NotFoundError("User");
-
-    const [habitsCompleted, tasksCompleted] = await Promise.all([
-        prisma.habitCompletion.count({ where: { userId } }),
-        prisma.task.count({ where: { userId, status: "COMPLETED" } }),
-    ]);
-
-    return { ...user, habitsCompleted, tasksCompleted };
-}

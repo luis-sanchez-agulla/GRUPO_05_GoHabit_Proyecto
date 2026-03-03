@@ -9,121 +9,124 @@
  * ambas operaciones ocurran juntas o ninguna).
  */
 
-import { prisma } from "@/lib/prisma";
+import { query, execute, pool } from "@/lib/mysql";
 import { NotFoundError } from "@/lib/errors";
-import { POINTS, COINS } from "@/lib/constants";   // Cuántos puntos/monedas otorgar
-import type { Prisma } from "@prisma/client";
-import type { CreateHabitInput, UpdateHabitInput } from "@/validations/habit.schema";
+import { POINTS, COINS } from "@/lib/constants";
 
 export const habitService = {
     /**
      * getByUser — Lista todos los hábitos de un usuario.
-     * Ordenados por fecha de creación (más recientes primero).
      */
     async getByUser(userId: string) {
-        return prisma.habit.findMany({
-            where: { userId },                 // Solo hábitos de ESTE usuario
-            orderBy: { createdAt: "desc" },    // Más recientes primero
-        });
+        const [habits]: any = await query(
+            'SELECT * FROM habits WHERE userId = ? ORDER BY createdAt DESC',
+            [userId]
+        );
+        return habits;
     },
 
     /**
      * getById — Obtiene un hábito específico con sus últimas 10 completions.
-     * Verifica que el hábito pertenece al usuario (seguridad).
-     *
-     * @throws NotFoundError si no existe o no le pertenece al usuario
      */
     async getById(habitId: string, userId: string) {
-        const habit = await prisma.habit.findFirst({
-            where: { id: habitId, userId },   // Filtro: ID + que sea del usuario
-            include: {
-                completions: {                   // Incluir las completions relacionadas
-                    orderBy: { completedAt: "desc" },
-                    take: 10,                      // Solo las últimas 10
-                },
-            },
-        });
+        const [habits]: any = await query(
+            'SELECT * FROM habits WHERE id = ? AND userId = ?',
+            [habitId, userId]
+        );
+        if (!habits || habits.length === 0) throw new NotFoundError('Habit');
 
-        if (!habit) throw new NotFoundError("Habit");
-        return habit;
+        const [completions]: any = await query(
+            'SELECT * FROM habit_completions WHERE habitId = ? ORDER BY completedAt DESC LIMIT 10',
+            [habitId]
+        );
+
+        return { ...habits[0], completions };
     },
 
     /**
      * create — Crea un nuevo hábito para el usuario.
-     * El spread operator (...data) copia todos los campos del input.
      */
-    async create(userId: string, data: CreateHabitInput) {
-        return prisma.habit.create({
-            data: { ...data, userId },   // Añadimos el userId del usuario autenticado
-        });
+    async create(userId: string, data: any) {
+        const { title, description, frequency, category, icon, color } = data;
+        const [result]: any = await execute(
+            "INSERT INTO habits (userId, title, description, frequency, category, icon, color) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [userId, title, description || null, frequency || 'DAILY', category || null, icon || null, color || null]
+        );
+        const [rows]: any = await query('SELECT * FROM habits WHERE id = ?', [result.insertId]);
+        return rows[0];
     },
 
     /**
      * update — Actualiza un hábito existente.
-     * Primero verifica que existe y pertenece al usuario.
      */
-    async update(habitId: string, userId: string, data: UpdateHabitInput) {
-        const habit = await prisma.habit.findFirst({ where: { id: habitId, userId } });
-        if (!habit) throw new NotFoundError("Habit");
+    async update(habitId: string, userId: string, data: any) {
+        const [habits]: any = await query(
+            "SELECT id FROM habits WHERE id = ? AND userId = ?",
+            [habitId, userId]
+        );
+        if (!habits || habits.length === 0) throw new NotFoundError("Habit");
 
-        return prisma.habit.update({
-            where: { id: habitId },
-            data,   // Solo actualiza los campos que se enviaron
-        });
+        const keys = Object.keys(data);
+        if (keys.length === 0) return this.getById(habitId, userId);
+
+        const setClause = keys.map(key => `${key} = ?`).join(', ');
+        const values = Object.values(data);
+
+        await execute(
+            `UPDATE habits SET ${setClause} WHERE id = ?`,
+            [...values, habitId]
+        );
+
+        return this.getById(habitId, userId);
     },
 
     /**
      * delete — Elimina un hábito y todas sus completions (Cascade).
-     * La opción onDelete: Cascade en schema.prisma se encarga de
-     * eliminar las completions asociadas automáticamente.
      */
     async delete(habitId: string, userId: string) {
-        const habit = await prisma.habit.findFirst({ where: { id: habitId, userId } });
-        if (!habit) throw new NotFoundError("Habit");
+        const [habits]: any = await query(
+            "SELECT id FROM habits WHERE id = ? AND userId = ?",
+            [habitId, userId]
+        );
+        if (!habits || habits.length === 0) throw new NotFoundError("Habit");
 
-        return prisma.habit.delete({ where: { id: habitId } });
+        await execute("DELETE FROM habits WHERE id = ?", [habitId]);
+        return { id: habitId, deleted: true };
     },
 
     /**
      * complete — Marca un hábito como completado (registra una completion).
-     *
-     * ¿Qué es una transacción ($transaction)?
-     * Ejecuta varias operaciones de BD como UNA SOLA operación atómica:
-     *   - Si ambas tienen éxito → se guardan los cambios
-     *   - Si alguna falla → se revierten TODOS los cambios
-     *
-     * Esto garantiza que:
-     *   1. Se crea el registro de completion
-     *   2. Se suman los puntos/monedas al usuario
-     * ...ambas cosas ocurren juntas. Nunca se crearán puntos sin completion
-     * ni completion sin puntos.
-     *
-     * @param habitId - ID del hábito a completar
-     * @param userId  - ID del usuario que lo completa
-     * @param note    - Nota opcional (ej: "Hoy medité 15 min en vez de 10")
      */
     async complete(habitId: string, userId: string, note?: string) {
-        const habit = await prisma.habit.findFirst({ where: { id: habitId, userId } });
-        if (!habit) throw new NotFoundError("Habit");
+        const [habits]: any = await query('SELECT id FROM habits WHERE id = ? AND userId = ?', [habitId, userId]);
+        if (!habits || habits.length === 0) throw new NotFoundError("Habit");
 
-        // Transacción: ambas operaciones se ejecutan juntas o ninguna
-        return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+        const connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        try {
             // 1. Crear el registro de completion
-            const completion = await tx.habitCompletion.create({
-                data: { habitId, userId, note },
-            });
+            const [result]: any = await connection.execute(
+                'INSERT INTO habit_completions (habitId, userId, note) VALUES (?, ?, ?)',
+                [habitId, userId, note || null]
+            );
 
             // 2. Sumar puntos y monedas al usuario
-            // { increment: N } suma N al valor actual (no reemplaza)
-            await tx.user.update({
-                where: { id: userId },
-                data: {
-                    points: { increment: POINTS.HABIT_COMPLETION },  // +10 puntos
-                    coins: { increment: COINS.HABIT_COMPLETION },    // +5 monedas
-                },
-            });
+            await connection.execute(
+                'UPDATE users SET points = points + ?, coins = coins + ? WHERE id = ?',
+                [POINTS.HABIT_COMPLETION, COINS.HABIT_COMPLETION, userId]
+            );
 
-            return completion;
-        });
+            await connection.commit();
+
+            const [completionRows]: any = await query('SELECT * FROM habit_completions WHERE id = ?', [result.insertId]);
+            return completionRows[0];
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
     },
+};
 };
