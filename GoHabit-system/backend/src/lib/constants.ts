@@ -35,6 +35,11 @@ export const COINS = {
     LEVEL_UP_BONUS: 25,          // Monedas extra al subir de nivel
 } as const;
 
+export const GAME_BALANCE = {
+    LEVEP_EXP_BASE: 100,           // Multiplicador de dificultad para subir de nivel (nivel * LEVEP_EXP_BASE)
+    STREAK_BONUS_MULTIPLIER: 0.5,  // Multiplicador para calcular el bonus de racha (días de racha * STREAK_BONUS_MULTIPLIER)
+}
+
 /**
  * LIMITS — Límites del sistema para prevenir abuso.
  * Establece máximos razonables para proteger la base de datos.

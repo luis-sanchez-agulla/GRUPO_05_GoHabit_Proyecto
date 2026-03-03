@@ -128,5 +128,12 @@ export const habitService = {
             connection.release();
         }
     },
-};
+
+    /**
+     * complete — Verificar y poner racha de habitos
+     */
+    async checkStreaks(userId: string) {
+        
+    },
+    
 };

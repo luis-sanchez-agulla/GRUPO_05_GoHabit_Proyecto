@@ -82,7 +82,7 @@ export const userService = {
         const user = rows[0];
         const updatedPoints = user.points + points;
         const updatedCoins = user.coins + coins;
-        const newLevel = Math.floor(updatedPoints / 100);
+        const newLevel = Math.floor(Math.sqrt(updatedPoints / 100));
 
         await execute(
             'UPDATE users SET points = ?, coins = ?, level = ? WHERE id = ?',
