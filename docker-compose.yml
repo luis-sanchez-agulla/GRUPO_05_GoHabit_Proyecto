@@ -18,6 +18,20 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+    # Límites para Raspberry Pi (comentar si despliegas en servidor potente)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'      # Máximo 1.5 núcleos
+          memory: 512M     # Máximo 512MB RAM
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"    # Máximo 10MB por archivo de log
+        max-file: "3"      # Mantener 3 archivos rotativos
 
   frontend:
     build:
@@ -28,6 +42,20 @@ services:
     depends_on:
       - backend
       - mysql
+    # Límites para Raspberry Pi 
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'      
+          memory: 128M     
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   mysql:
     image: mysql:8.0
@@ -56,6 +84,21 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    # Límites para Raspberry Pi
+    # NOTA: raspberry.cnf ya tiene optimizaciones internas de MySQL
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'      
+          memory: 512M     
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   mysql_data:
