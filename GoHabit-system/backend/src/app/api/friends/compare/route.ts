@@ -4,22 +4,6 @@
  */
 
 import { withAuth } from "@/middleware/with-auth";
-import { friendService } from "@/services/friend.service";
-import { success, error } from "@/lib/api-response";
-import { ValidationError } from "@/lib/errors";
+import { friendController } from "@/controllers/friend.controller";
 
-export const GET = withAuth(async (req, { user }) => {
-    try {
-        const { searchParams } = new URL(req.url);
-        const friendId = searchParams.get("friendId");
-
-        if (!friendId) {
-            throw new ValidationError("Query param 'friendId' is required");
-        }
-
-        const comparison = await friendService.compareProgress(user.id, friendId);
-        return success(comparison);
-    } catch (err) {
-        return error(err);
-    }
-});
+export const GET = withAuth((req, ctx) => friendController.compareProgress(req, ctx));

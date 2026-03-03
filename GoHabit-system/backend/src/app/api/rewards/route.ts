@@ -2,14 +2,6 @@
  * GET /api/rewards — Obtener catálogo de recompensas.
  */
 
-import { rewardService } from "@/services/reward.service";
-import { success, error } from "@/lib/api-response";
+import { rewardController } from "@/controllers/reward.controller";
 
-export async function GET() {
-    try {
-        const rewards = await rewardService.getAll();
-        return success(rewards);
-    } catch (err) {
-        return error(err);
-    }
-}
+export const GET = (req: any, ctx: any) => rewardController.getAll(req, ctx);

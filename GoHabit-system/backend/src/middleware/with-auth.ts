@@ -35,7 +35,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, extractTokenFromHeader } from "@/lib/auth";
 import { error } from "@/lib/api-response";
 import { UnauthorizedError } from "@/lib/errors";
-import type { AuthenticatedUser } from "@/types/api";
+import type { AuthenticatedUser } from "@/api/api.types";
 
 /**
  * Tipo del handler que recibe withAuth.

@@ -3,17 +3,8 @@
  */
 
 import { withAuth } from "@/middleware/with-auth";
-import { habitService } from "@/services/habit.service";
+import { withValidation } from "@/middleware/with-validation";
 import { completeHabitSchema } from "@/validations/habit.schema";
-import { created, error } from "@/lib/api-response";
+import { habitController } from "@/controllers/habit.controller";
 
-export const POST = withAuth(async (req, { user, params }) => {
-    try {
-        const body = await req.json().catch(() => ({}));
-        const data = completeHabitSchema.parse(body);
-        const completion = await habitService.complete(params!.habitId, user.id, data.note);
-        return created(completion);
-    } catch (err) {
-        return error(err);
-    }
-});
+export const POST = withAuth(withValidation(completeHabitSchema, (req, ctx) => habitController.complete(req, ctx)));

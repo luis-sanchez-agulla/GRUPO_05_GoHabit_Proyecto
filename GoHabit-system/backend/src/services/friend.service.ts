@@ -13,7 +13,7 @@
  * ambos se ven en la lista del otro. Por eso usamos OR en las queries.
  */
 
-import { query, execute } from "@/lib/mysql";
+import { friendRepository } from "@/repositories/friend.repository";
 import { NotFoundError } from "@/lib/errors";
 
 export const friendService = {
@@ -21,23 +21,7 @@ export const friendService = {
      * getFriends — Lista todos los amigos aceptados de un usuario.
      */
     async getFriends(userId: string) {
-        const [friendships]: any = await query(
-            `SELECT * FROM friendships 
-             WHERE status = 'ACCEPTED' AND (senderId = ? OR receiverId = ?)`,
-            [userId, userId]
-        );
-
-        const friendIds = friendships.map((f: any) => f.senderId === userId ? f.receiverId : f.senderId);
-
-        if (friendIds.length === 0) return [];
-
-        const [friendDetails]: any = await query(
-            `SELECT id, username, firstName, lastName, avatarUrl, level, points 
-             FROM users WHERE id IN (?)`,
-            [friendIds]
-        );
-
-        return friendDetails;
+        return friendRepository.findFriends(userId);
     },
 
     /**
@@ -46,19 +30,10 @@ export const friendService = {
     async sendRequest(senderId: string, receiverId: string) {
         if (senderId === receiverId) throw new Error('Cannot send a friend request to yourself');
 
-        const [existing]: any = await query(
-            `SELECT id FROM friendships 
-             WHERE (senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?)`,
-            [senderId, receiverId, receiverId, senderId]
-        );
+        const existing = await friendRepository.findExistingRequest(senderId, receiverId);
+        if (existing) throw new Error('Friend request already exists');
 
-        if (existing && existing.length > 0) throw new Error('Friend request already exists');
-
-        await execute(
-            'INSERT INTO friendships (senderId, receiverId, status) VALUES (?, ?, ?)',
-            [senderId, receiverId, 'PENDING']
-        );
-
+        await friendRepository.createRequest(senderId, receiverId);
         return { success: true };
     },
 
@@ -66,16 +41,10 @@ export const friendService = {
      * respondToRequest — Responde a una solicitud recibida (aceptar/rechazar).
      */
     async respondToRequest(friendshipId: string, userId: string, status: "ACCEPTED" | "REJECTED") {
-        const [rows]: any = await query(
-            "SELECT id FROM friendships WHERE id = ? AND receiverId = ? AND status = ?",
-            [friendshipId, userId, "PENDING"]
-        );
-        if (!rows || rows.length === 0) throw new NotFoundError("Friend request");
+        const friendship = await friendRepository.findPendingRequest(friendshipId, userId);
+        if (!friendship) throw new NotFoundError("Friend request");
 
-        await execute(
-            "UPDATE friendships SET status = ? WHERE id = ?",
-            [status, friendshipId]
-        );
+        await friendRepository.updateStatus(friendshipId, status);
         return { success: true };
     },
 
@@ -83,13 +52,10 @@ export const friendService = {
      * removeFriend — Elimina una amistad.
      */
     async removeFriend(friendshipId: string, userId: string) {
-        const [rows]: any = await query(
-            "SELECT id FROM friendships WHERE id = ? AND (senderId = ? OR receiverId = ?)",
-            [friendshipId, userId, userId]
-        );
-        if (!rows || rows.length === 0) throw new NotFoundError("Friendship");
+        const friendship = await friendRepository.findFriendship(friendshipId, userId);
+        if (!friendship) throw new NotFoundError("Friendship");
 
-        await execute("DELETE FROM friendships WHERE id = ?", [friendshipId]);
+        await friendRepository.deleteFriendship(friendshipId);
         return { success: true };
     },
 
@@ -108,22 +74,18 @@ export const friendService = {
      * getProgress — Helper interno para obtener el progreso resumido de un usuario.
      */
     async getProgress(userId: string) {
-        const [rows]: any = await query(
-            'SELECT id, username, points, coins, level FROM users WHERE id = ?',
-            [userId]
-        );
-        if (!rows || rows.length === 0) throw new NotFoundError("User");
-        const user = rows[0];
+        const user = await friendRepository.getUserStats(userId);
+        if (!user) throw new NotFoundError("User");
 
-        const [habitsCompletedResult, tasksCompletedResult]: any = await Promise.all([
-            query("SELECT COUNT(*) as count FROM habit_completions WHERE userId = ?", [userId]),
-            query("SELECT COUNT(*) as count FROM tasks WHERE userId = ? AND status = ?", [userId, "COMPLETED"]),
+        const [habitsCompleted, tasksCompleted] = await Promise.all([
+            friendRepository.countHabitCompletions(userId),
+            friendRepository.countTasksCompleted(userId),
         ]);
 
         return {
             ...user,
-            habitsCompleted: habitsCompletedResult[0][0].count,
-            tasksCompleted: tasksCompletedResult[0][0].count
+            habitsCompleted,
+            tasksCompleted
         };
     }
 };

@@ -3,14 +3,6 @@
  */
 
 import { withAuth } from "@/middleware/with-auth";
-import { authService } from "@/services/auth.service";
-import { success, error } from "@/lib/api-response";
+import { authController } from "@/controllers/auth.controller";
 
-export const GET = withAuth(async (_req, { user }) => {
-    try {
-        const profile = await authService.getMe(user.id);
-        return success(profile);
-    } catch (err) {
-        return error(err);
-    }
-});
+export const GET = withAuth((req, ctx) => authController.me(req, ctx));

@@ -4,8 +4,6 @@
  * Este endpoint existe como punto de extensión (e.g. blacklist de tokens).
  */
 
-import { success } from "@/lib/api-response";
+import { authController } from "@/controllers/auth.controller";
 
-export async function POST() {
-    return success({ message: "Logged out successfully" });
-}
+export const POST = (req: any, ctx: any) => authController.logout(req, ctx);

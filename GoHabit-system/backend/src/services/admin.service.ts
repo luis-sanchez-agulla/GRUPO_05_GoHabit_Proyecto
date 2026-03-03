@@ -8,7 +8,7 @@
  * globales y CRUD de recompensas.
  */
 
-import { query, execute } from "@/lib/mysql";
+import { adminRepository } from "@/repositories/admin.repository";
 import { NotFoundError } from "@/lib/errors";
 
 export const adminService = {
@@ -23,13 +23,8 @@ export const adminService = {
     async getUsers(page: number = 1, limit: number = 20) {
         const offset = (page - 1) * limit;
 
-        const [users]: any = await query(
-            'SELECT id, email, username, firstName, lastName, role, points, level, createdAt FROM users ORDER BY createdAt DESC LIMIT ? OFFSET ?',
-            [limit, offset]
-        );
-
-        const [countRow]: any = await query('SELECT COUNT(*) as total FROM users');
-        const total = countRow[0].total;
+        const users = await adminRepository.findUsers(limit, offset);
+        const total = await adminRepository.countUsers();
 
         return {
             users,
@@ -46,80 +41,45 @@ export const adminService = {
      * updateUserRole — Cambia el rol de un usuario (USER ↔ ADMIN).
      */
     async updateUserRole(userId: string, role: "USER" | "ADMIN") {
-        const [rows]: any = await query('SELECT id FROM users WHERE id = ?', [userId]);
-        if (!rows || rows.length === 0) throw new NotFoundError("User");
+        const user = await adminRepository.findUserById(userId);
+        if (!user) throw new NotFoundError("User");
 
-        await execute('UPDATE users SET role = ? WHERE id = ?', [role, userId]);
+        await adminRepository.updateUserRole(userId, role);
 
-        const [updatedRows]: any = await query(
-            'SELECT id, email, username, role FROM users WHERE id = ?',
-            [userId]
-        );
-        return updatedRows[0];
+        return adminRepository.findUserById(userId);
     },
 
     /**
      * getStats — Estadísticas globales del sistema.
      */
     async getStats() {
-        const queries = [
-            query('SELECT COUNT(*) as count FROM users'),
-            query('SELECT COUNT(*) as count FROM habits'),
-            query('SELECT COUNT(*) as count FROM tasks'),
-            query('SELECT COUNT(*) as count FROM habit_completions'),
-        ];
-
-        const [users, habits, tasks, completions]: any = await Promise.all(queries);
-
-        return {
-            totalUsers: users[0][0].count,
-            totalHabits: habits[0][0].count,
-            totalTasks: tasks[0][0].count,
-            totalCompletions: completions[0][0].count,
-        };
+        return adminRepository.getSystemStats();
     },
 
     // ── Gestión de recompensas (solo admin) ──────────
 
-    /** createReward — Crea una nueva recompensa en el catálogo. */
     async createReward(data: { name: string; description?: string; cost: number; icon?: string }) {
-        const [result]: any = await execute(
-            'INSERT INTO rewards (name, description, cost, icon) VALUES (?, ?, ?, ?)',
-            [data.name, data.description || null, data.cost, data.icon || null]
-        );
-        const [rows]: any = await query('SELECT * FROM rewards WHERE id = ?', [result.insertId]);
-        return rows[0];
+        const rewardId = await adminRepository.createReward(data);
+        return adminRepository.findRewardById(rewardId.toString());
     },
 
     /** updateReward — Actualiza una recompensa existente. */
     async updateReward(rewardId: string, data: { name?: string; description?: string; cost?: number; icon?: string; isActive?: boolean }) {
-        const [existing]: any = await query('SELECT id FROM rewards WHERE id = ?', [rewardId]);
-        if (!existing || existing.length === 0) throw new NotFoundError("Reward");
+        const existing = await adminRepository.findRewardById(rewardId);
+        if (!existing) throw new NotFoundError("Reward");
 
-        const keys = Object.keys(data);
-        if (keys.length === 0) {
-            const [rows]: any = await query('SELECT * FROM rewards WHERE id = ?', [rewardId]);
-            return rows[0];
-        }
+        if (Object.keys(data).length === 0) return existing;
 
-        const setClause = keys.map(key => `${key} = ?`).join(', ');
-        const values = Object.values(data);
-
-        await execute(
-            `UPDATE rewards SET ${setClause} WHERE id = ?`,
-            [...values, rewardId]
-        );
-
-        const [updatedRows]: any = await query('SELECT * FROM rewards WHERE id = ?', [rewardId]);
-        return updatedRows[0];
+        await adminRepository.updateReward(rewardId, data);
+        return adminRepository.findRewardById(rewardId);
     },
 
     /** deleteReward — Elimina una recompensa del catálogo. */
     async deleteReward(rewardId: string) {
-        const [existing]: any = await query('SELECT id FROM rewards WHERE id = ?', [rewardId]);
-        if (!existing || existing.length === 0) throw new NotFoundError("Reward");
+        const existing = await adminRepository.findRewardById(rewardId);
+        if (!existing) throw new NotFoundError("Reward");
 
-        await execute('DELETE FROM rewards WHERE id = ?', [rewardId]);
+        await adminRepository.deleteReward(rewardId);
         return { id: rewardId, deleted: true };
     },
 };

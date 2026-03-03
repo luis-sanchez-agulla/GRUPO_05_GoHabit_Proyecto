@@ -16,32 +16,15 @@
  *   3. Reemplazar la lógica de reorganizeTasks con una llamada al modelo
  */
 
-import { query } from "@/lib/mysql";
+import { aiRepository } from "@/repositories/ai.repository";
 import { NotFoundError } from "@/lib/errors";
 
 export const aiService = {
     /**
      * reorganizeTasks — Reorganiza las tareas pendientes del usuario.
-     *
-     * Versión actual (placeholder):
-     *   - Obtiene tareas PENDING e IN_PROGRESS
-     *   - Las ordena por prioridad (HIGH > MEDIUM > LOW) y fecha límite
-     *   - Devuelve sugerencias genéricas
      */
     async reorganizeTasks(userId: string) {
-        const [tasks]: any = await query(
-            `SELECT * FROM tasks 
-             WHERE userId = ? AND status IN ('PENDING', 'IN_PROGRESS')
-             ORDER BY 
-                CASE priority 
-                    WHEN 'HIGH' THEN 1 
-                    WHEN 'MEDIUM' THEN 2 
-                    WHEN 'LOW' THEN 3 
-                    ELSE 4 
-                END ASC,
-                dueDate ASC`,
-            [userId]
-        );
+        const tasks = await aiRepository.findTasksForReorganization(userId);
 
         if (!tasks || tasks.length === 0) {
             throw new NotFoundError("No pending tasks found");

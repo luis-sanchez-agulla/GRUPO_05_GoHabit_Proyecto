@@ -8,7 +8,8 @@
  * al marcar una tarea como completada.
  */
 
-import { query, execute, pool } from "@/lib/mysql";
+import { pool } from "@/lib/mysql";
+import { taskRepository } from "@/repositories/task.repository";
 import { NotFoundError } from "@/lib/errors";
 import { POINTS, COINS } from "@/lib/constants";
 
@@ -17,54 +18,30 @@ export const taskService = {
      * getByUser — Lista todas las tareas del usuario.
      */
     async getByUser(userId: string) {
-        const [tasks]: any = await query(
-            'SELECT * FROM tasks WHERE userId = ? ORDER BY dueDate ASC, createdAt DESC',
-            [userId]
-        );
-        return tasks;
+        return taskRepository.findAllByUserId(userId);
     },
 
     /** getById — Obtiene una tarea específica. Verifica propiedad. */
     async getById(taskId: string, userId: string) {
-        const [tasks]: any = await query(
-            'SELECT * FROM tasks WHERE id = ? AND userId = ?',
-            [taskId, userId]
-        );
-        if (!tasks || tasks.length === 0) throw new NotFoundError('Task');
-        return tasks[0];
+        const task = await taskRepository.findById(taskId);
+        if (!task || task.userId !== userId) throw new NotFoundError('Task');
+        return task;
     },
 
     /**
      * create — Crea una nueva tarea.
      */
     async create(userId: string, data: any) {
-        const { title, description, dueDate, scheduledAt, priority, category } = data;
-        const [result]: any = await execute(
-            'INSERT INTO tasks (userId, title, description, dueDate, scheduledAt, priority, category) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [
-                userId,
-                title,
-                description || null,
-                dueDate ? new Date(dueDate) : null,
-                scheduledAt ? new Date(scheduledAt) : null,
-                priority || 'MEDIUM',
-                category || null
-            ]
-        );
-        const [newTask]: any = await query('SELECT * FROM tasks WHERE id = ?', [result.insertId]);
-        return newTask[0];
+        const insertId = await taskRepository.create(userId, data);
+        return taskRepository.findById(insertId.toString());
     },
 
     /**
      * update — Actualiza una tarea existente.
      */
     async update(taskId: string, userId: string, data: any) {
-        const [tasks]: any = await query(
-            "SELECT * FROM tasks WHERE id = ? AND userId = ?",
-            [taskId, userId]
-        );
-        if (!tasks || tasks.length === 0) throw new NotFoundError("Task");
-        const task = tasks[0];
+        const task = await taskRepository.findById(taskId);
+        if (!task || task.userId !== userId) throw new NotFoundError("Task");
 
         // Preparar los datos de actualización
         const updateData: Record<string, any> = { ...data };
@@ -78,21 +55,11 @@ export const taskService = {
             try {
                 updateData.completedAt = new Date();
 
-                const keys = Object.keys(updateData);
-                const setClause = keys.map(key => `${key} = ?`).join(', ');
-                const values = Object.values(updateData);
-
                 // 1. Actualizar la tarea
-                await connection.execute(
-                    `UPDATE tasks SET ${setClause} WHERE id = ?`,
-                    [...values, taskId]
-                );
+                await taskRepository.updateWithConnection(taskId, updateData, connection);
 
                 // 2. Sumar puntos y monedas al usuario
-                await connection.execute(
-                    "UPDATE users SET points = points + ?, coins = coins + ? WHERE id = ?",
-                    [POINTS.TASK_COMPLETION, COINS.TASK_COMPLETION, userId]
-                );
+                await taskRepository.updateUserStats(userId, POINTS.TASK_COMPLETION, COINS.TASK_COMPLETION, connection);
 
                 await connection.commit();
                 return this.getById(taskId, userId);
@@ -104,29 +71,19 @@ export const taskService = {
             }
         } else {
             // Si NO es completion, actualización normal sin transacción
-            const keys = Object.keys(updateData);
-            if (keys.length === 0) return this.getById(taskId, userId);
+            if (Object.keys(updateData).length === 0) return this.getById(taskId, userId);
 
-            const setClause = keys.map(key => `${key} = ?`).join(', ');
-            const values = Object.values(updateData);
-
-            await execute(
-                `UPDATE tasks SET ${setClause} WHERE id = ?`,
-                [...values, taskId]
-            );
+            await taskRepository.update(taskId, userId, updateData);
             return this.getById(taskId, userId);
         }
     },
 
     /** delete — Elimina una tarea. */
     async delete(taskId: string, userId: string) {
-        const [tasks]: any = await query(
-            "SELECT id FROM tasks WHERE id = ? AND userId = ?",
-            [taskId, userId]
-        );
-        if (!tasks || tasks.length === 0) throw new NotFoundError("Task");
+        const task = await taskRepository.findById(taskId);
+        if (!task || task.userId !== userId) throw new NotFoundError("Task");
 
-        await execute("DELETE FROM tasks WHERE id = ?", [taskId]);
+        await taskRepository.delete(taskId, userId);
         return { id: taskId, deleted: true };
     },
 
@@ -134,12 +91,6 @@ export const taskService = {
      * getCalendar — Obtiene tareas para la vista calendario.
      */
     async getCalendar(userId: string, from: Date, to: Date) {
-        const [tasks]: any = await query(
-            `SELECT * FROM tasks WHERE userId = ? AND 
-            (dueDate BETWEEN ? AND ? OR scheduledAt BETWEEN ? AND ?)
-            ORDER BY dueDate ASC`,
-            [userId, from, to, from, to]
-        );
-        return tasks;
+        return taskRepository.findByDateRange(userId, from, to);
     },
 };

@@ -4,16 +4,6 @@
 
 import { withAuth } from "@/middleware/with-auth";
 import { withRole } from "@/middleware/with-role";
-import { adminService } from "@/services/admin.service";
-import { success, error } from "@/lib/api-response";
+import { adminController } from "@/controllers/admin.controller";
 
-export const GET = withAuth(
-    withRole(["ADMIN"], async (req, { user }) => {
-        try {
-            const stats = await adminService.getStats();
-            return success(stats);
-        } catch (err) {
-            return error(err);
-        }
-    })
-);
+export const GET = withAuth(withRole(["ADMIN"], (req, ctx) => adminController.getStats(req, ctx)));

@@ -17,7 +17,7 @@
  * Este servicio gestiona: registro, login y consulta de perfil.
  */
 
-import { query, execute } from "@/lib/mysql";          // Cliente de base de datos
+import { userRepository } from "@/repositories/user.repository";
 import { signToken } from "@/lib/auth";           // Genera tokens JWT
 import { ConflictError, UnauthorizedError, NotFoundError } from "@/lib/errors";  // Errores tipados
 import bcrypt from "bcryptjs";                    // Hashing de contraseñas
@@ -41,12 +41,9 @@ export const authService = {
      */
     async register(input: RegisterInput) {
         // Buscar si ya existe un usuario con ese email O username
-        const [existing]: any = await query(
-            'SELECT id FROM users WHERE email = ? OR username = ?',
-            [input.email, input.username]
-        );
+        const existing = await userRepository.findByEmailOrUsername(input.email, input.username);
 
-        if (existing && existing.length > 0) {
+        if (existing) {
             throw new ConflictError("Email or username already exists");
         }
 
@@ -54,21 +51,15 @@ export const authService = {
         const hashedPassword = await bcrypt.hash(input.password, SALT_ROUNDS);
 
         // Crear el usuario en MySQL
-        const [result]: any = await execute(
-            'INSERT INTO users (email, username, password, firstName, lastName) VALUES (?, ?, ?, ?, ?)',
-            [input.email, input.username, hashedPassword, input.firstName, input.lastName]
-        );
+        const userId = await userRepository.create({
+            ...input,
+            password: hashedPassword
+        });
 
-        const userId = result.insertId;
-
-        const [userRows]: any = await query(
-            'SELECT id, email, username, role FROM users WHERE id = ?',
-            [userId]
-        );
-        const user = userRows[0];
+        const user = await userRepository.findById(userId.toString());
 
         // Generar token JWT para autenticación inmediata
-        const token = signToken(user.id, user.role);
+        const token = signToken(user!.id, user!.role);
         return { user, token };
     },
 
@@ -86,11 +77,7 @@ export const authService = {
      */
     async login(input: LoginInput) {
         // Buscar usuario por email (incluimos password para comparar)
-        const [rows]: any = await query(
-            'SELECT id, email, username, role, password FROM users WHERE email = ?',
-            [input.email]
-        );
-        const user = rows[0];
+        const user = await userRepository.findByEmailWithPassword(input.email);
 
         // Verificar: ¿existe el usuario? ¿la contraseña coincide con el hash?
         if (!user || !(await bcrypt.compare(input.password, user.password))) {
@@ -110,13 +97,8 @@ export const authService = {
      * Se llama desde GET /api/auth/me con el ID extraído del JWT.
      */
     async getMe(userId: string) {
-        const [rows]: any = await query(
-            'SELECT id, email, username, firstName, lastName, avatarUrl, role, points, coins, level, createdAt FROM users WHERE id = ?',
-            [userId]
-        );
-
-        if (!rows || rows.length === 0) throw new NotFoundError('User');
-
-        return rows[0];
+        const user = await userRepository.findById(userId);
+        if (!user) throw new NotFoundError('User');
+        return user;
     },
 };

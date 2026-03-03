@@ -9,7 +9,8 @@
  *   - Consulta de progreso del usuario (puntos, monedas, nivel)
  */
 
-import { query, execute, pool } from "@/lib/mysql";
+import { pool } from "@/lib/mysql";
+import { rewardRepository } from "@/repositories/reward.repository";
 import { NotFoundError, ValidationError } from "@/lib/errors";
 
 export const rewardService = {
@@ -17,43 +18,24 @@ export const rewardService = {
      * getAll — Devuelve todas las recompensas activas del catálogo.
      */
     async getAll() {
-        const [rewards]: any = await query(
-            'SELECT * FROM rewards WHERE isActive = 1 ORDER BY cost ASC'
-        );
-        return rewards;
+        return rewardRepository.findAllActive();
     },
 
     /**
      * redeem — Canjea una recompensa gastando monedas del usuario.
      */
     async redeem(userId: string, rewardId: string) {
-        const [rewards]: any = await query(
-            'SELECT * FROM rewards WHERE id = ? AND isActive = 1',
-            [rewardId]
-        );
-        if (!rewards || rewards.length === 0) throw new NotFoundError('Reward');
-        const reward = rewards[0];
+        const reward = await rewardRepository.findById(rewardId);
+        if (!reward || !reward.isActive) throw new NotFoundError('Reward');
 
-        const [users]: any = await query(
-            'SELECT coins FROM users WHERE id = ?',
-            [userId]
-        );
-        if (!users || users.length === 0) throw new NotFoundError('User');
-        const user = users[0];
-
-        if (user.coins < reward.cost) throw new ValidationError('Insufficient coins');
+        const userCoins = await rewardRepository.getUserCoins(userId);
+        if (userCoins < reward.cost) throw new ValidationError('Insufficient coins');
 
         const connection = await pool.getConnection();
         await connection.beginTransaction();
         try {
-            await connection.execute(
-                'INSERT INTO user_rewards (userId, rewardId) VALUES (?, ?)',
-                [userId, rewardId]
-            );
-            await connection.execute(
-                'UPDATE users SET coins = coins - ? WHERE id = ?',
-                [reward.cost, userId]
-            );
+            await rewardRepository.createRedemption(userId, rewardId, connection);
+            await rewardRepository.subtractCoins(userId, reward.cost, connection);
             await connection.commit();
             return { success: true };
         } catch (error) {
@@ -68,22 +50,18 @@ export const rewardService = {
      * getUserProgress — Devuelve un resumen del progreso del usuario.
      */
     async getUserProgress(userId: string) {
-        const [userResult]: any = await query(
-            "SELECT points, coins, level FROM users WHERE id = ?",
-            [userId]
-        );
-        if (!userResult || userResult.length === 0) throw new NotFoundError("User");
-        const user = userResult[0];
+        const user = await rewardRepository.getUserStats(userId);
+        if (!user) throw new NotFoundError("User");
 
-        const [habitsCompletedResult, tasksCompletedResult]: any = await Promise.all([
-            query("SELECT COUNT(*) as count FROM habit_completions WHERE userId = ?", [userId]),
-            query("SELECT COUNT(*) as count FROM tasks WHERE userId = ? AND status = ?", [userId, "COMPLETED"]),
+        const [habitsCompleted, tasksCompleted] = await Promise.all([
+            rewardRepository.countHabitCompletions(userId),
+            rewardRepository.countTasksCompleted(userId),
         ]);
 
         return {
             ...user,
-            habitsCompleted: habitsCompletedResult[0][0].count,
-            tasksCompleted: tasksCompletedResult[0][0].count,
+            habitsCompleted,
+            tasksCompleted,
             currentStreak: 0,
         };
     },

@@ -8,21 +8,25 @@
  * y perfil PÚBLICO (datos visibles para otros usuarios).
  */
 
-import { query, execute } from "@/lib/mysql";
+import { userRepository } from "@/repositories/user.repository";
 import { NotFoundError, ConflictError } from "@/lib/errors";
 
 export const userService = {
+    /**
+     * getAll — Obtener lista de todos los usuarios (perfil público).
+     */
+    async getAll() {
+        return userRepository.findAll();
+    },
+
     /**
      * getProfile — Perfil PRIVADO (todos los datos excepto password).
      * Solo accesible por el propio usuario (GET /api/users, GET /api/auth/me).
      */
     async getProfile(userId: string) {
-        const [rows]: any = await query(
-            'SELECT id, email, username, firstName, lastName, avatarUrl, role, points, coins, level, createdAt FROM users WHERE id = ?',
-            [userId]
-        );
-        if (!rows || rows.length === 0) throw new NotFoundError('User');
-        return rows[0];
+        const user = await userRepository.findById(userId);
+        if (!user) throw new NotFoundError('User');
+        return user;
     },
 
     /**
@@ -31,12 +35,9 @@ export const userService = {
      * NO incluye email, monedas, ni datos sensibles.
      */
     async getPublicProfile(userId: string) {
-        const [rows]: any = await query(
-            'SELECT id, username, firstName, lastName, avatarUrl, level, points FROM users WHERE id = ?',
-            [userId]
-        );
-        if (!rows || rows.length === 0) throw new NotFoundError('User');
-        return rows[0];
+        const user = await userRepository.findPublicById(userId);
+        if (!user) throw new NotFoundError('User');
+        return user;
     },
 
     /**
@@ -47,24 +48,14 @@ export const userService = {
      */
     async updateProfile(userId: string, data: any) {
         if (data.username) {
-            const [existing]: any = await query(
-                'SELECT id FROM users WHERE username = ? AND id != ?',
-                [data.username, userId]
-            );
-            if (existing && existing.length > 0) throw new ConflictError('Username already taken');
+            const exists = await userRepository.existsOtherWithUsername(data.username, userId);
+            if (exists) throw new ConflictError('Username already taken');
         }
 
         const keys = Object.keys(data);
         if (keys.length === 0) return this.getProfile(userId);
 
-        const setClause = keys.map(key => `${key} = ?`).join(', ');
-        const values = Object.values(data);
-
-        await execute(
-            `UPDATE users SET ${setClause} WHERE id = ?`,
-            [...values, userId]
-        );
-
+        await userRepository.update(userId, data);
         return this.getProfile(userId);
     },
 
@@ -73,26 +64,20 @@ export const userService = {
     * Se llama desde el servicio de tareas al completar una tarea.
     */
     async setXpAndCoins(userId: string, points: number, coins: number) {
-        const [rows]: any = await query(
-            'SELECT points, coins, level FROM users WHERE id = ?',
-            [userId]
-        );
-        if (!rows || rows.length === 0) throw new NotFoundError('User');
+        const user = await userRepository.findById(userId);
+        if (!user) throw new NotFoundError('User');
 
-        const user = rows[0];
         const updatedPoints = user.points + points;
         const updatedCoins = user.coins + coins;
         const newLevel = Math.floor(Math.sqrt(updatedPoints / 100));
 
-        await execute(
-            'UPDATE users SET points = ?, coins = ?, level = ? WHERE id = ?',
-            [updatedPoints, updatedCoins, Math.max(newLevel, user.level), userId]
+        await userRepository.updateStats(
+            userId,
+            updatedPoints,
+            updatedCoins,
+            Math.max(newLevel, user.level)
         );
 
-        const [updatedRows]: any = await query(
-            'SELECT id, points, coins, level FROM users WHERE id = ?',
-            [userId]
-        );
-        return updatedRows[0];
+        return userRepository.findById(userId);
     },
 };

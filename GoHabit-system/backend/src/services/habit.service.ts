@@ -9,7 +9,8 @@
  * ambas operaciones ocurran juntas o ninguna).
  */
 
-import { query, execute, pool } from "@/lib/mysql";
+import { pool } from "@/lib/mysql";
+import { habitRepository } from "@/repositories/habit.repository";
 import { NotFoundError } from "@/lib/errors";
 import { POINTS, COINS } from "@/lib/constants";
 
@@ -18,65 +19,39 @@ export const habitService = {
      * getByUser — Lista todos los hábitos de un usuario.
      */
     async getByUser(userId: string) {
-        const [habits]: any = await query(
-            'SELECT * FROM habits WHERE userId = ? ORDER BY createdAt DESC',
-            [userId]
-        );
-        return habits;
+        return habitRepository.findAllByUserId(userId);
     },
 
     /**
      * getById — Obtiene un hábito específico con sus últimas 10 completions.
      */
     async getById(habitId: string, userId: string) {
-        const [habits]: any = await query(
-            'SELECT * FROM habits WHERE id = ? AND userId = ?',
-            [habitId, userId]
-        );
-        if (!habits || habits.length === 0) throw new NotFoundError('Habit');
+        const habit = await habitRepository.findById(habitId);
+        if (!habit || habit.userId !== userId) throw new NotFoundError('Habit');
 
-        const [completions]: any = await query(
-            'SELECT * FROM habit_completions WHERE habitId = ? ORDER BY completedAt DESC LIMIT 10',
-            [habitId]
-        );
+        const completions = await habitRepository.findCompletions(habitId, 10);
 
-        return { ...habits[0], completions };
+        return { ...habit, completions };
     },
 
     /**
      * create — Crea un nuevo hábito para el usuario.
      */
     async create(userId: string, data: any) {
-        const { title, description, frequency, category, icon, color } = data;
-        const [result]: any = await execute(
-            "INSERT INTO habits (userId, title, description, frequency, category, icon, color) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            [userId, title, description || null, frequency || 'DAILY', category || null, icon || null, color || null]
-        );
-        const [rows]: any = await query('SELECT * FROM habits WHERE id = ?', [result.insertId]);
-        return rows[0];
+        const insertId = await habitRepository.create(userId, data);
+        return habitRepository.findById(insertId.toString());
     },
 
     /**
      * update — Actualiza un hábito existente.
      */
     async update(habitId: string, userId: string, data: any) {
-        const [habits]: any = await query(
-            "SELECT id FROM habits WHERE id = ? AND userId = ?",
-            [habitId, userId]
-        );
-        if (!habits || habits.length === 0) throw new NotFoundError("Habit");
+        const habit = await habitRepository.findById(habitId);
+        if (!habit || habit.userId !== userId) throw new NotFoundError("Habit");
 
-        const keys = Object.keys(data);
-        if (keys.length === 0) return this.getById(habitId, userId);
+        if (Object.keys(data).length === 0) return this.getById(habitId, userId);
 
-        const setClause = keys.map(key => `${key} = ?`).join(', ');
-        const values = Object.values(data);
-
-        await execute(
-            `UPDATE habits SET ${setClause} WHERE id = ?`,
-            [...values, habitId]
-        );
-
+        await habitRepository.update(habitId, userId, data);
         return this.getById(habitId, userId);
     },
 
@@ -84,13 +59,10 @@ export const habitService = {
      * delete — Elimina un hábito y todas sus completions (Cascade).
      */
     async delete(habitId: string, userId: string) {
-        const [habits]: any = await query(
-            "SELECT id FROM habits WHERE id = ? AND userId = ?",
-            [habitId, userId]
-        );
-        if (!habits || habits.length === 0) throw new NotFoundError("Habit");
+        const habit = await habitRepository.findById(habitId);
+        if (!habit || habit.userId !== userId) throw new NotFoundError("Habit");
 
-        await execute("DELETE FROM habits WHERE id = ?", [habitId]);
+        await habitRepository.delete(habitId, userId);
         return { id: habitId, deleted: true };
     },
 
@@ -98,29 +70,22 @@ export const habitService = {
      * complete — Marca un hábito como completado (registra una completion).
      */
     async complete(habitId: string, userId: string, note?: string) {
-        const [habits]: any = await query('SELECT id FROM habits WHERE id = ? AND userId = ?', [habitId, userId]);
-        if (!habits || habits.length === 0) throw new NotFoundError("Habit");
+        const habit = await habitRepository.findById(habitId);
+        if (!habit || habit.userId !== userId) throw new NotFoundError("Habit");
 
         const connection = await pool.getConnection();
         await connection.beginTransaction();
 
         try {
             // 1. Crear el registro de completion
-            const [result]: any = await connection.execute(
-                'INSERT INTO habit_completions (habitId, userId, note) VALUES (?, ?, ?)',
-                [habitId, userId, note || null]
-            );
+            const completionId = await habitRepository.createCompletion(habitId, userId, note, connection);
 
             // 2. Sumar puntos y monedas al usuario
-            await connection.execute(
-                'UPDATE users SET points = points + ?, coins = coins + ? WHERE id = ?',
-                [POINTS.HABIT_COMPLETION, COINS.HABIT_COMPLETION, userId]
-            );
+            await habitRepository.updateUserStats(userId, POINTS.HABIT_COMPLETION, COINS.HABIT_COMPLETION, connection);
 
             await connection.commit();
 
-            const [completionRows]: any = await query('SELECT * FROM habit_completions WHERE id = ?', [result.insertId]);
-            return completionRows[0];
+            return habitRepository.findCompletionById(completionId);
         } catch (error) {
             await connection.rollback();
             throw error;
@@ -133,49 +98,24 @@ export const habitService = {
     * checkStreaks — Calcula y actualiza la racha del usuario
     */
     async checkStreaks(userId: string, habitId: string): Promise<number> {
+        const habit = await habitRepository.findById(habitId);
+        if (!habit || habit.userId !== userId) throw new NotFoundError("Habit");
 
-        // 1️⃣ Validamos que el hábito pertenece al usuario
-        const [habits]: any = await query(
-            'SELECT id FROM habits WHERE id = ? AND userId = ?',
-            [habitId, userId]
-        );
+        const dates = await habitRepository.findCompletionDates(habitId, userId);
 
-        if (!habits || habits.length === 0) {
-            throw new NotFoundError("Habit");
-        }
-
-        // 2️⃣ Obtenemos TODOS los días únicos en los que el usuario completó ese hábito
-        const [rows]: any = await query(
-            `SELECT DISTINCT DATE(completedAt) as fecha
-         FROM habit_completions
-         WHERE habitId = ? AND userId = ?
-         ORDER BY fecha ASC`,
-            [habitId, userId]
-        );
-
-        if (!rows.length) {
-            await execute('UPDATE users SET streak = 0 WHERE id = ?', [userId]);
+        if (!dates.length) {
+            await habitRepository.updateUserStreak(userId, 0);
             return 0;
         }
 
-        const dates: Date[] = rows.map((row: any) => {
-            const d = new Date(row.fecha);
-            d.setHours(0, 0, 0, 0);
-            return d;
-        });
-
         let streak = 0;
-
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
         let compareDate = today;
 
         for (let i = dates.length - 1; i >= 0; i--) {
-
-            const diff =
-                (compareDate.getTime() - dates[i].getTime()) /
-                (1000 * 60 * 60 * 24);
+            const diff = (compareDate.getTime() - dates[i].getTime()) / (1000 * 60 * 60 * 24);
 
             if (diff === 0 || diff === 1) {
                 streak++;
@@ -185,14 +125,7 @@ export const habitService = {
             }
         }
 
-        // 3️⃣ Actualizamos la racha del usuario
-        await execute(
-            'UPDATE users SET streak = ? WHERE id = ?',
-            [streak, userId]
-        );
-
+        await habitRepository.updateUserStreak(userId, streak);
         return streak;
     }
-
-
 };

@@ -2,12 +2,6 @@
  * GET /api/health — Healthcheck endpoint.
  */
 
-import { NextResponse } from "next/server";
+import { healthController } from "@/controllers/health.controller";
 
-export async function GET() {
-    return NextResponse.json({
-        status: "ok",
-        timestamp: new Date().toISOString(),
-        service: "gohabit-backend",
-    });
-}
+export const GET = (req: any, ctx: any) => healthController.check(req, ctx);
