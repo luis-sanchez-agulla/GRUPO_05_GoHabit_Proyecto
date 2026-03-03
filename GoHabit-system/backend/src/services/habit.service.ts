@@ -130,10 +130,69 @@ export const habitService = {
     },
 
     /**
-     * complete — Verificar y poner racha de habitos
-     */
-    async checkStreaks(userId: string) {
-        
-    },
-    
+    * checkStreaks — Calcula y actualiza la racha del usuario
+    */
+    async checkStreaks(userId: string, habitId: string): Promise<number> {
+
+        // 1️⃣ Validamos que el hábito pertenece al usuario
+        const [habits]: any = await query(
+            'SELECT id FROM habits WHERE id = ? AND userId = ?',
+            [habitId, userId]
+        );
+
+        if (!habits || habits.length === 0) {
+            throw new NotFoundError("Habit");
+        }
+
+        // 2️⃣ Obtenemos TODOS los días únicos en los que el usuario completó ese hábito
+        const [rows]: any = await query(
+            `SELECT DISTINCT DATE(completedAt) as fecha
+         FROM habit_completions
+         WHERE habitId = ? AND userId = ?
+         ORDER BY fecha ASC`,
+            [habitId, userId]
+        );
+
+        if (!rows.length) {
+            await execute('UPDATE users SET streak = 0 WHERE id = ?', [userId]);
+            return 0;
+        }
+
+        const dates: Date[] = rows.map((row: any) => {
+            const d = new Date(row.fecha);
+            d.setHours(0, 0, 0, 0);
+            return d;
+        });
+
+        let streak = 0;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let compareDate = today;
+
+        for (let i = dates.length - 1; i >= 0; i--) {
+
+            const diff =
+                (compareDate.getTime() - dates[i].getTime()) /
+                (1000 * 60 * 60 * 24);
+
+            if (diff === 0 || diff === 1) {
+                streak++;
+                compareDate = dates[i];
+            } else if (diff > 1) {
+                break;
+            }
+        }
+
+        // 3️⃣ Actualizamos la racha del usuario
+        await execute(
+            'UPDATE users SET streak = ? WHERE id = ?',
+            [streak, userId]
+        );
+
+        return streak;
+    }
+
+
 };

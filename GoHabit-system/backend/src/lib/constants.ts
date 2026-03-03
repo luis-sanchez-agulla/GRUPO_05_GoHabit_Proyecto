@@ -37,7 +37,7 @@ export const COINS = {
 
 export const GAME_BALANCE = {
     LEVEP_EXP_BASE: 100,           // Multiplicador de dificultad para subir de nivel (nivel * LEVEP_EXP_BASE)
-    STREAK_BONUS_MULTIPLIER: 0.5,  // Multiplicador para calcular el bonus de racha (días de racha * STREAK_BONUS_MULTIPLIER)
+    STREAK_BONUS_MULTIPLIER: 0.2,  // Multiplicador para calcular el bonus de racha (días de racha * STREAK_BONUS_MULTIPLIER)
 }
 
 /**
