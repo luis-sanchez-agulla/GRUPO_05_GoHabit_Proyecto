@@ -26,6 +26,7 @@ INSERT INTO Registro_Habito (habito_id, fecha) VALUES
 (1, '2026-03-01 07:30:00'),
 (1, '2026-03-02 07:40:00'),
 -- Carlos: hábito 2 (leer)
+
 (2, '2026-03-01 22:10:00'),
 (2, '2026-03-02 22:05:00'),
 -- Carlos: hábito 3 (agua)
