@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS Accesorio (
     nombre VARCHAR(255) NOT NULL,
     tipo VARCHAR(100) NOT NULL,
     rareza VARCHAR(100) NOT NULL,
+    activo INT DEFAULT 0,
 );
 
 CREATE TABLE IF NOT EXISTS Avatar_Accesorio (

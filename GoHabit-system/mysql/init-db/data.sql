@@ -57,17 +57,18 @@ INSERT INTO Registro_Habito (habito_id, fecha) VALUES
 (11, '2026-03-01 15:00:00'),
 (11, '2026-03-02 16:00:00');
 
-INSERT INTO Accesorio (id, nombre, tipo, rareza) VALUES
-(1,  'Sombrero de vaquero',   'gorro',  'comun'),
-(2,  'Corona dorada',         'gorro',  'legendario'),
-(3,  'Gafas de sol',          'gafas',     'comun'),
-(4,  'Monóculo steampunk',    'gafas',     'raro'),
-(5,  'Capa de héroe',         'espalda',      'raro'),
-(6,  'Alas de ángel',         'espalda',      'legendario'),
-(7,  'Bufanda de rayas',      'cuello',   'comun'),
-(8,  'Collar de diamantes',   'cuello',    'legendario'),
-(9,  'Mochila aventurero',    'espalda',   'raro');
-
+INSERT INTO Accesorio (id, nombre, tipo, rareza, activo) VALUES
+(1,  'Sombrero de vaquero',   'gorro',  'comun', 1),
+(2,  'Bufanda de rayas',      'cuello',   'comun', 1),
+(3,  'Gafas de sol',          'gafas',     'comun', 0),
+(4,  'Bufanda de rayas',      'cuello',   'comun', 1),
+(5,  'Monóculo steampunk',    'gafas',     'raro', 0),
+(6,  'Capa de héroe',         'espalda',      'raro', 1),
+(7,  'Mochila aventurero',    'espalda',   'raro', 1),
+(8,  'Alas de ángel',         'espalda',      'legendario,', 0),
+(9,  'Collar de diamantes',   'cuello',    'legendario', 0),
+(10, 'Corona dorada',         'gorro',  'legendario', 0);
+ 
 INSERT INTO LootBox (id, nombre, coste, rareza) VALUES
 (1, 'Caja Común',     50,  'comun'),
 (2, 'Caja Rara',   150, 'raro'),
