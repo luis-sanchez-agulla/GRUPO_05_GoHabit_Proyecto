@@ -75,5 +75,20 @@ export const userRepository = {
             'UPDATE users SET points = ?, coins = ?, level = ? WHERE id = ?',
             [points, coins, level, userId]
         );
+    },
+
+    async getTreeStage(userId: string): Promise<any> {
+        const [rows]: any = await query(
+            'SELECT etapa FROM Avatar WHERE usuario_id = ?',
+            [userId]
+        );
+        return rows && rows.length > 0 ? rows[0] : null;
+    },
+
+    async updateTreeStage(userId: string, newStage: number): Promise<void> {
+        await execute(
+            'UPDATE Avatar SET etapa = ? WHERE usuario_id = ?',
+            [newStage, userId]
+        );
     }
 };

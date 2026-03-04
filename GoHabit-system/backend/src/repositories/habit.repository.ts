@@ -99,5 +99,5 @@ export const habitRepository = {
             'UPDATE users SET streak = ? WHERE id = ?',
             [streak, userId]
         );
-    }
+    },
 };

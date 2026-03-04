@@ -10,6 +10,7 @@
 
 import { userRepository } from "@/repositories/user.repository";
 import { NotFoundError, ConflictError } from "@/lib/errors";
+import { TREE_STAGES, TREE_STAGE_LEVELS } from "@/lib/constants";
 
 export const userService = {
     /**
@@ -66,18 +67,35 @@ export const userService = {
     async setXpAndCoins(userId: string, points: number, coins: number) {
         const user = await userRepository.findById(userId);
         if (!user) throw new NotFoundError('User');
+        const stage = await userRepository.getTreeStage(userId);
+        if (!stage) throw new NotFoundError('User or Avatar');
 
         const updatedPoints = user.points + points;
         const updatedCoins = user.coins + coins;
         const newLevel = Math.floor(Math.sqrt(updatedPoints / 100));
+        if (newLevel > user.level) {
 
-        await userRepository.updateStats(
-            userId,
-            updatedPoints,
-            updatedCoins,
-            Math.max(newLevel, user.level)
-        );
+            const currentStage = TREE_STAGE_LEVELS.find(level => user.points >= level.min && user.points <= level.max)?.stage ?? 0;
+            const newStage = TREE_STAGE_LEVELS.find(level => updatedPoints >= level.min && updatedPoints <= level.max)?.stage;
 
-        return userRepository.findById(userId);
+            if (newStage !== undefined && newStage > currentStage) {
+                await userRepository.updateTreeStage(userId, newStage);
+            }
+
+            await userRepository.updateStats(
+                userId,
+                updatedPoints,
+                updatedCoins,
+                Math.max(newLevel, user.level)
+            );
+
+            return userRepository.findById(userId);
+        }
     },
+
+    async getTreeStage(userId: string) {
+        const stage = await userRepository.getTreeStage(userId);
+        if (!stage) throw new NotFoundError('User or Avatar');
+        return stage;
+    }
 };

@@ -12,9 +12,14 @@ export interface UserPublicProfile {
     points: number;
 }
 
+
 export interface UserPrivateProfile extends UserPublicProfile {
     email: string;
     role: string;
     coins: number;
     createdAt: Date;
+}
+
+export interface TreeStage {
+    stage: number;    // Current stage of the tree
 }

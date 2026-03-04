@@ -26,6 +26,13 @@ export interface HabitCreateInput {
     icon?: string;
 }
 
+export interface currentHabitStreak {
+    habitId: string;
+    currentStreak: number;
+    longestStreak: number;
+    lastCompletedAt: Date | null;
+}
+
 export interface HabitUpdateInput extends Partial<HabitCreateInput> {
     isActive?: boolean;
 }

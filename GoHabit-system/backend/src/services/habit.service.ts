@@ -83,9 +83,13 @@ export const habitService = {
             // 2. Sumar puntos y monedas al usuario
             await habitRepository.updateUserStats(userId, POINTS.HABIT_COMPLETION, COINS.HABIT_COMPLETION, connection);
 
+            // 3. Actualizar la racha
+            const newStreak = await this.checkStreaks(userId, habitId);
+
             await connection.commit();
 
-            return habitRepository.findCompletionById(completionId);
+            const completion = await habitRepository.findCompletionById(completionId);
+            return { ...completion, currentStreak: newStreak };
         } catch (error) {
             await connection.rollback();
             throw error;
@@ -95,37 +99,46 @@ export const habitService = {
     },
 
     /**
-    * checkStreaks — Calcula y actualiza la racha del usuario
+    * checkStreaks — Calcula la racha específica de un hábito recorriendo su historial.
+    * 
+    * Explicación para principiantes:
+    * - No guardamos la racha en una tabla aparte, sino que cada vez que la necesitamos, 
+    *   la calculamos mirando las fechas en 'habit_completions'.
     */
     async checkStreaks(userId: string, habitId: string): Promise<number> {
-        const habit = await habitRepository.findById(habitId);
-        if (!habit || habit.userId !== userId) throw new NotFoundError("Habit");
-
+        // 1. Buscamos todas las fechas en las que se completó este hábito (ordenadas de vieja a nueva)
         const dates = await habitRepository.findCompletionDates(habitId, userId);
 
-        if (!dates.length) {
-            await habitRepository.updateUserStreak(userId, 0);
-            return 0;
-        }
+        if (!dates.length) return 0;
 
         let streak = 0;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
+        // Empezamos comparando desde hoy
         let compareDate = today;
 
+        // Recorremos las fechas de la más reciente (final del array) a la más antigua
         for (let i = dates.length - 1; i >= 0; i--) {
-            const diff = (compareDate.getTime() - dates[i].getTime()) / (1000 * 60 * 60 * 24);
+            const completionDate = dates[i];
 
-            if (diff === 0 || diff === 1) {
+            // Calculamos la diferencia de días entre 'compareDate' y 'completionDate'
+            const diffTime = compareDate.getTime() - completionDate.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) {
+                // Es el mismo día. Sumamos 1 racha si es el primer elemento que evaluamos.
+                if (streak === 0) streak = 1;
+            } else if (diffDays === 1) {
+                // Es exactamente el día anterior. ¡Racha continua!
                 streak++;
-                compareDate = dates[i];
-            } else if (diff > 1) {
+                compareDate = completionDate; // Ahora compararemos con este día
+            } else {
+                // Hay un hueco de más de un día. La racha se rompe aquí.
                 break;
             }
         }
 
-        await habitRepository.updateUserStreak(userId, streak);
         return streak;
     }
 };
