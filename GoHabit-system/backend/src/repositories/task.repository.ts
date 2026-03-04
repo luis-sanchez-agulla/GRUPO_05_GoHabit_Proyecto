@@ -60,6 +60,14 @@ export const taskRepository = {
         );
     },
 
+    async countTasksCompleted(userId: string): Promise<number> {
+        const [rows]: any = await query(
+            "SELECT COUNT(*) as count FROM tasks WHERE userId = ? AND status = ?",
+            [userId, "COMPLETED"]
+        );
+        return rows[0].count;
+    },
+
     async findByDateRange(userId: string, from: Date, to: Date): Promise<Task[]> {
         const [rows]: any = await query(
             `SELECT * FROM tasks WHERE userId = ? AND 

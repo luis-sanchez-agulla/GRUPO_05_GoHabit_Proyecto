@@ -10,7 +10,7 @@ export interface Reward {
     icon: string | null;
     isActive: boolean;
 }
-
+ 
 export interface RewardCreateInput {
     name: string;
     type: string;

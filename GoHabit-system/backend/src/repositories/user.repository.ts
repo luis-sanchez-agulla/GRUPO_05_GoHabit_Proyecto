@@ -76,6 +76,38 @@ export const userRepository = {
             [points, coins, level, userId]
         );
     },
+ 
+    async getUserStats(userId: string): Promise<any | null> {
+        const [rows]: any = await query(
+            "SELECT points, coins, level FROM users WHERE id = ?",
+            [userId]
+        );
+        return rows && rows.length > 0 ? rows[0] : null;
+    },
+
+    async findUserAccessories(userId: string): Promise<any[]> {
+        const [rows]: any = await query(`SELECT id FROM Accesorio AS a INNER JOIN Avatar_Accesorio AS aa ON a.id = aa.accesorioId WHERE aa.userId = ?`, [userId]);
+        return rows || [];
+    },
+
+    async addAccessoryToUser(userId: string, accessoryId: string): Promise<void> {
+        await execute(
+            'INSERT INTO Avatar_Accesorio (userId, accesorioId) VALUES (?, ?)',
+            [userId, accessoryId]
+        );
+    },
+
+    async getUserCoins(userId: string): Promise<number> {
+        const [rows]: any = await query('SELECT coins FROM users WHERE id = ?', [userId]);
+        return rows && rows.length > 0 ? rows[0].coins : 0;
+    },
+
+    async subtractCoins(userId: string, amount: number, connection: any): Promise<void> {
+        await connection.execute(
+            'UPDATE users SET coins = coins - ? WHERE id = ?',
+            [amount, userId]
+        );
+    },
 
     async getTreeStage(userId: string): Promise<any> {
         const [rows]: any = await query(

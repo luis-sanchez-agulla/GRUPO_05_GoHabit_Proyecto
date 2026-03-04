@@ -24,7 +24,7 @@ Actualmente tenemos una racha global en el usuario, pero los hábitos deben tene
 El usuario progresa visualmente a través de niveles y etapas del árbol (Semilla, Brote, Árbol Joven, Árbol Adulto, Gran Árbol).
 
 ### Tareas:
-- [ ] **Entidad**: Añadir `treeStage` (string) a [UserPublicProfile](file:///c:/Users/sluis/Documents/Ingenieria%20Informatica/3ro/Segundo/Proyectos%20ll/GRUPO_05_GoHabit_Proyecto/GoHabit-system/backend/src/entities/user.entity.ts#5-14).
+- [x] **Entidad**: Añadir `treeStage` (string) a [UserPublicProfile](file:///c:/Users/sluis/Documents/Ingenieria%20Informatica/3ro/Segundo/Proyectos%20ll/GRUPO_05_GoHabit_Proyecto/GoHabit-system/backend/src/entities/user.entity.ts#5-14).
     - **Archivo**: [src/entities/user.entity.ts](file:///c:/Users/sluis/Documents/Ingenieria%20Informatica/3ro/Segundo/Proyectos%20ll/GRUPO_05_GoHabit_Proyecto/GoHabit-system/backend/src/entities/user.entity.ts)
 - [x] **Servicio**: Mejorar `userService.setXpAndCoins` para que, además de calcular el nivel, determine el `treeStage` basado en umbrales de puntos.
     - **Archivo**: [src/services/user.service.ts](file:///c:/Users/sluis/Documents/Ingenieria%20Informatica/3ro/Segundo/Proyectos%20ll/GRUPO_05_GoHabit_Proyecto/GoHabit-system/backend/src/services/user.service.ts)
@@ -39,10 +39,10 @@ El usuario progresa visualmente a través de niveles y etapas del árbol (Semill
 Sistema para gastar monedas y obtener accesorios decorativos aleatorios según su rareza.
 
 ### Tareas:
-- [ ] **Repositorio de Recompensas**: Crear métodos para obtener los accesorios contenidos en una caja específica.
+- [x] **Repositorio de Recompensas**: Crear métodos para obtener los accesorios contenidos en una caja específica.
     - **Archivo**: [src/repositories/reward.repository.ts](file:///c:/Users/sluis/Documents/Ingenieria%20Informatica/3ro/Segundo/Proyectos%20ll/GRUPO_05_GoHabit_Proyecto/GoHabit-system/backend/src/repositories/reward.repository.ts)
     - **Sugerencia**: `findAccessoriesByLootBox(lootBoxId: string)`
-- [ ] **Servicio de Recompensas**: Implementar `openLootBox`.
+- [x] **Servicio de Recompensas**: Implementar `openLootBox`.
     - **Archivo**: [src/services/reward.service.ts](file:///c:/Users/sluis/Documents/Ingenieria%20Informatica/3ro/Segundo/Proyectos%20ll/GRUPO_05_GoHabit_Proyecto/GoHabit-system/backend/src/services/reward.service.ts)
     - **Ayuda/Lógica**:
         1. Verificar si el usuario tiene suficientes monedas.
