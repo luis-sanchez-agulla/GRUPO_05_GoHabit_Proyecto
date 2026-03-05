@@ -57,10 +57,10 @@ export const habitController = {
 
     async complete(req: any, context: any) {
         try {
-            const { user, params } = context;
+            const { user, params, data } = context;
             const { habitId } = await params;
-            const body = await req.json().catch(() => ({}));
-            const completion = await habitService.complete(habitId, user.id, body.note);
+            // Note: withValidation already parsed the body into context.data
+            const completion = await habitService.complete(habitId, user.id, data?.note);
             return success(completion);
         } catch (err) {
             return error(err);

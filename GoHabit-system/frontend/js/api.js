@@ -91,8 +91,32 @@ async function fetchApi(endpoint, options = {}) {
     return data;
 }
 
+/**
+ * Prueba de conexión al backend.
+ * Intenta registrar un usuario de prueba y muestra el resultado en la consola.
+ */
+async function testConnection() {
+    try {
+        const response = await fetchApi('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({
+                email: 'test_connection@gohabit.dev',
+                username: 'test_connection',
+                password: 'test1234',
+                firstName: 'Test'
+            })
+        });
+        console.log('Conexión exitosa:', response);
+    } catch (err) {
+        console.error('Error en la conexión:', err);
+    }
+}
+
 // Inicializar la autenticación nada más cargar el script (opcional pero acelera)
 ensureAuthenticated().catch(console.error);
+
+// Ejecutar la prueba de conexión al cargar el script
+testConnection();
 
 // Agregarlo a la ventana global
 window.fetchApi = fetchApi;

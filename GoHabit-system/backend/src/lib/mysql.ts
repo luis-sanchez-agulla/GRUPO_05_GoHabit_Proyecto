@@ -9,21 +9,17 @@
 
 import mysql from 'mysql2/promise';
 
+import { env } from '@/config/env';
+
 // Singleton para el pool de conexiones
 const globalForMySQL = globalThis as unknown as {
     pool: mysql.Pool | undefined;
 };
 
-// URL de la base de datos desde .env
-const DATABASE_URL = process.env.DATABASE_URL;
-
-if (!DATABASE_URL) {
-    throw new Error('DATABASE_URL is not defined in environment variables');
-}
-
+// Usamos la URL validada de nuestro config centralizado
 export const pool =
     globalForMySQL.pool ??
-    mysql.createPool(DATABASE_URL);
+    mysql.createPool(env.DATABASE_URL);
 
 // En desarrollo, guardamos el pool en el global para evitar agotar conexiones con hot-reload
 if (process.env.NODE_ENV !== 'production') {

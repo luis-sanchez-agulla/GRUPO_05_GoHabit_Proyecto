@@ -7,7 +7,7 @@
 import { withAuth } from "@/middleware/with-auth";
 import { withRole } from "@/middleware/with-role";
 import { withValidation } from "@/middleware/with-validation";
-import { createRewardSchema, updateRewardSchema } from "@/validations/reward.schema";
+import { createRewardSchema, updateRewardSchema, deleteRewardSchema } from "@/validations/reward.schema";
 import { adminController } from "@/controllers/admin.controller";
 
 export const POST = withAuth(withRole(["ADMIN"], withValidation(createRewardSchema, (req, ctx) => adminController.createReward(req, ctx))));
