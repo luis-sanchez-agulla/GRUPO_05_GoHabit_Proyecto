@@ -10,6 +10,7 @@
 
 import { pool } from "@/lib/mysql";
 import { taskRepository } from "@/repositories/task.repository";
+import { userService } from "@/services/user.service";
 import { NotFoundError } from "@/lib/errors";
 import { POINTS, COINS } from "@/lib/constants";
 
@@ -59,7 +60,7 @@ export const taskService = {
                 await taskRepository.updateWithConnection(taskId, updateData, connection);
 
                 // 2. Sumar puntos y monedas al usuario
-                await taskRepository.updateUserStats(userId, POINTS.TASK_COMPLETION, COINS.TASK_COMPLETION, connection);
+                await userService.addProgress(userId, POINTS.TASK_COMPLETION, COINS.TASK_COMPLETION, connection);
 
                 await connection.commit();
                 return this.getById(taskId, userId);

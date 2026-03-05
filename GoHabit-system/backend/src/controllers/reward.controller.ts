@@ -11,11 +11,21 @@ export const rewardController = {
         }
     },
 
-    
-
-    async redeem(userId: string, rarity: string) {
+    async getUserProgress(req: any, context: any) {
         try {
-            const result = await rewardService.redeem(userId, rarity);
+            const { user } = context;
+            const profile = await rewardService.getUserProgress(user.id);
+            return success(profile);
+        } catch (err) {
+            return error(err);
+        }
+    },
+
+    async redeem(req: any, context: any) {
+        try {
+            const { user, data } = context;
+            const { rarity } = data;
+            const result = await rewardService.redeem(user.id, rarity);
             return created(result);
         } catch (err) {
             return error(err);

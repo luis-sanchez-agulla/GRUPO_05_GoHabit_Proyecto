@@ -23,6 +23,23 @@ export const rewardService = {
         return rewardRepository.findAllActive();
     },
 
+    /**
+     * getUserProgress — Obtiene el estado actual de progreso del usuario.
+     */
+    async getUserProgress(userId: string) {
+        const user = await userRepository.findById(userId);
+        if (!user) throw new NotFoundError('User not found');
+
+        const stage = await userRepository.getTreeStage(userId);
+
+        return {
+            points: user.points,
+            coins: user.coins,
+            level: user.level,
+            treeStage: stage?.etapa ?? 0
+        };
+    },
+
 
     /**
      * redeem — Canjea una recompensa gastando monedas del usuario.
@@ -31,35 +48,46 @@ export const rewardService = {
         const user = await userRepository.findById(userId);
         if (!user) { throw new NotFoundError('Usuario no encontrado'); }
 
-        const costeLootBox = await rewardRepository.getLootBoxCostByRarity(rarity);
-        if (user.points < costeLootBox) {
+        const cost = await rewardRepository.getLootBoxCostByRarity(rarity);
+        if (user.coins < cost) {
             throw new ValidationError('No tienes suficientes monedas para canjear esta recompensa');
         }
-
-        
 
         const userAccessories = await userRepository.findUserAccessories(userId);
         const allAccessories = await rewardRepository.findAllActiveByRarity(rarity);
 
         // Filtrar accesorios que el usuario no posee
-        const availableAccessories = allAccessories.filter(accessory => 
+        const availableAccessories = allAccessories.filter(accessory =>
             !userAccessories.some(userAccessory => userAccessory.id === accessory.id)
         );
 
         if (availableAccessories.length === 0) {
-            throw new ValidationError('No hay accesorios disponibles para canjear.');
+            throw new ValidationError('No hay accesorios disponibles para canjear de esta rareza.');
         }
 
         // Seleccionar un accesorio aleatorio
         const randomIndex = randomInt(0, availableAccessories.length);
         const selectedAccessory = availableAccessories[randomIndex];
 
-        user.points -= costeLootBox;
+        // Iniciar transacción para el canje
+        const connection = await pool.getConnection();
+        await connection.beginTransaction();
 
-        userRepository.update(userId, { points: user.points });
-        userRepository.addAccessoryToUser(userId, selectedAccessory.id);
+        try {
+            // 1. Restar monedas
+            await userRepository.subtractCoins(userId, cost, connection);
 
-        return selectedAccessory;
+            // 2. Añadir accesorio
+            await userRepository.addAccessoryToUser(userId, selectedAccessory.id);
+
+            await connection.commit();
+            return selectedAccessory;
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
     },
 };
 

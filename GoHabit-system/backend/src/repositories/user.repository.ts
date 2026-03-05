@@ -76,7 +76,14 @@ export const userRepository = {
             [points, coins, level, userId]
         );
     },
- 
+
+    async updateStatsWithConnection(userId: string, points: number, coins: number, level: number, connection: any): Promise<void> {
+        await connection.execute(
+            'UPDATE users SET points = ?, coins = ?, level = ? WHERE id = ?',
+            [points, coins, level, userId]
+        );
+    },
+
     async getUserStats(userId: string): Promise<any | null> {
         const [rows]: any = await query(
             "SELECT points, coins, level FROM users WHERE id = ?",

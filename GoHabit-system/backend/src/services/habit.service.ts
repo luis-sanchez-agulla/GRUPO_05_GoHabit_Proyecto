@@ -11,6 +11,7 @@
 
 import { pool } from "@/lib/mysql";
 import { habitRepository } from "@/repositories/habit.repository";
+import { userService } from "@/services/user.service";
 import { NotFoundError } from "@/lib/errors";
 import { POINTS, COINS } from "@/lib/constants";
 
@@ -80,8 +81,8 @@ export const habitService = {
             // 1. Crear el registro de completion
             const completionId = await habitRepository.createCompletion(habitId, userId, note, connection);
 
-            // 2. Sumar puntos y monedas al usuario
-            await habitRepository.updateUserStats(userId, POINTS.HABIT_COMPLETION, COINS.HABIT_COMPLETION, connection);
+            // 2. Sumar puntos y monedas al usuario (usando el servicio centralizado)
+            await userService.addProgress(userId, POINTS.HABIT_COMPLETION, COINS.HABIT_COMPLETION, connection);
 
             // 3. Actualizar la racha
             const newStreak = await this.checkStreaks(userId, habitId);

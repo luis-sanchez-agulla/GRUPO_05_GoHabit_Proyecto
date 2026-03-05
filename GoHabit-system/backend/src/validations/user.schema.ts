@@ -25,4 +25,10 @@ export const updateProfileSchema = z.object({
     avatarUrl: z.string().url("URL inválida").optional(),  // Debe ser una URL válida si se envía
 });
 
+export const updateUserRoleSchema = z.object({
+    userId: z.string(),
+    role: z.enum(["USER", "ADMIN"]),
+});
+
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type UpdateUserRoleInput = z.infer<typeof updateUserRoleSchema>;

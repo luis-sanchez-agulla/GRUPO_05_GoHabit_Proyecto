@@ -61,36 +61,39 @@ export const userService = {
     },
 
     /**
-    * setXpAndCoins — Método interno para actualizar puntos, monedas y nivel del usuario.
-    * Se llama desde el servicio de tareas al completar una tarea.
-    */
-    async setXpAndCoins(userId: string, points: number, coins: number) {
+     * addProgress — Actualiza puntos, monedas, nivel y etapa del árbol.
+     * Se llama al completar hábitos o tareas.
+     */
+    async addProgress(userId: string, points: number, coins: number, connection?: any) {
         const user = await userRepository.findById(userId);
         if (!user) throw new NotFoundError('User');
-        const stage = await userRepository.getTreeStage(userId);
-        if (!stage) throw new NotFoundError('User or Avatar');
 
         const updatedPoints = user.points + points;
         const updatedCoins = user.coins + coins;
+
+        // El nivel es la raíz cuadrada de (puntos / 100)
         const newLevel = Math.floor(Math.sqrt(updatedPoints / 100));
-        if (newLevel > user.level) {
 
-            const currentStage = TREE_STAGE_LEVELS.find(level => user.points >= level.min && user.points <= level.max)?.stage ?? 0;
-            const newStage = TREE_STAGE_LEVELS.find(level => updatedPoints >= level.min && updatedPoints <= level.max)?.stage;
+        // Determinar la etapa del árbol basada en los puntos
+        const newStage = TREE_STAGE_LEVELS.find(
+            lvl => updatedPoints >= lvl.min && updatedPoints <= lvl.max
+        )?.stage ?? 0;
 
-            if (newStage !== undefined && newStage > currentStage) {
-                await userRepository.updateTreeStage(userId, newStage);
-            }
-
-            await userRepository.updateStats(
-                userId,
-                updatedPoints,
-                updatedCoins,
-                Math.max(newLevel, user.level)
-            );
-
-            return userRepository.findById(userId);
+        // Si se nos pasa una conexión, usamos esa (para transacciones), si no, usamos el pool normal
+        if (connection) {
+            await userRepository.updateStatsWithConnection(userId, updatedPoints, updatedCoins, newLevel, connection);
+            await userRepository.updateTreeStage(userId, newStage); // Nota: updateTreeStage debería aceptar conexión también si queremos ser estrictos
+        } else {
+            await userRepository.updateStats(userId, updatedPoints, updatedCoins, newLevel);
+            await userRepository.updateTreeStage(userId, newStage);
         }
+
+        return {
+            points: updatedPoints,
+            coins: updatedCoins,
+            level: newLevel,
+            stage: newStage
+        };
     },
 
     async getTreeStage(userId: string) {

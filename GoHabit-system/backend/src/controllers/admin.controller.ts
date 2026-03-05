@@ -18,8 +18,8 @@ export const adminController = {
 
     async updateUserRole(req: any, context: any) {
         try {
-            const { userId, role } = await req.json() as { userId: string; role: "USER" | "ADMIN" };
-            const updated = await adminService.updateUserRole(userId, role);
+            const { data } = context;
+            const updated = await adminService.updateUserRole(data.userId, data.role);
             return success(updated);
         } catch (err) {
             return error(err);
@@ -37,8 +37,7 @@ export const adminController = {
 
     async createReward(req: any, context: any) {
         try {
-            const body = await req.json();
-            const data = createRewardSchema.parse(body);
+            const { data } = context;
             const reward = await adminService.createReward(data);
             return created(reward);
         } catch (err) {
@@ -48,10 +47,9 @@ export const adminController = {
 
     async updateReward(req: any, context: any) {
         try {
-            const body = await req.json() as { rewardId: string;[key: string]: unknown };
-            const { rewardId, ...data } = body;
-            const validated = updateRewardSchema.parse(data);
-            const reward = await adminService.updateReward(rewardId, validated);
+            const { data } = context;
+            const { rewardId, ...updateData } = data;
+            const reward = await adminService.updateReward(rewardId, updateData);
             return success(reward);
         } catch (err) {
             return error(err);
@@ -60,8 +58,8 @@ export const adminController = {
 
     async deleteReward(req: any, context: any) {
         try {
-            const { rewardId } = await req.json() as { rewardId: string };
-            await adminService.deleteReward(rewardId);
+            const { data } = context;
+            await adminService.deleteReward(data.rewardId);
             return noContent();
         } catch (err) {
             return error(err);
