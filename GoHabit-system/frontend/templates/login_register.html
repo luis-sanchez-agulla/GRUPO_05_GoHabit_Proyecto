@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register</title>
+    <link rel="stylesheet" href="../css/login_register.css">
+    <script src="/js/api.js"></script>
+</head>
+
+<body>
+    <div class="background-logo"></div>
+    <div class="container">
+        <div class="logo-container">
+            <img src="../assets/logo.png" alt="GoHabit Logo" id="main-logo">
+        </div>
+        <div class="form-wrapper">
+            <div class="form-container" id="login-form">
+                <h2>Login</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="login-email">Email:</label>
+                        <input type="email" id="login-email" name="email" required>
+                        <small class="error-message" id="login-email-error"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password:</label>
+                        <input type="password" id="login-password" name="password" required>
+                        <small class="error-message" id="login-password-error"></small>
+                    </div>
+                    <button type="submit" class="btn-primary">Login</button>
+                    <p class="switch-form">Don't have an account? <span id="show-register">Register here</span></p>
+                </form>
+            </div>
+
+            <div class="form-container" id="register-form">
+                <h2>Register</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="register-firstname">First Name:</label>
+                        <input type="text" id="register-firstname" name="firstname" required>
+                        <small class="error-message" id="register-firstname-error"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-lastname">Last Name:</label>
+                        <input type="text" id="register-lastname" name="lastname" required>
+                        <small class="error-message" id="register-lastname-error"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email:</label>
+                        <input type="email" id="register-email" name="email" required>
+                        <small class="error-message" id="register-email-error"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password:</label>
+                        <input type="password" id="register-password" name="password" required>
+                        <small class="error-message" id="register-password-error"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-birthdate">Date of Birth:</label>
+                        <input type="date" id="register-birthdate" name="birthdate" required>
+                        <small class="error-message" id="register-birthdate-error"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-phone">Phone:</label>
+                        <input type="tel" id="register-phone" name="phone" required>
+                        <small class="error-message" id="register-phone-error"></small>
+                    </div>
+                    <button type="submit" class="btn-primary">Register</button>
+                    <p class="switch-form">Already have an account? <span id="show-login">Login here</span></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/login_register.js"></script>
+</body>
+
+</html>

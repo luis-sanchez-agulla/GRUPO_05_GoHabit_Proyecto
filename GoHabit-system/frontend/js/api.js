@@ -1,123 +1,81 @@
-/**
- * api.js
- * Script temporal para conectar el frontend con el backend de Next.js.
- * Auto-registra o auto-loguea un usuario de prueba para obtener un Token JWT.
- */
+/* api.js - Central API utility for GoHabit */
 
-const API_BASE_URL = 'http://localhost:3000/api';
-let authToken = localStorage.getItem('gohabit_token');
-
-// Configuración del usuario de prueba
-const testUser = {
-    email: 'test_user@gohabit.dev',
-    username: 'test_user_123',
-    password: 'password123',
-    firstName: 'Alex'
+const API_CONFIG = {
+    BASE_URL: `${window.location.origin}/api`,
+    TOKEN_KEY: 'gohabit_token'
 };
 
-/**
- * Asegura que tengamos un token JWT válido antes de hacer peticiones.
- */
-async function ensureAuthenticated() {
-    if (authToken) return authToken;
+console.log('GoHabitAPI: Initialized with BASE_URL', API_CONFIG.BASE_URL);
 
-    try {
-        // 1. Intentar hacer login
-        let res = await fetch(`${API_BASE_URL}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: testUser.email, password: testUser.password })
-        });
+const api = {
+    setToken(token) {
+        localStorage.setItem(API_CONFIG.TOKEN_KEY, token);
+    },
 
-        let data = await res.json();
+    getToken() {
+        return localStorage.getItem(API_CONFIG.TOKEN_KEY);
+    },
 
-        if (res.ok && data.data && data.data.token) {
-            authToken = data.data.token;
-            localStorage.setItem('gohabit_token', authToken);
-            return authToken;
+    clearToken() {
+        localStorage.removeItem(API_CONFIG.TOKEN_KEY);
+    },
+
+    async request(endpoint, options = {}) {
+        const url = `${API_CONFIG.BASE_URL}${endpoint}`;
+        const token = this.getToken();
+
+        const headers = {
+            'Content-Type': 'application/json',
+            ...options.headers
+        };
+
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
         }
 
-        // 2. Si el login falla (ej. usuario no existe), intentamos registrarlo
-        res = await fetch(`${API_BASE_URL}/auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(testUser)
-        });
+        const config = {
+            ...options,
+            headers
+        };
 
-        data = await res.json();
+        try {
+            const response = await fetch(url, config);
+            const result = await response.json();
 
-        if (res.ok && data.data && data.data.token) {
-            authToken = data.data.token;
-            localStorage.setItem('gohabit_token', authToken);
-            return authToken;
+            if (!response.ok) {
+                throw new Error(result.message || 'Something went wrong');
+            }
+
+            return result;
+        } catch (error) {
+            console.error('API Request Error:', error);
+            throw error;
         }
+    },
 
-        console.error('Error auto-autenticando:', data);
-        return null;
+    get(endpoint, options = {}) {
+        return this.request(endpoint, { ...options, method: 'GET' });
+    },
 
-    } catch (err) {
-        console.error('Error de red al auto-autenticar:', err);
-        return null;
-    }
-}
-
-/**
- * Wrapper para hacer peticiones fetch al API con el token JWT inyectado.
- */
-async function fetchApi(endpoint, options = {}) {
-    const token = await ensureAuthenticated();
-
-    if (!token) {
-        throw new Error('No se pudo autenticar al usuario de prueba');
-    }
-
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        ...(options.headers || {})
-    };
-
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        ...options,
-        headers
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.message || 'Error en la petición API');
-    }
-
-    return data;
-}
-
-/**
- * Prueba de conexión al backend.
- * Intenta registrar un usuario de prueba y muestra el resultado en la consola.
- */
-async function testConnection() {
-    try {
-        const response = await fetchApi('/auth/register', {
+    post(endpoint, body, options = {}) {
+        return this.request(endpoint, {
+            ...options,
             method: 'POST',
-            body: JSON.stringify({
-                email: 'test_connection@gohabit.dev',
-                username: 'test_connection',
-                password: 'test1234',
-                firstName: 'Test'
-            })
+            body: JSON.stringify(body)
         });
-        console.log('Conexión exitosa:', response);
-    } catch (err) {
-        console.error('Error en la conexión:', err);
+    },
+
+    put(endpoint, body, options = {}) {
+        return this.request(endpoint, {
+            ...options,
+            method: 'PUT',
+            body: JSON.stringify(body)
+        });
+    },
+
+    delete(endpoint, options = {}) {
+        return this.request(endpoint, { ...options, method: 'DELETE' });
     }
-}
+};
 
-// Inicializar la autenticación nada más cargar el script (opcional pero acelera)
-ensureAuthenticated().catch(console.error);
-
-// Ejecutar la prueba de conexión al cargar el script
-testConnection();
-
-// Agregarlo a la ventana global
-window.fetchApi = fetchApi;
-window.gohabitTestUser = testUser;
+window.GoHabitAPI = api;

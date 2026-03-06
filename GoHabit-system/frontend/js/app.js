@@ -1,53 +1,54 @@
 /* app.js - shared UI + state helpers for GoHabit (no framework) */
 
-(function(){
+(function () {
   const STORAGE = {
     seeds: 'semillasUsuario',
     habits: 'habitosCompletados',
     theme: 'gohabitTheme',
+    user: 'gohabit_user'
   };
 
-  function todayKey(d = new Date()){
+  function todayKey(d = new Date()) {
     const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,'0');
-    const day = String(d.getDate()).padStart(2,'0');
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
   }
 
-  function getJSON(key, fallback){
-    try{
+  function getJSON(key, fallback) {
+    try {
       const v = localStorage.getItem(key);
       return v ? JSON.parse(v) : fallback;
-    }catch{ return fallback; }
+    } catch { return fallback; }
   }
 
-  function setJSON(key, value){
+  function setJSON(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
   }
 
   // Seeds
-  function getSeeds(){
+  function getSeeds() {
     const v = localStorage.getItem(STORAGE.seeds);
     const n = v ? parseInt(v, 10) : 500;
     return Number.isFinite(n) ? n : 500;
   }
-  function setSeeds(n){ localStorage.setItem(STORAGE.seeds, String(Math.max(0, n|0))); }
-  function addSeeds(delta){ const n = getSeeds() + (delta|0); setSeeds(n); return getSeeds(); }
-  function subSeeds(delta){ const n = Math.max(0, getSeeds() - (delta|0)); setSeeds(n); return getSeeds(); }
+  function setSeeds(n) { localStorage.setItem(STORAGE.seeds, String(Math.max(0, n | 0))); }
+  function addSeeds(delta) { const n = getSeeds() + (delta | 0); setSeeds(n); return getSeeds(); }
+  function subSeeds(delta) { const n = Math.max(0, getSeeds() - (delta | 0)); setSeeds(n); return getSeeds(); }
 
   // Habits state (per day)
-  function getHabitsState(){ return getJSON(STORAGE.habits, {}); }
-  function getHabitDone(habitId, dateKey = todayKey()){
+  function getHabitsState() { return getJSON(STORAGE.habits, {}); }
+  function getHabitDone(habitId, dateKey = todayKey()) {
     const st = getHabitsState();
     return !!(st?.[dateKey]?.[String(habitId)]);
   }
-  function setHabitDone(habitId, done, dateKey = todayKey()){
+  function setHabitDone(habitId, done, dateKey = todayKey()) {
     const st = getHabitsState();
-    if(!st[dateKey]) st[dateKey] = {};
+    if (!st[dateKey]) st[dateKey] = {};
     st[dateKey][String(habitId)] = !!done;
     setJSON(STORAGE.habits, st);
   }
-  function toggleHabit(habitId, opts = {}){
+  function toggleHabit(habitId, opts = {}) {
     const {
       reward = 10,
       dateKey = todayKey(),
@@ -61,12 +62,12 @@
     setHabitDone(habitId, next, dateKey);
     const total = next ? addSeeds(reward) : subSeeds(reward);
     toast(next ? toastGood : toastBad, next ? 'good' : 'bad');
-    if(typeof onChange === 'function') onChange(next, total);
-    return {done: next, total};
+    if (typeof onChange === 'function') onChange(next, total);
+    return { done: next, total };
   }
 
   // Toast
-  function toast(message, kind = 'good'){
+  function toast(message, kind = 'good') {
     const el = document.createElement('div');
     el.className = `gh-toast gh-toast--${kind === 'bad' ? 'bad' : 'good'}`;
     el.style.animation = 'ghSlideIn .18s ease-out';
@@ -90,14 +91,14 @@
   }
 
   // Theme
-  function applyTheme(mode){
+  function applyTheme(mode) {
     document.body.classList.toggle('dark', mode === 'dark');
     document.documentElement.classList.toggle('dark', mode === 'dark');
   }
 
-  function initTheme(){
+  function initTheme() {
     const saved = localStorage.getItem(STORAGE.theme);
-    if(saved === 'dark' || saved === 'light'){
+    if (saved === 'dark' || saved === 'light') {
       applyTheme(saved);
       return;
     }
@@ -105,7 +106,7 @@
     applyTheme(prefersDark ? 'dark' : 'light');
   }
 
-  function toggleTheme(){
+  function toggleTheme() {
     const isDark = document.body.classList.contains('dark');
     const next = isDark ? 'light' : 'dark';
     localStorage.setItem(STORAGE.theme, next);
@@ -113,13 +114,13 @@
     const btns = document.querySelectorAll('[data-theme-toggle]');
     btns.forEach(b => {
       const icon = b.querySelector('.material-symbols-outlined');
-      if(icon) icon.textContent = next === 'dark' ? 'light_mode' : 'dark_mode';
+      if (icon) icon.textContent = next === 'dark' ? 'light_mode' : 'dark_mode';
       b.setAttribute('aria-label', next === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
     });
   }
 
   // Bind seeds to any element
-  function bindSeeds(selector){
+  function bindSeeds(selector) {
     const els = document.querySelectorAll(selector);
     const update = () => {
       const n = getSeeds();
@@ -130,29 +131,62 @@
     return update;
   }
 
-  function initNav(){
+  function initNav() {
     const path = (location.pathname.split('/').pop() || '').toLowerCase();
     document.querySelectorAll('nav a[href]').forEach(a => {
       const href = (a.getAttribute('href') || '').toLowerCase();
       const active = href.endsWith(path);
-      if(active){
+      if (active) {
         a.setAttribute('aria-current', 'page');
         // try to add an active class if the page uses it
-        if(!a.className.includes('--active')) a.classList.add('is-active');
+        if (!a.className.includes('--active')) a.classList.add('is-active');
       }
     });
   }
 
-  function wireThemeButtons(){
+  function wireThemeButtons() {
     document.querySelectorAll('[data-theme-toggle]').forEach(btn => {
       btn.addEventListener('click', toggleTheme);
       btn.classList.add('gh-icon-btn');
       const icon = btn.querySelector('.material-symbols-outlined');
-      if(icon){
+      if (icon) {
         const isDark = document.body.classList.contains('dark');
         icon.textContent = isDark ? 'light_mode' : 'dark_mode';
       }
     });
+  }
+
+  async function initUser() {
+    // If we are on login/register, don't fetch
+    if (window.location.pathname.includes('login_register.html')) return;
+
+    const token = window.GoHabitAPI ? window.GoHabitAPI.getToken() : null;
+
+    // Immediate redirect if no token
+    if (!token) {
+      window.location.href = '/login_register';
+      return;
+    }
+
+    try {
+      const user = await window.GoHabitAPI.get('/auth/me');
+      setJSON(STORAGE.user, user.data);
+
+      // Update generic profile elements
+      const nameEl = document.querySelector('.index-header__title');
+      if (nameEl) nameEl.textContent = `¡Hola, ${user.data.firstname || user.data.username}!`;
+
+      const seedsEls = document.querySelectorAll('[data-seeds]');
+      seedsEls.forEach(el => el.textContent = (user.data.seeds || 0).toLocaleString('es-ES'));
+
+      const levelEls = document.querySelectorAll('.index-tree-badge__level, .habitos-level-number');
+      levelEls.forEach(el => el.textContent = `Nivel ${user.data.level || 1}`);
+
+    } catch (err) {
+      console.error('Failed to fetch user profile:', err);
+      // If unauthorized or any error during initial fetch, redirect to login
+      window.location.href = 'login_register.html';
+    }
   }
 
   window.GoHabit = {
@@ -169,11 +203,17 @@
     bindSeeds,
     initNav,
     wireThemeButtons,
+    initUser,
   };
 
   document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     wireThemeButtons();
     initNav();
+
+    // Check if API is available and init user
+    if (window.GoHabitAPI) {
+      initUser();
+    }
   });
 })();
