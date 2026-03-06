@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>Tienda de Primavera - Habit Tracker</title>
+  <link rel="stylesheet" href="../css/app.css">
   <link rel="stylesheet" href="../css/tienda.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-    rel="stylesheet" />
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 </head>
 
 <body class="tienda-page">
@@ -20,9 +19,14 @@
         <span class="material-symbols-outlined">arrow_back</span>
       </a>
       <h1 class="tienda-header__title">Tienda de Primavera</h1>
-      <div class="tienda-header__balance">
-        <span class="material-symbols-outlined tienda-header__balance-icon">eco</span>
-        <span class="tienda-header__balance-text">550 Semillas</span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="tienda-header__balance" aria-label="Semillas disponibles">
+          <span class="material-symbols-outlined tienda-header__balance-icon">eco</span>
+          <span class="tienda-header__balance-text"><span data-seeds>550</span> Semillas</span>
+        </div>
+        <button type="button" data-theme-toggle aria-label="Cambiar a modo oscuro">
+          <span class="material-symbols-outlined">dark_mode</span>
+        </button>
       </div>
     </header>
     <!-- Main Content -->
@@ -131,6 +135,7 @@
       </div>
     </nav>
   </div>
+  <script src="../js/app.js" defer></script>
+  <script src="../js/pages/bindSeeds.js" defer></script>
 </body>
-
 </html>

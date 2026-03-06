@@ -44,22 +44,26 @@ body.dark {
   height: 100vh;
   width: 100%;
   flex-direction: column;
-  overflow: hidden;
-  max-width: 28rem;
+  overflow: visible;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
-  background-color: white;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  padding-left:1rem;
+  padding-right:1rem;
+  background: transparent;
+  box-shadow: none;
 }
 
 body.dark .objeto-container {
   background-color: var(--background-dark);
 }
 
+@media (min-width: 640px) {
+  .objeto-container { max-width:44rem; padding-left:1.5rem; padding-right:1.5rem; }
+}
+
 @media (min-width: 1024px) {
-  .objeto-container {
-    max-width: 64rem;
-  }
+  .objeto-container { max-width:64rem; padding-left:3rem; padding-right:3rem; }
 }
 
 /* ==================== Header ==================== */

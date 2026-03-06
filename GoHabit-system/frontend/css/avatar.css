@@ -33,17 +33,24 @@ body.avatar-page.dark {
 /* Contenedor principal */
 .avatar-container {
   width: 100%;
-  max-width: 28rem;
+  max-width: 100%;
   margin: 0 auto;
+  padding-left:1rem;
+  padding-right:1rem;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
+/* Make container full-bleed look */
+.avatar-container { background: transparent; box-shadow: none; }
+
+@media (min-width: 640px) {
+  .avatar-container { max-width:44rem; padding-left:1.5rem; padding-right:1.5rem; }
+}
+
 @media (min-width: 1024px) {
-  .avatar-container {
-    max-width: 64rem;
-  }
+  .avatar-container { max-width:64rem; padding-left:3rem; padding-right:3rem; }
 }
 
 /* ================================================

@@ -45,17 +45,23 @@ body.habitos-page.dark {
 /* Contenedor principal */
 .habitos-container {
   width: 100%;
-  max-width: 28rem;
+  max-width: 100%;
   margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background: transparent;
+  box-shadow: none;
+}
+
+@media (min-width: 640px) {
+  .habitos-container { max-width: 44rem; padding-left:1.5rem; padding-right:1.5rem; }
 }
 
 @media (min-width: 1024px) {
-  .habitos-container {
-    max-width: 64rem;
-  }
+  .habitos-container { max-width: 64rem; padding-left:3rem; padding-right:3rem; }
 }
 
 /* ================================================
@@ -178,12 +184,9 @@ body.dark .habitos-tree-section {
 }
 
 @keyframes pulse {
-
-  0%,
-  100% {
+  0%, 100% {
     opacity: 1;
   }
-
   50% {
     opacity: 0.8;
   }
@@ -510,7 +513,7 @@ body.dark .habit-checkbox__box {
   border-color: #475569;
 }
 
-.habit-checkbox__input:checked~.habit-checkbox__box {
+.habit-checkbox__input:checked ~ .habit-checkbox__box {
   background-color: var(--primary);
   border-color: var(--primary);
 }
@@ -522,7 +525,7 @@ body.dark .habit-checkbox__box {
   transition: opacity 0.2s;
 }
 
-.habit-checkbox__input:checked~.habit-checkbox__box .habit-checkbox__icon {
+.habit-checkbox__input:checked ~ .habit-checkbox__box .habit-checkbox__icon {
   opacity: 1;
 }
 

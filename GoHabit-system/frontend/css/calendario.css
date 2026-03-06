@@ -47,8 +47,10 @@ body.calendario-page.dark {
 /* ==================== Main Container ==================== */
 .calendario-container {
   width: 100%;
-  max-width: 28rem;
+  max-width: 100%;
   margin: 0 auto;
+  padding-left:1rem;
+  padding-right:1rem;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -58,6 +60,14 @@ body.calendario-page.dark {
 
 body.dark .calendario-container {
   background-color: var(--background-dark);
+}
+
+@media (min-width: 640px) {
+  .calendario-container { max-width:44rem; padding-left:1.5rem; padding-right:1.5rem; }
+}
+
+@media (min-width: 1024px) {
+  .calendario-container { max-width:64rem; padding-left:3rem; padding-right:3rem; }
 }
 
 /* ==================== Header ==================== */
@@ -783,7 +793,6 @@ body.dark .calendario-modal__content {
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
-
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -902,11 +911,9 @@ body.dark .calendario-modal-habit__icon {
   0% {
     transform: scale(1);
   }
-
   50% {
     transform: scale(1.2);
   }
-
   100% {
     transform: scale(1);
   }

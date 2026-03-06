@@ -47,18 +47,28 @@ body.anadir-habito-page.dark {
 /* ==================== Main Container ==================== */
 .anadir-habito-container {
   width: 100%;
-  max-width: 28rem;
+  max-width: 100%;
   margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: var(--cream);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  background: transparent;
+  box-shadow: none;
   position: relative;
 }
 
 body.dark .anadir-habito-container {
   background-color: var(--background-dark);
+}
+
+@media (min-width: 640px) {
+  .anadir-habito-container { max-width: 44rem; padding-left:1.5rem; padding-right:1.5rem; }
+}
+
+@media (min-width: 1024px) {
+  .anadir-habito-container { max-width: 64rem; padding-left:3rem; padding-right:3rem; }
 }
 
 /* ==================== Header ==================== */
@@ -122,8 +132,7 @@ body.dark .anadir-habito-header__title {
 /* ==================== Main Content ==================== */
 .anadir-habito-main {
   flex: 1;
-  padding: 1.5rem 1rem 6rem 1rem;
-  /* Bottom padding para la nav bar */
+  padding: 1.5rem 1rem 6rem 1rem; /* Bottom padding para la nav bar */
   overflow-y: auto;
 }
 
@@ -403,11 +412,11 @@ body.dark .toggle-label {
   border-radius: 50%;
 }
 
-.toggle-switch__input:checked+.toggle-switch__slider {
+.toggle-switch__input:checked + .toggle-switch__slider {
   background-color: var(--primary);
 }
 
-.toggle-switch__input:checked+.toggle-switch__slider:before {
+.toggle-switch__input:checked + .toggle-switch__slider:before {
   transform: translateX(1.25rem);
 }
 
