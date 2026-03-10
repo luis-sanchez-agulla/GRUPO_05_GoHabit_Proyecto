@@ -3,17 +3,8 @@
  */
 
 import { withAuth } from "@/middleware/with-auth";
-import { userService } from "@/services/user.service";
+import { withValidation } from "@/middleware/with-validation";
 import { updateProfileSchema } from "@/validations/user.schema";
-import { success, error } from "@/lib/api-response";
+import { userController } from "@/controllers/user.controller";
 
-export const PUT = withAuth(async (req, { user }) => {
-    try {
-        const body = await req.json();
-        const data = updateProfileSchema.parse(body);
-        const profile = await userService.updateProfile(user.id, data);
-        return success(profile);
-    } catch (err) {
-        return error(err);
-    }
-});
+export const PUT = withAuth(withValidation(updateProfileSchema, (req, ctx) => userController.updateProfile(req, ctx)));

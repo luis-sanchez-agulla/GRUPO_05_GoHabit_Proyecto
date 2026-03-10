@@ -9,93 +9,85 @@
  *   - Consulta de progreso del usuario (puntos, monedas, nivel)
  */
 
-import { prisma } from "@/lib/prisma";
+import { pool } from "@/lib/mysql";
+import { rewardRepository } from "@/repositories/reward.repository";
+import { userRepository } from "@/repositories/user.repository";
 import { NotFoundError, ValidationError } from "@/lib/errors";
+import { randomInt } from "crypto";
 
 export const rewardService = {
     /**
      * getAll — Devuelve todas las recompensas activas del catálogo.
-     * Ordenadas por coste (más baratas primero).
-     * No requiere autenticación.
      */
     async getAll() {
-        return prisma.reward.findMany({
-            where: { isActive: true },     // Solo recompensas activas (visibles)
-            orderBy: { cost: "asc" },      // Ordenar: baratas primero
-        });
+        return rewardRepository.findAllActive();
     },
+
+    /**
+     * getUserProgress — Obtiene el estado actual de progreso del usuario.
+     */
+    async getUserProgress(userId: string) {
+        const user = await userRepository.findById(userId);
+        if (!user) throw new NotFoundError('User not found');
+
+        const stage = await userRepository.getTreeStage(userId);
+
+        return {
+            points: user.points,
+            coins: user.coins,
+            level: user.level,
+            treeStage: stage?.etapa ?? 0
+        };
+    },
+
 
     /**
      * redeem — Canjea una recompensa gastando monedas del usuario.
-     *
-     * Flujo:
-     *   1. Verificar que la recompensa existe y está activa
-     *   2. Verificar que el usuario tiene suficientes monedas
-     *   3. En una transacción:
-     *      a. Crear registro en user_rewards (se canjeó)
-     *      b. Restar las monedas del usuario
-     *
-     * @throws NotFoundError si la recompensa no existe
-     * @throws ValidationError si no tiene suficientes monedas
      */
-    async redeem(userId: string, rewardId: string) {
-        // 1. Buscar la recompensa
-        const reward = await prisma.reward.findFirst({
-            where: { id: rewardId, isActive: true },
-        });
-        if (!reward) throw new NotFoundError("Reward");
+    async redeem(userId: string, rarity: string) {
+        const user = await userRepository.findById(userId);
+        if (!user) { throw new NotFoundError('Usuario no encontrado'); }
 
-        // 2. Verificar saldo de monedas
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { coins: true },
-        });
-        if (!user || user.coins < reward.cost) {
-            throw new ValidationError("Insufficient coins");
+        const cost = await rewardRepository.getLootBoxCostByRarity(rarity);
+        if (user.coins < cost) {
+            throw new ValidationError('No tienes suficientes monedas para canjear esta recompensa');
         }
 
-        // 3. Transacción: registrar canje + restar monedas
-        return prisma.$transaction(async (tx) => {
-            // Crear registro de canje
-            const userReward = await tx.userReward.create({
-                data: { userId, rewardId },
-            });
+        const userAccessories = await userRepository.findUserAccessories(userId);
+        const allAccessories = await rewardRepository.findAllActiveByRarity(rarity);
 
-            // Restar monedas: { decrement: N } resta N del valor actual
-            await tx.user.update({
-                where: { id: userId },
-                data: { coins: { decrement: reward.cost } },
-            });
+        // Filtrar accesorios que el usuario no posee
+        const availableAccessories = allAccessories.filter(accessory =>
+            !userAccessories.some(userAccessory => userAccessory.id === accessory.id)
+        );
 
-            return userReward;
-        });
-    },
+        if (availableAccessories.length === 0) {
+            throw new ValidationError('No hay accesorios disponibles para canjear de esta rareza.');
+        }
 
-    /**
-     * getUserProgress — Devuelve un resumen del progreso del usuario.
-     * Combina datos del modelo User con conteos de la BD.
-     *
-     * Respuesta ejemplo:
-     *   { points: 250, coins: 80, level: 3, habitsCompleted: 25, tasksCompleted: 12, currentStreak: 5 }
-     */
-    async getUserProgress(userId: string) {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { points: true, coins: true, level: true },
-        });
-        if (!user) throw new NotFoundError("User");
+        // Seleccionar un accesorio aleatorio
+        const randomIndex = randomInt(0, availableAccessories.length);
+        const selectedAccessory = availableAccessories[randomIndex];
 
-        // Promise.all ejecuta ambas consultas EN PARALELO (más rápido)
-        const [habitsCompleted, tasksCompleted] = await Promise.all([
-            prisma.habitCompletion.count({ where: { userId } }),
-            prisma.task.count({ where: { userId, status: "COMPLETED" } }),
-        ]);
+        // Iniciar transacción para el canje
+        const connection = await pool.getConnection();
+        await connection.beginTransaction();
 
-        return {
-            ...user,
-            habitsCompleted,
-            tasksCompleted,
-            currentStreak: 0,  // TODO: Implementar cálculo de racha real
-        };
+        try {
+            // 1. Restar monedas
+            await userRepository.subtractCoins(userId, cost, connection);
+
+            // 2. Añadir accesorio
+            await userRepository.addAccessoryToUser(userId, selectedAccessory.id);
+
+            await connection.commit();
+            return selectedAccessory;
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
     },
 };
+

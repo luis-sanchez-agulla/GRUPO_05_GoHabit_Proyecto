@@ -8,7 +8,7 @@
  * globales y CRUD de recompensas.
  */
 
-import { prisma } from "@/lib/prisma";
+import { adminRepository } from "@/repositories/admin.repository";
 import { NotFoundError } from "@/lib/errors";
 
 export const adminService = {
@@ -19,28 +19,12 @@ export const adminService = {
      * @param limit - Usuarios por página (por defecto 20)
      *
      * Devuelve los usuarios + metadatos de paginación.
-     * El frontend usa "meta" para mostrar controles de paginación.
      */
     async getUsers(page: number = 1, limit: number = 20) {
-        const skip = (page - 1) * limit;  // Calcular cuántos saltar
+        const offset = (page - 1) * limit;
 
-        // Promise.all ejecuta AMBAS consultas en paralelo:
-        // 1. Los usuarios de esta página
-        // 2. El conteo total (para calcular totalPages)
-        const [users, total] = await Promise.all([
-            prisma.user.findMany({
-                skip,             // Saltar los de páginas anteriores
-                take: limit,      // Tomar solo "limit" usuarios
-                select: {
-                    id: true, email: true, username: true,
-                    firstName: true, lastName: true,
-                    role: true, points: true, level: true,
-                    createdAt: true,
-                },
-                orderBy: { createdAt: "desc" },  // Más recientes primero
-            }),
-            prisma.user.count(),  // Conteo total de usuarios
-        ]);
+        const users = await adminRepository.findUsers(limit, offset);
+        const total = await adminRepository.countUsers();
 
         return {
             users,
@@ -48,59 +32,54 @@ export const adminService = {
                 page,
                 limit,
                 total,
-                totalPages: Math.ceil(total / limit),  // Redondear hacia arriba
+                totalPages: Math.ceil(total / limit),
             },
         };
     },
 
     /**
      * updateUserRole — Cambia el rol de un usuario (USER ↔ ADMIN).
-     * Útil para promover usuarios a admin o degradarlos.
      */
     async updateUserRole(userId: string, role: "USER" | "ADMIN") {
-        const user = await prisma.user.findUnique({ where: { id: userId } });
+        const user = await adminRepository.findUserById(userId);
         if (!user) throw new NotFoundError("User");
 
-        return prisma.user.update({
-            where: { id: userId },
-            data: { role },
-            select: { id: true, email: true, username: true, role: true },
-        });
+        await adminRepository.updateUserRole(userId, role);
+
+        return adminRepository.findUserById(userId);
     },
 
     /**
      * getStats — Estadísticas globales del sistema.
-     * Útil para un dashboard de administrador.
      */
     async getStats() {
-        const [totalUsers, totalHabits, totalTasks, totalCompletions] = await Promise.all([
-            prisma.user.count(),
-            prisma.habit.count(),
-            prisma.task.count(),
-            prisma.habitCompletion.count(),
-        ]);
-
-        return { totalUsers, totalHabits, totalTasks, totalCompletions };
+        return adminRepository.getSystemStats();
     },
 
     // ── Gestión de recompensas (solo admin) ──────────
 
-    /** createReward — Crea una nueva recompensa en el catálogo. */
     async createReward(data: { name: string; description?: string; cost: number; icon?: string }) {
-        return prisma.reward.create({ data });
+        const rewardId = await adminRepository.createReward(data);
+        return adminRepository.findRewardById(rewardId.toString());
     },
 
     /** updateReward — Actualiza una recompensa existente. */
     async updateReward(rewardId: string, data: { name?: string; description?: string; cost?: number; icon?: string; isActive?: boolean }) {
-        const reward = await prisma.reward.findUnique({ where: { id: rewardId } });
-        if (!reward) throw new NotFoundError("Reward");
-        return prisma.reward.update({ where: { id: rewardId }, data });
+        const existing = await adminRepository.findRewardById(rewardId);
+        if (!existing) throw new NotFoundError("Reward");
+
+        if (Object.keys(data).length === 0) return existing;
+
+        await adminRepository.updateReward(rewardId, data);
+        return adminRepository.findRewardById(rewardId);
     },
 
     /** deleteReward — Elimina una recompensa del catálogo. */
     async deleteReward(rewardId: string) {
-        const reward = await prisma.reward.findUnique({ where: { id: rewardId } });
-        if (!reward) throw new NotFoundError("Reward");
-        return prisma.reward.delete({ where: { id: rewardId } });
+        const existing = await adminRepository.findRewardById(rewardId);
+        if (!existing) throw new NotFoundError("Reward");
+
+        await adminRepository.deleteReward(rewardId);
+        return { id: rewardId, deleted: true };
     },
 };

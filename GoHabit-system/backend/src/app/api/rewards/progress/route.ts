@@ -3,14 +3,6 @@
  */
 
 import { withAuth } from "@/middleware/with-auth";
-import { rewardService } from "@/services/reward.service";
-import { success, error } from "@/lib/api-response";
+import { rewardController } from "@/controllers/reward.controller";
 
-export const GET = withAuth(async (_req, { user }) => {
-    try {
-        const progress = await rewardService.getUserProgress(user.id);
-        return success(progress);
-    } catch (err) {
-        return error(err);
-    }
-});
+export const GET = withAuth((req, ctx) => rewardController.getUserProgress(req, ctx));

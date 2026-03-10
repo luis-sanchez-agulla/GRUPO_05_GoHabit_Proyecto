@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS Inventario (
 CREATE TABLE IF NOT EXISTS LootBox (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
-    caste INT NOT NULL,
+    coste INT NOT NULL,
     rareza VARCHAR(100) NOT NULL,
 );
 
@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS Accesorio (
     nombre VARCHAR(255) NOT NULL,
     tipo VARCHAR(100) NOT NULL,
     rareza VARCHAR(100) NOT NULL,
+    activo INT DEFAULT 0,
 );
 
 CREATE TABLE IF NOT EXISTS Avatar_Accesorio (

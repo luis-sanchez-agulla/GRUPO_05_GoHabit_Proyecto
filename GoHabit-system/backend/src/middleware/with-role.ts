@@ -26,7 +26,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { error } from "@/lib/api-response";
 import { ForbiddenError } from "@/lib/errors";
-import type { AuthenticatedUser } from "@/types/api";
+import type { AuthenticatedUser } from "@/api/api.types";
 
 /** Tipo del handler que recibe withRole (idéntico al de withAuth) */
 type RoleHandler = (

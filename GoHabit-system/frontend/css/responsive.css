@@ -1,0 +1,238 @@
+/* Archivo: css/responsive.css
+   Reglas base y media queries para responsividad (mobile-first).
+*/
+
+:root{
+  --container-max:1200px;
+  --page-padding:16px;
+  --header-height:64px;
+  --bottom-nav-height:72px;
+}
+
+/* Helpers generales */
+body{margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; padding-bottom: var(--bottom-nav-height);}
+.container{max-width:var(--container-max);margin:0 auto;padding:0 var(--page-padding);box-sizing:border-box}
+
+/* Formularios y controls */
+input,select,textarea,button{box-sizing:border-box;font-family:inherit}
+input[type="text"], input[type="number"], .form-input, .goal-input{width:100%;max-width:100%;}
+.form-group{margin-bottom:14px}
+
+/* Grid de categorías: adaptativo */
+.category-grid{display:flex;flex-wrap:wrap;gap:8px}
+.category-button{flex:1 1 calc(50% - 8px);min-width:120px}
+
+/* Selector de frecuencia */
+.frequency-selector{display:flex;flex-wrap:wrap;gap:6px}
+.frequency-day{min-width:34px}
+
+/* Grupo meta: input + select */
+.goal-input-group{display:flex;gap:8px}
+.goal-input{flex:1}
+.goal-select{flex:0 0 120px}
+
+/* Botones y layout */
+.submit-button{width:100%;padding:12px 16px}
+
+/* Bottom nav: fijo en móvil, adaptado en escritorio */
+.bottom-nav{position:static;display:flex;justify-content:space-around;padding:8px 0;background:#fff;border-top:1px solid rgba(0,0,0,0.06);box-shadow:0 -4px 12px rgba(0,0,0,0.06);z-index:100;height:auto}
+.bottom-nav__item{display:flex;flex-direction:column;align-items:center;font-size:12px;text-decoration:none;color:inherit;padding:6px 8px}
+
+/* Encabezados */
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+
+/* Use sticky headers (stay in flow) so they don't enlarge or overlap content */
+.anadir-habito-header,
+.index-header,
+.habitos-header,
+.perfil-header,
+.tienda-header,
+.objeto-header,
+.avatar-header,
+.calendario-header { position: sticky; top: 0; z-index: 90; padding: 12px 0; }
+
+/* Header padding on larger screens */
+@media (min-width: 1024px) {
+  .anadir-habito-header,
+  .index-header,
+  .habitos-header,
+  .perfil-header,
+  .tienda-header,
+  .objeto-header,
+  .avatar-header,
+  .calendario-header { padding: 20px 0; }
+}
+
+/* Layout para pantallas mayores */
+@media(min-width:768px){
+  .category-button{flex:0 0 auto}
+  .goal-select{flex:0 0 160px}
+  .bottom-nav{box-shadow:none;border-top:0;background:transparent;justify-content:flex-end;padding:0}
+  .bottom-nav__label{display:none}
+  .submit-button{width:auto;padding:10px 18px}
+  .container{padding:0 24px}
+  .anadir-habito-container, .habitos-container, .perfil-container, .tienda-container, .objeto-container{max-width:900px;margin:0 auto}
+}
+
+@media(min-width:1024px){
+  .category-button{min-width:140px}
+  .goal-select{flex:0 0 180px}
+}
+
+/* Hacer que headers y bottom-nav sean full-bleed acorde al padding del contenedor */
+.anadir-habito-header,
+.index-header,
+.habitos-header,
+.perfil-header,
+.tienda-header,
+.objeto-header,
+.avatar-header,
+.calendario-header {
+  width: calc(100% + 2rem);
+  margin-left: -1rem;
+  margin-right: -1rem;
+}
+
+.bottom-nav {
+  width: calc(100% + 2rem);
+  margin-left: -1rem;
+  margin-right: -1rem;
+}
+
+@media (min-width: 640px) {
+  .anadir-habito-header,
+  .index-header,
+  .habitos-header,
+  .perfil-header,
+  .tienda-header,
+  .objeto-header,
+  .avatar-header,
+  .calendario-header,
+  .bottom-nav {
+    width: calc(100% + 3rem);
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .anadir-habito-header,
+  .index-header,
+  .habitos-header,
+  .perfil-header,
+  .tienda-header,
+  .objeto-header,
+  .avatar-header,
+  .calendario-header,
+  .bottom-nav {
+    width: calc(100% + 6rem);
+    margin-left: -3rem;
+    margin-right: -3rem;
+  }
+}
+
+/* Fondo semitransparente con blur para contraste legible */
+.anadir-habito-header,
+.index-header,
+.habitos-header,
+.perfil-header,
+.tienda-header,
+.objeto-header,
+.avatar-header,
+.calendario-header {
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.bottom-nav {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-top: 1px solid rgba(0,0,0,0.04);
+}
+
+/* Dark mode variants */
+body.dark .anadir-habito-header,
+body.dark .index-header,
+body.dark .habitos-header,
+body.dark .perfil-header,
+body.dark .tienda-header,
+body.dark .objeto-header,
+body.dark .avatar-header,
+body.dark .calendario-header {
+  background: rgba(31,36,27,0.72);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+body.dark .bottom-nav {
+  background: rgba(31,36,27,0.9);
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+/* Fixed bottom-nav only on small screens; allow it to scroll away on desktop */
+@media (max-width: 767px) {
+  .bottom-nav { position: fixed; left:0; right:0; bottom:0; height: var(--bottom-nav-height); }
+  body { padding-bottom: var(--bottom-nav-height); }
+}
+
+@media (min-width: 768px) {
+  /* desktop: bottom-nav scrolls with page */
+  .bottom-nav { position: static; box-shadow: none; }
+  body { padding-bottom: 0; }
+}
+
+/* Desktop-first: centered constrained containers by default */
+.index-container,
+.habitos-container,
+.perfil-container,
+.tienda-container,
+.objeto-container,
+.avatar-container,
+.calendario-container,
+.anadir-habito-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 48px;
+  padding-right: 48px;
+  box-sizing: border-box;
+}
+
+/* Smaller paddings on medium screens */
+@media (max-width: 1023px) {
+  .index-container,
+  .habitos-container,
+  .perfil-container,
+  .tienda-container,
+  .objeto-container,
+  .avatar-container,
+  .calendario-container,
+  .anadir-habito-container {
+    padding-left: 32px;
+    padding-right: 32px;
+    max-width: 900px;
+  }
+}
+
+/* Mobile: full-width, mobile paddings, bottom-nav fixed */
+@media (max-width: 767px) {
+  .index-container,
+  .habitos-container,
+  .perfil-container,
+  .tienda-container,
+  .objeto-container,
+  .avatar-container,
+  .calendario-container,
+  .anadir-habito-container {
+    max-width: 100%;
+    margin: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .bottom-nav { position: fixed; left:0; right:0; bottom:0; height: var(--bottom-nav-height); }
+  body { padding-bottom: var(--bottom-nav-height); }
+}

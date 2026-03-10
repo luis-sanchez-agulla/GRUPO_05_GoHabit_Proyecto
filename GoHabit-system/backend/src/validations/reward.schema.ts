@@ -24,9 +24,14 @@ export const updateRewardSchema = createRewardSchema.partial().extend({
  * El usuario envía el ID de la recompensa que quiere canjear.
  */
 export const redeemRewardSchema = z.object({
-    rewardId: z.string().uuid("ID de recompensa inválido"),  // Debe ser un UUID válido
+    rewardId: z.string().min(1, "ID de recompensa inválido"),
+});
+
+export const deleteRewardSchema = z.object({
+    rewardId: z.string().min(1, "ID de recompensa inválido"),
 });
 
 export type CreateRewardInput = z.infer<typeof createRewardSchema>;
 export type UpdateRewardInput = z.infer<typeof updateRewardSchema>;
 export type RedeemRewardInput = z.infer<typeof redeemRewardSchema>;
+export type DeleteRewardInput = z.infer<typeof deleteRewardSchema>;

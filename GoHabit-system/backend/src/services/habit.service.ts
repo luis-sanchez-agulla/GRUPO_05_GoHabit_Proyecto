@@ -9,120 +9,137 @@
  * ambas operaciones ocurran juntas o ninguna).
  */
 
-import { prisma } from "@/lib/prisma";
+import { pool } from "@/lib/mysql";
+import { habitRepository } from "@/repositories/habit.repository";
+import { userService } from "@/services/user.service";
 import { NotFoundError } from "@/lib/errors";
-import { POINTS, COINS } from "@/lib/constants";   // Cuántos puntos/monedas otorgar
-import type { CreateHabitInput, UpdateHabitInput } from "@/validations/habit.schema";
+import { POINTS, COINS } from "@/lib/constants";
 
 export const habitService = {
     /**
      * getByUser — Lista todos los hábitos de un usuario.
-     * Ordenados por fecha de creación (más recientes primero).
      */
     async getByUser(userId: string) {
-        return prisma.habit.findMany({
-            where: { userId },                 // Solo hábitos de ESTE usuario
-            orderBy: { createdAt: "desc" },    // Más recientes primero
-        });
+        return habitRepository.findAllByUserId(userId);
     },
 
     /**
      * getById — Obtiene un hábito específico con sus últimas 10 completions.
-     * Verifica que el hábito pertenece al usuario (seguridad).
-     *
-     * @throws NotFoundError si no existe o no le pertenece al usuario
      */
     async getById(habitId: string, userId: string) {
-        const habit = await prisma.habit.findFirst({
-            where: { id: habitId, userId },   // Filtro: ID + que sea del usuario
-            include: {
-                completions: {                   // Incluir las completions relacionadas
-                    orderBy: { completedAt: "desc" },
-                    take: 10,                      // Solo las últimas 10
-                },
-            },
-        });
+        const habit = await habitRepository.findById(habitId);
+        if (!habit || habit.userId !== userId) throw new NotFoundError('Habit');
 
-        if (!habit) throw new NotFoundError("Habit");
-        return habit;
+        const completions = await habitRepository.findCompletions(habitId, 10);
+
+        return { ...habit, completions };
     },
 
     /**
      * create — Crea un nuevo hábito para el usuario.
-     * El spread operator (...data) copia todos los campos del input.
      */
-    async create(userId: string, data: CreateHabitInput) {
-        return prisma.habit.create({
-            data: { ...data, userId },   // Añadimos el userId del usuario autenticado
-        });
+    async create(userId: string, data: any) {
+        const insertId = await habitRepository.create(userId, data);
+        return habitRepository.findById(insertId.toString());
     },
 
     /**
      * update — Actualiza un hábito existente.
-     * Primero verifica que existe y pertenece al usuario.
      */
-    async update(habitId: string, userId: string, data: UpdateHabitInput) {
-        const habit = await prisma.habit.findFirst({ where: { id: habitId, userId } });
-        if (!habit) throw new NotFoundError("Habit");
+    async update(habitId: string, userId: string, data: any) {
+        const habit = await habitRepository.findById(habitId);
+        if (!habit || habit.userId !== userId) throw new NotFoundError("Habit");
 
-        return prisma.habit.update({
-            where: { id: habitId },
-            data,   // Solo actualiza los campos que se enviaron
-        });
+        if (Object.keys(data).length === 0) return this.getById(habitId, userId);
+
+        await habitRepository.update(habitId, userId, data);
+        return this.getById(habitId, userId);
     },
 
     /**
      * delete — Elimina un hábito y todas sus completions (Cascade).
-     * La opción onDelete: Cascade en schema.prisma se encarga de
-     * eliminar las completions asociadas automáticamente.
      */
     async delete(habitId: string, userId: string) {
-        const habit = await prisma.habit.findFirst({ where: { id: habitId, userId } });
-        if (!habit) throw new NotFoundError("Habit");
+        const habit = await habitRepository.findById(habitId);
+        if (!habit || habit.userId !== userId) throw new NotFoundError("Habit");
 
-        return prisma.habit.delete({ where: { id: habitId } });
+        await habitRepository.delete(habitId, userId);
+        return { id: habitId, deleted: true };
     },
 
     /**
      * complete — Marca un hábito como completado (registra una completion).
-     *
-     * ¿Qué es una transacción ($transaction)?
-     * Ejecuta varias operaciones de BD como UNA SOLA operación atómica:
-     *   - Si ambas tienen éxito → se guardan los cambios
-     *   - Si alguna falla → se revierten TODOS los cambios
-     *
-     * Esto garantiza que:
-     *   1. Se crea el registro de completion
-     *   2. Se suman los puntos/monedas al usuario
-     * ...ambas cosas ocurren juntas. Nunca se crearán puntos sin completion
-     * ni completion sin puntos.
-     *
-     * @param habitId - ID del hábito a completar
-     * @param userId  - ID del usuario que lo completa
-     * @param note    - Nota opcional (ej: "Hoy medité 15 min en vez de 10")
      */
     async complete(habitId: string, userId: string, note?: string) {
-        const habit = await prisma.habit.findFirst({ where: { id: habitId, userId } });
-        if (!habit) throw new NotFoundError("Habit");
+        const habit = await habitRepository.findById(habitId);
+        if (!habit || habit.userId !== userId) throw new NotFoundError("Habit");
 
-        // Transacción: ambas operaciones se ejecutan juntas o ninguna
-        return prisma.$transaction(async (tx) => {
+        const connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        try {
             // 1. Crear el registro de completion
-            const completion = await tx.habitCompletion.create({
-                data: { habitId, userId, note },
-            });
+            const completionId = await habitRepository.createCompletion(habitId, userId, note, connection);
 
-            // 2. Sumar puntos y monedas al usuario
-            // { increment: N } suma N al valor actual (no reemplaza)
-            await tx.user.update({
-                where: { id: userId },
-                data: {
-                    points: { increment: POINTS.HABIT_COMPLETION },  // +10 puntos
-                    coins: { increment: COINS.HABIT_COMPLETION },    // +5 monedas
-                },
-            });
+            // 2. Sumar puntos y monedas al usuario (usando el servicio centralizado)
+            await userService.addProgress(userId, POINTS.HABIT_COMPLETION, COINS.HABIT_COMPLETION, connection);
 
-            return completion;
-        });
+            // 3. Actualizar la racha
+            const newStreak = await this.checkStreaks(userId, habitId);
+
+            await connection.commit();
+
+            const completion = await habitRepository.findCompletionById(completionId);
+            return { ...completion, currentStreak: newStreak };
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
     },
+
+    /**
+    * checkStreaks — Calcula la racha específica de un hábito recorriendo su historial.
+    * 
+    * Explicación para principiantes:
+    * - No guardamos la racha en una tabla aparte, sino que cada vez que la necesitamos, 
+    *   la calculamos mirando las fechas en 'habit_completions'.
+    */
+    async checkStreaks(userId: string, habitId: string): Promise<number> {
+        // 1. Buscamos todas las fechas en las que se completó este hábito (ordenadas de vieja a nueva)
+        const dates = await habitRepository.findCompletionDates(habitId, userId);
+
+        if (!dates.length) return 0;
+
+        let streak = 0;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Empezamos comparando desde hoy
+        let compareDate = today;
+
+        // Recorremos las fechas de la más reciente (final del array) a la más antigua
+        for (let i = dates.length - 1; i >= 0; i--) {
+            const completionDate = dates[i];
+
+            // Calculamos la diferencia de días entre 'compareDate' y 'completionDate'
+            const diffTime = compareDate.getTime() - completionDate.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) {
+                // Es el mismo día. Sumamos 1 racha si es el primer elemento que evaluamos.
+                if (streak === 0) streak = 1;
+            } else if (diffDays === 1) {
+                // Es exactamente el día anterior. ¡Racha continua!
+                streak++;
+                compareDate = completionDate; // Ahora compararemos con este día
+            } else {
+                // Hay un hueco de más de un día. La racha se rompe aquí.
+                break;
+            }
+        }
+
+        return streak;
+    }
 };

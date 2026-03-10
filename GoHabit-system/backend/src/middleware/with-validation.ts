@@ -42,6 +42,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ZodSchema, ZodError } from "zod";
 import { error } from "@/lib/api-response";
 import { ValidationError } from "@/lib/errors";
+import type { AuthenticatedUser } from "@/api/api.types";
 
 /**
  * Tipo del handler que recibe withValidation.
@@ -50,31 +51,26 @@ import { ValidationError } from "@/lib/errors";
  */
 type ValidatedHandler<T> = (
     req: NextRequest,
-    context: { data: T; params?: Record<string, string> }
+    context: { data: T; user?: AuthenticatedUser; params?: Record<string, string> }
 ) => Promise<NextResponse>;
 
 /**
  * withValidation — Envuelve un handler para validar el body automáticamente.
- *
- * @param schema  - Schema Zod que define la forma esperada del body
- * @param handler - Handler que recibe los datos ya validados y tipados
- * @returns       - Nueva función que valida el body antes de ejecutar
  */
 export function withValidation<T>(schema: ZodSchema<T>, handler: ValidatedHandler<T>) {
-    return async (req: NextRequest, routeContext?: { params?: Promise<Record<string, string>> }) => {
+    return async (req: NextRequest, context: any) => {
         try {
             // 1. Leer el body JSON de la petición
             const body = await req.json();
 
-            // 2. Validar con Zod — si falla, lanza ZodError automáticamente
-            //    Si pasa, `data` tiene el tipo correcto inferido del schema
+            // 2. Validar con Zod
             const data = schema.parse(body);
 
-            // 3. Resolver params dinámicos de la ruta (igual que en withAuth)
-            const resolvedParams = routeContext?.params ? await routeContext.params : undefined;
+            // 3. Resolver params si es necesario (si context.params es una Promise)
+            const params = context.params instanceof Promise ? await context.params : context.params;
 
-            // 4. Ejecutar el handler con los datos validados
-            return handler(req, { data, params: resolvedParams });
+            // 4. Ejecutar el handler con los datos validados y el resto del contexto (user, etc.)
+            return handler(req, { ...context, data, params });
         } catch (err) {
             // Si Zod detectó errores de validación
             if (err instanceof ZodError) {

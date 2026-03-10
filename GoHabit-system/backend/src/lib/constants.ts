@@ -35,6 +35,11 @@ export const COINS = {
     LEVEL_UP_BONUS: 25,          // Monedas extra al subir de nivel
 } as const;
 
+export const GAME_BALANCE = {
+    LEVEP_EXP_BASE: 100,           // Multiplicador de dificultad para subir de nivel (nivel * LEVEP_EXP_BASE)
+    STREAK_BONUS_MULTIPLIER: 0.2,  // Multiplicador para calcular el bonus de racha (días de racha * STREAK_BONUS_MULTIPLIER)
+}
+
 /**
  * LIMITS — Límites del sistema para prevenir abuso.
  * Establece máximos razonables para proteger la base de datos.
@@ -57,3 +62,32 @@ export const ROLES = {
     USER: "USER",
     ADMIN: "ADMIN",
 } as const;
+
+export const TREE_STAGE_LEVELS = [
+    { min: 0, max: 10, stage: 0 },
+    { min: 11, max: 30, stage: 1 },
+    { min: 31, max: 60, stage: 2 },
+    { min: 61, max: 100, stage: 3 },
+    { min: 101, max: 150, stage: 4 },
+    { min: 151, max: 210, stage: 5 },
+    { min: 211, max: 280, stage: 6 },
+    { min: 281, max: 360, stage: 7 },
+    { min: 361, max: 450, stage: 8 },
+    { min: 451, max: 500, stage: 9 },
+    { min: 501, max: Infinity, stage: 10 },
+];
+
+export const TREE_STAGES = {
+    0: "semilla",
+    1: "brote",
+    2: "arbolito",
+    3: "arbol joven",
+    4: "arbol maduro",
+    5: "arbol especial",
+    6: "arbol legendario",
+    7: "arbol mítico",
+    8: "arbol divino",
+    9: "arbol celestial",
+    10: "arbol cosmico",
+};
+

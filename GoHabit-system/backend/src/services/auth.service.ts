@@ -17,9 +17,9 @@
  * Este servicio gestiona: registro, login y consulta de perfil.
  */
 
-import { prisma } from "@/lib/prisma";          // Cliente de base de datos
+import { userRepository } from "@/repositories/user.repository";
 import { signToken } from "@/lib/auth";           // Genera tokens JWT
-import { ConflictError, UnauthorizedError } from "@/lib/errors";  // Errores tipados
+import { ConflictError, UnauthorizedError, NotFoundError } from "@/lib/errors";  // Errores tipados
 import bcrypt from "bcryptjs";                    // Hashing de contraseñas
 import type { LoginInput, RegisterInput } from "@/validations/auth.schema";
 
@@ -41,33 +41,25 @@ export const authService = {
      */
     async register(input: RegisterInput) {
         // Buscar si ya existe un usuario con ese email O username
-        const existing = await prisma.user.findFirst({
-            where: { OR: [{ email: input.email }, { username: input.username }] },
-        });
+        const existing = await userRepository.findByEmailOrUsername(input.email, input.username);
 
         if (existing) {
             throw new ConflictError("Email or username already exists");
         }
 
         // Hashear la contraseña: "password123" → "$2a$10$X7sKz..."
-        // Aunque alguien acceda a la BD, no puede ver la contraseña original
         const hashedPassword = await bcrypt.hash(input.password, SALT_ROUNDS);
 
         // Crear el usuario en MySQL
-        // select: indica qué campos devolver (excluimos password)
-        const user = await prisma.user.create({
-            data: {
-                email: input.email,
-                username: input.username,
-                password: hashedPassword,
-                firstName: input.firstName,
-                lastName: input.lastName,
-            },
-            select: { id: true, email: true, username: true, role: true },
+        const userId = await userRepository.create({
+            ...input,
+            password: hashedPassword
         });
 
+        const user = await userRepository.findById(userId.toString());
+
         // Generar token JWT para autenticación inmediata
-        const token = signToken(user.id, user.role);
+        const token = signToken(user!.id, user!.role);
         return { user, token };
     },
 
@@ -85,13 +77,9 @@ export const authService = {
      */
     async login(input: LoginInput) {
         // Buscar usuario por email (incluimos password para comparar)
-        const user = await prisma.user.findUnique({
-            where: { email: input.email },
-            select: { id: true, email: true, username: true, role: true, password: true },
-        });
+        const user = await userRepository.findByEmailWithPassword(input.email);
 
         // Verificar: ¿existe el usuario? ¿la contraseña coincide con el hash?
-        // bcrypt.compare("password123", "$2a$10$X7sKz...") → true/false
         if (!user || !(await bcrypt.compare(input.password, user.password))) {
             throw new UnauthorizedError("Invalid email or password");
         }
@@ -100,7 +88,6 @@ export const authService = {
         const token = signToken(user.id, user.role);
 
         // Quitar el password del objeto antes de devolverlo al cliente
-        // Desestructuración: { password: _, ...userWithoutPassword } separa el campo
         const { password: _, ...userWithoutPassword } = user;
         return { user: userWithoutPassword, token };
     },
@@ -110,24 +97,8 @@ export const authService = {
      * Se llama desde GET /api/auth/me con el ID extraído del JWT.
      */
     async getMe(userId: string) {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-                id: true,
-                email: true,
-                username: true,
-                firstName: true,
-                lastName: true,
-                avatarUrl: true,
-                role: true,
-                points: true,
-                coins: true,
-                level: true,
-                createdAt: true,
-                // password NO se incluye — nunca se envía al cliente
-            },
-        });
-
+        const user = await userRepository.findById(userId);
+        if (!user) throw new NotFoundError('User');
         return user;
     },
 };

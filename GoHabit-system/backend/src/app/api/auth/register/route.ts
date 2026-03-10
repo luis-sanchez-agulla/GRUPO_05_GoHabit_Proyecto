@@ -4,14 +4,6 @@
 
 import { withValidation } from "@/middleware/with-validation";
 import { registerSchema } from "@/validations/auth.schema";
-import { authService } from "@/services/auth.service";
-import { created, error } from "@/lib/api-response";
+import { authController } from "@/controllers/auth.controller";
 
-export const POST = withValidation(registerSchema, async (_req, { data }) => {
-    try {
-        const result = await authService.register(data);
-        return created(result);
-    } catch (err) {
-        return error(err);
-    }
-});
+export const POST = withValidation(registerSchema, (req, ctx) => authController.register(req, ctx));

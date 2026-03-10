@@ -5,32 +5,9 @@
 
 import { withAuth } from "@/middleware/with-auth";
 import { withRole } from "@/middleware/with-role";
-import { adminService } from "@/services/admin.service";
-import { success, error } from "@/lib/api-response";
+import { withValidation } from "@/middleware/with-validation";
+import { updateUserRoleSchema } from "@/validations/user.schema";
+import { adminController } from "@/controllers/admin.controller";
 
-export const GET = withAuth(
-    withRole(["ADMIN"], async (req) => {
-        try {
-            const { searchParams } = new URL(req.url);
-            const page = Number(searchParams.get("page")) || 1;
-            const limit = Number(searchParams.get("limit")) || 20;
-
-            const result = await adminService.getUsers(page, limit);
-            return success(result.users, 200, result.meta);
-        } catch (err) {
-            return error(err);
-        }
-    })
-);
-
-export const PUT = withAuth(
-    withRole(["ADMIN"], async (req) => {
-        try {
-            const { userId, role } = await req.json() as { userId: string; role: "USER" | "ADMIN" };
-            const updated = await adminService.updateUserRole(userId, role);
-            return success(updated);
-        } catch (err) {
-            return error(err);
-        }
-    })
-);
+export const GET = withAuth(withRole(["ADMIN"], (req, ctx) => adminController.getUsers(req, ctx)));
+export const PUT = withAuth(withRole(["ADMIN"], withValidation(updateUserRoleSchema, (req, ctx) => adminController.updateUserRole(req, ctx))));

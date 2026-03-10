@@ -1,16 +1,8 @@
 /**
- * GET /api/users — Obtener perfil del usuario autenticado.
+ * GET /api/users — Listar todos los usuarios (perfil público).
  */
 
 import { withAuth } from "@/middleware/with-auth";
-import { userService } from "@/services/user.service";
-import { success, error } from "@/lib/api-response";
+import { userController } from "@/controllers/user.controller";
 
-export const GET = withAuth(async (_req, { user }) => {
-    try {
-        const profile = await userService.getProfile(user.id);
-        return success(profile);
-    } catch (err) {
-        return error(err);
-    }
-});
+export const GET = withAuth((req, ctx) => userController.getUsers(req, ctx));

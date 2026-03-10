@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crear cuenta - GoHabit</title>
+
+  <link rel="stylesheet" href="../css/app.css" />
+  <link rel="stylesheet" href="../css/auth.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
+</head>
+<body class="auth-page">
+
+  <main class="auth-layout">
+    <section class="auth-hero">
+      <div class="auth-hero__badge">
+        <span class="material-symbols-outlined">eco</span>
+        GoHabit
+      </div>
+
+      <h1 class="auth-hero__title">Empieza hoy a construir tu mejor versión</h1>
+      <p class="auth-hero__text">
+        Define tus objetivos, mantén tus hábitos y visualiza tu progreso de forma sencilla.
+      </p>
+
+      <div class="auth-hero__mock">
+        <div class="auth-hero__circle auth-hero__circle--one"></div>
+        <div class="auth-hero__circle auth-hero__circle--two"></div>
+        <div class="auth-hero__tree">
+          <span class="material-symbols-outlined">psychiatry</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="auth-card-wrap">
+      <div class="auth-card">
+        <a href="login.html" class="auth-back">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+
+        <div class="auth-card__header">
+          <p class="auth-card__kicker">Únete a GoHabit</p>
+          <h2 class="auth-card__title">Crear cuenta</h2>
+          <p class="auth-card__subtitle">Crea tu perfil y empieza a crecer día a día.</p>
+        </div>
+
+        <form class="auth-form" id="registerForm">
+          <label class="auth-field">
+            <span class="auth-field__label">Nombre</span>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined auth-input__icon">person</span>
+              <input type="text" placeholder="Tu nombre" required />
+            </div>
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-field__label">Correo electrónico</span>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined auth-input__icon">mail</span>
+              <input type="email" placeholder="tuemail@email.com" required />
+            </div>
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-field__label">Contraseña</span>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined auth-input__icon">lock</span>
+              <input type="password" id="password" placeholder="Mínimo 8 caracteres" required />
+            </div>
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-field__label">Confirmar contraseña</span>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined auth-input__icon">verified_user</span>
+              <input type="password" id="confirmPassword" placeholder="Repite la contraseña" required />
+            </div>
+          </label>
+
+          <label class="auth-check auth-check--terms">
+            <input type="checkbox" required />
+            <span>Acepto los términos y la política de privacidad</span>
+          </label>
+
+          <button type="submit" class="auth-button auth-button--primary">
+            Crear cuenta
+          </button>
+        </form>
+
+        <p class="auth-footer">
+          ¿Ya tienes cuenta?
+          <a href="login.html" class="auth-link auth-link--strong">Inicia sesión</a>
+        </p>
+      </div>
+    </section>
+  </main>
+<script>
+
+document.getElementById("registerForm").addEventListener("submit", function(e){
+
+const password = document.getElementById("password").value;
+const confirm = document.getElementById("confirmPassword").value;
+
+if(password !== confirm){
+
+e.preventDefault();
+alert("Las contraseñas no coinciden");
+
+}
+
+});
+
+</script>
+</body>
+</html>

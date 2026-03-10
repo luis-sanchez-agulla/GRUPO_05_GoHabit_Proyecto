@@ -3,17 +3,8 @@
  */
 
 import { withAuth } from "@/middleware/with-auth";
-import { rewardService } from "@/services/reward.service";
+import { withValidation } from "@/middleware/with-validation";
 import { redeemRewardSchema } from "@/validations/reward.schema";
-import { created, error } from "@/lib/api-response";
+import { rewardController } from "@/controllers/reward.controller";
 
-export const POST = withAuth(async (req, { user }) => {
-    try {
-        const body = await req.json();
-        const { rewardId } = redeemRewardSchema.parse(body);
-        const result = await rewardService.redeem(user.id, rewardId);
-        return created(result);
-    } catch (err) {
-        return error(err);
-    }
-});
+export const POST = withAuth(withValidation(redeemRewardSchema, (req, ctx) => rewardController.redeem(req, ctx)));

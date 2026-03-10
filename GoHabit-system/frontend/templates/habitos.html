@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Dashboard de Hábitos y Crecimiento</title>
+
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/habitos.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+</head>
+
+<body class="habitos-page">
+
+  <!-- ✅ HEADER FULL WIDTH (fuera del container) -->
+<header class="gh-header">
+  <div class="gh-header__inner gh-header__inner--home">
+    <div class="gh-header__left">
+      <a href="index.html" class="gh-icon-btn" aria-label="Volver">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </a>
+
+      <div class="gh-header__titles">
+        <p class="gh-header__kicker">Tus metas</p>
+        <h1 class="gh-header__headline">Hábitos</h1>
+      </div>
+    </div>
+
+    <div class="gh-header__right">
+      <div class="gh-chip" aria-label="Semillas disponibles">
+        <span class="material-symbols-outlined" aria-hidden="true">eco</span>
+        <span data-seeds>500</span>
+      </div>
+
+      <a href="calendario.html" class="gh-icon-btn" aria-label="Abrir calendario">
+        <span class="material-symbols-outlined">calendar_today</span>
+      </a>
+
+      <button type="button" class="gh-icon-btn" data-theme-toggle aria-label="Cambiar tema">
+        <span class="material-symbols-outlined">dark_mode</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+  <!-- ✅ CONTENIDO centrado -->
+  <div class="habitos-container">
+    <main class="habitos-main">
+
+      <!-- Tree Visual Section -->
+      <div class="habitos-tree-section">
+        <div class="habitos-tree-visual">
+          <div class="habitos-tree-icon-container">
+            <span class="material-symbols-outlined habitos-tree-icon">park</span>
+            <div class="habitos-tree-badge">
+              <span class="material-symbols-outlined habitos-tree-badge-icon">eco</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="habitos-level-container">
+          <div class="habitos-level-card">
+            <p class="habitos-level-label">Nivel Actual</p>
+            <p class="habitos-level-number">Nivel 12</p>
+          </div>
+        </div>
+
+        <div class="habitos-xp-container">
+          <div class="habitos-xp-header">
+            <span class="habitos-xp-label">Progreso del Roble</span>
+            <span class="habitos-xp-value">750 / 1000 XP</span>
+          </div>
+          <div class="habitos-xp-bar">
+            <div class="habitos-xp-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="habitos-content">
+        <div class="habitos-section-header">
+          <h2 class="habitos-section-title">Objetivos de hoy</h2>
+          <a href="habitos.html" class="habitos-view-all-link">Ver todo</a>
+        </div>
+
+        <div class="habitos-cards-container">
+          <!-- Habit Card 1 -->
+          <div class="habit-card" data-habit-id="1" data-reward="10">
+            <div class="habit-card__icon-container habit-card__icon-container--primary">
+              <span class="material-symbols-outlined">water_drop</span>
+            </div>
+            <div class="habit-card__content">
+              <h3 class="habit-card__title">Beber 2L de agua</h3>
+              <p class="habit-card__category">Hidratación</p>
+            </div>
+            <label class="habit-checkbox">
+              <input class="habit-checkbox__input" type="checkbox"/>
+              <div class="habit-checkbox__box">
+                <span class="material-symbols-outlined habit-checkbox__icon">check</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Habit Card 2 -->
+          <div class="habit-card" data-habit-id="2" data-reward="10">
+            <div class="habit-card__icon-container habit-card__icon-container--purple">
+              <span class="material-symbols-outlined">menu_book</span>
+            </div>
+            <div class="habit-card__content">
+              <h3 class="habit-card__title">Leer 15 páginas</h3>
+              <p class="habit-card__category">Mente</p>
+            </div>
+            <label class="habit-checkbox">
+              <input class="habit-checkbox__input" type="checkbox"/>
+              <div class="habit-checkbox__box">
+                <span class="material-symbols-outlined habit-checkbox__icon">check</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Habit Card 3 -->
+          <div class="habit-card" data-habit-id="3" data-reward="10">
+            <div class="habit-card__icon-container habit-card__icon-container--orange">
+              <span class="material-symbols-outlined">self_improvement</span>
+            </div>
+            <div class="habit-card__content">
+              <h3 class="habit-card__title">Meditar 10 min</h3>
+              <p class="habit-card__category">Espiritualidad</p>
+            </div>
+            <label class="habit-checkbox">
+              <input class="habit-checkbox__input" type="checkbox"/>
+              <div class="habit-checkbox__box">
+                <span class="material-symbols-outlined habit-checkbox__icon">check</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Habit Card 4 -->
+          <div class="habit-card" data-habit-id="4" data-reward="10">
+            <div class="habit-card__icon-container habit-card__icon-container--blue">
+              <span class="material-symbols-outlined">directions_walk</span>
+            </div>
+            <div class="habit-card__content">
+              <h3 class="habit-card__title">Caminar 5000 pasos</h3>
+              <p class="habit-card__category">Salud</p>
+            </div>
+            <label class="habit-checkbox">
+              <input class="habit-checkbox__input" type="checkbox"/>
+              <div class="habit-checkbox__box">
+                <span class="material-symbols-outlined habit-checkbox__icon">check</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="habitos-add-container">
+          <a href="anadirHabito.html" class="habitos-add-button">
+            <span class="material-symbols-outlined">add_circle</span>
+            <span>Añadir hábito</span>
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <!-- ✅ NAVBAR -->
+    <nav class="index-nav">
+      <div class="index-nav__container">
+        <a href="index.html" class="index-nav__link">
+          <span class="index-nav__icon">🏠</span>
+          <span class="index-nav__text">Inicio</span>
+        </a>
+
+        <a href="habitos.html" class="index-nav__link index-nav__link--active">
+          <span class="index-nav__icon">✔️</span>
+          <span class="index-nav__text">Hábitos</span>
+        </a>
+
+        <a href="avatar.html" class="index-nav__link">
+          <span class="index-nav__icon">🌳</span>
+          <span class="index-nav__text">Avatar</span>
+        </a>
+
+        <a href="tienda.html" class="index-nav__link">
+          <span class="index-nav__icon">🛒</span>
+          <span class="index-nav__text">Tienda</span>
+        </a>
+
+        <a href="perfil.html" class="index-nav__link">
+          <span class="index-nav__icon">👤</span>
+          <span class="index-nav__text">Perfil</span>
+        </a>
+      </div>
+    </nav>
+
+  </div>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/pages/habitos.js" defer></script>
+</body>
+</html>
