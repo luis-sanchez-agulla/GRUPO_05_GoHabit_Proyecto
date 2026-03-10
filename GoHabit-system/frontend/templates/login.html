@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iniciar sesión - GoHabit</title>
+
+  <link rel="stylesheet" href="../css/app.css" />
+  <link rel="stylesheet" href="../css/auth.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
+</head>
+<body class="auth-page">
+
+  <main class="auth-layout">
+    <section class="auth-hero">
+      <div class="auth-hero__badge">
+        <span class="material-symbols-outlined">eco</span>
+        GoHabit
+      </div>
+
+      <h1 class="auth-hero__title">Haz crecer tus metas cada día</h1>
+      <p class="auth-hero__text">
+        Convierte tus hábitos en progreso, gana semillas y haz evolucionar tu árbol.
+      </p>
+
+      <div class="auth-hero__mock">
+        <div class="auth-hero__circle auth-hero__circle--one"></div>
+        <div class="auth-hero__circle auth-hero__circle--two"></div>
+        <div class="auth-hero__tree">
+          <span class="material-symbols-outlined">park</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="auth-card-wrap">
+      <div class="auth-card">
+        <a href="index.html" class="auth-back">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+
+        <div class="auth-card__header">
+          <p class="auth-card__kicker">Bienvenido de nuevo</p>
+          <h2 class="auth-card__title">Iniciar sesión</h2>
+          <p class="auth-card__subtitle">Accede a tu cuenta y sigue con tu progreso.</p>
+        </div>
+
+        <form class="auth-form" action="index.html">
+          <label class="auth-field">
+            <span class="auth-field__label">Correo electrónico</span>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined auth-input__icon">mail</span>
+              <input type="email" placeholder="tuemail@email.com" required />
+            </div>
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-field__label">Contraseña</span>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined auth-input__icon">lock</span>
+              <input type="password" placeholder="••••••••" required />
+            </div>
+          </label>
+
+          <div class="auth-row">
+            <label class="auth-check">
+              <input type="checkbox" />
+              <span>Recordarme</span>
+            </label>
+
+            <a href="#" class="auth-link">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <button type="submit" class="auth-button auth-button--primary">
+            Iniciar sesión
+          </button>
+        </form>
+
+  
+
+        <p class="auth-footer">
+          ¿No tienes cuenta?
+          <a href="registro.html" class="auth-link auth-link--strong">Crear cuenta</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+</body>
+</html>

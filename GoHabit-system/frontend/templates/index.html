@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <!-- Meta Tags -->
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Pantalla de Inicio con Árbol Avatar</title>
 
     <link rel="stylesheet" href="../css/responsive.css">
@@ -13,15 +12,13 @@
     <link rel="stylesheet" href="../css/index.css">
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 </head>
-
 <body>
     <div class="index-container">
         <!-- Header Section -->
-        <header class="index-header">
+        <header class="index-header gh-fullbleed">
             <div>
                 <p class="index-header__greeting">Buenos días,</p>
                 <h1 class="index-header__title">¡Hola, Alex!</h1>
@@ -43,13 +40,12 @@
             <div class="index-tree-glow"></div>
             <div class="index-tree-container">
                 <!-- Tree Image Placeholder -->
-                <div class="index-tree-image" data-alt="Beautiful growing green tree illustration representing progress"
-                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVjO9jGOV1NPgGHkRpiszfA7j4bNqwVW2Tg76Hw1fgn_0w4gLNeXnGx-mCNh9_xY4VvLeT1IIh-orEBsrvjrlCHnxEhAUMFVwxpCYG7TpW6GtcXmLxBy2gtGgiRE4UofK7HCUMdGr4NpWVyB1IggbR76dsyHhpe-mA0O3gIYXWPFDYsxtDfDpfgIl-Euax_gp26WKVNUBr9yYf1AjStg0IrAG_bBGua3eGeAr6VDgRHX7H5NNFyNu0XGkqYj5NIisBbRv8livaJWY');">
+                <div class="index-tree-image" data-avatar-image data-alt="Árbol avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVjO9jGOV1NPgGHkRpiszfA7j4bNqwVW2Tg76Hw1fgn_0w4gLNeXnGx-mCNh9_xY4VvLeT1IIh-orEBsrvjrlCHnxEhAUMFVwxpCYG7TpW6GtcXmLxBy2gtGgiRE4UofK7HCUMdGr4NpWVyB1IggbR76dsyHhpe-mA0O3gIYXWPFDYsxtDfDpfgIl-Euax_gp26WKVNUBr9yYf1AjStg0IrAG_bBGua3eGeAr6VDgRHX7H5NNFyNu0XGkqYj5NIisBbRv8livaJWY');">
                 </div>
                 <!-- Floating Level Badge -->
                 <div class="index-tree-badge">
-                    <span class="index-tree-badge__level">Nivel 5</span>
-                    <span class="index-tree-badge__name">Roble Joven</span>
+                    <span class="index-tree-badge__level" data-avatar-level>Nivel 5</span>
+                    <span class="index-tree-badge__name" data-avatar-name>Roble Joven</span>
                 </div>
             </div>
         </div>
@@ -77,8 +73,7 @@
                             <span class="index-task-card__progress-text">1.5 / 2L</span>
                         </div>
                     </div>
-                    <button class="index-task-card__button" type="button" data-habit-toggle="1"
-                        aria-label="Marcar hábito como completado">
+                    <button class="index-task-card__button" type="button" data-habit-toggle="1" aria-label="Marcar hábito como completado">
                         <span class="material-symbols-outlined">radio_button_unchecked</span>
                     </button>
                 </div>
@@ -120,35 +115,37 @@
         </div>
 
         <!-- Navigation Bar -->
-        <nav class="index-nav">
-            <div class="index-nav__container">
-                <a class="index-nav__link index-nav__link--active" href="index.html">
-                    <span class="material-symbols-outlined fill index-nav__icon">home</span>
-                    <p class="index-nav__text">Inicio</p>
-                </a>
-                <a class="index-nav__link" href="habitos.html">
-                    <span class="material-symbols-outlined index-nav__icon">task_alt</span>
-                    <p class="index-nav__text">Hábitos</p>
-                </a>
-                <a class="index-nav__link" href="avatar.html">
-                    <span class="material-symbols-outlined index-nav__icon">park</span>
-                    <p class="index-nav__text">Avatar</p>
-                </a>
-                <a class="index-nav__link" href="tienda.html">
-                    <span class="material-symbols-outlined index-nav__icon">storefront</span>
-                    <p class="index-nav__text">Tienda</p>
-                </a>
-                <a class="index-nav__link" href="perfil.html">
-                    <span class="material-symbols-outlined index-nav__icon">person</span>
-                    <p class="index-nav__text">Perfil</p>
-                </a>
-            </div>
-        </nav>
-    </div>
+ <nav class="index-nav">
+  <div class="index-nav__container">
+    <a href="index.html" class="index-nav__link index-nav__link--active">
+      <span class="index-nav__icon">🏠</span>
+      <span class="index-nav__text">Inicio</span>
+    </a>
 
-    <script src="../js/api.js"></script>
+    <a href="habitos.html" class="index-nav__link ">
+      <span class="index-nav__icon">✔️</span>
+      <span class="index-nav__text">Hábitos</span>
+    </a>
+
+    <a href="avatar.html" class="index-nav__link">
+      <span class="index-nav__icon">🌳</span>
+      <span class="index-nav__text">Avatar</span>
+    </a>
+
+    <a href="tienda.html" class="index-nav__link">
+      <span class="index-nav__icon">🛒</span>
+      <span class="index-nav__text">Tienda</span>
+    </a>
+
+    <a href="perfil.html" class="index-nav__link">
+      <span class="index-nav__icon">👤</span>
+      <span class="index-nav__text">Perfil</span>
+    </a>
+  </div>
+</nav>
+
     <script src="../js/app.js" defer></script>
+    <script src="../js/pages/avatarImage.js" defer></script>
     <script src="../js/pages/index.js" defer></script>
 </body>
-
 </html>

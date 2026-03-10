@@ -21,11 +21,20 @@
   --tap: 44px;
 }
 
+/* Full-bleed helper: lets a bar span the entire viewport width
+   even when the page content is inside a centered container. */
+.gh-fullbleed{
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
 body{
   background:
     radial-gradient(900px 450px at 50% -10%, rgba(114,135,100,.20), transparent 55%),
     radial-gradient(700px 320px at 90% 30%, rgba(217,140,113,.16), transparent 55%),
     var(--bg);
+  overflow-x: hidden;
 }
 
 body.dark{
@@ -149,4 +158,347 @@ body.dark .gh-toast{ border-color: rgba(255,255,255,.10); }
 [class$='__button']{
   min-width: var(--tap);
   min-height: var(--tap);
+}
+
+/* Standardized top header used across pages */
+
+/* Make header match index.css spacing and balance style */
+/* Header full width */
+.gh-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  width: 100%;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(114,135,100,.12);
+}
+
+/* Contenido del header centrado */
+.gh-header__inner {
+  max-width: 64rem; /* 1024px */
+  margin: 0 auto;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+body.dark .gh-header {
+  background: rgba(31,36,27,.92);
+  border-bottom-color: rgba(255,255,255,.08);
+}
+
+/* ===== Header tipo Index (alineado a la izquierda) ===== */
+.gh-header__inner--home{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.gh-header__left{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.gh-header__titles{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.gh-header__kicker{
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.gh-header__headline{
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gh-header__right{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.gh-chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(114,135,100,.10);
+  border: 1px solid rgba(114,135,100,.14);
+  white-space: nowrap;
+}
+
+/* Botones redondos como en Index */
+.gh-icon-btn{
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(114,135,100,.14);
+  background: rgba(255,255,255,.8);
+  box-shadow: 0 10px 22px rgba(0,0,0,.06);
+  cursor: pointer;
+}
+
+body.dark .gh-icon-btn{
+  background: rgba(31,36,27,.65);
+  border-color: rgba(255,255,255,.10);
+}
+body.dark .gh-chip{
+  background: rgba(114,135,100,.18);
+  border-color: rgba(255,255,255,.10);
+}
+
+/* Ajuste móvil para que no se rompa */
+@media (max-width: 520px){
+  .gh-header__headline{ font-size: 28px; }
+  .gh-chip{ padding: 8px 10px; }
+  .gh-icon-btn{ width: 40px; height: 40px; }
+}
+/* ===== Ajuste: header más separado y con aire ===== */
+.gh-header__inner--home{
+  padding-top: 18px;
+  padding-bottom: 18px;
+  gap: 22px;                 /* más separación general */
+}
+
+.gh-header__left{
+  gap: 16px;                 /* separa flecha y texto */
+}
+
+.gh-header__right{
+  gap: 14px;                 /* separa chip/calendario/luna */
+  margin-left: 14px;         /* empuja el bloque derecho un poco */
+}
+
+/* Chip un poco más grande (como en index) */
+.gh-chip{
+  padding: 12px 16px;
+  border-radius: 999px;
+}
+
+/* Botones un poco más grandes y consistentes */
+.gh-icon-btn{
+  width: 46px;
+  height: 46px;
+}
+
+/* Títulos con más aire */
+.gh-header__kicker{
+  margin-bottom: 2px;
+}
+
+.gh-header__headline{
+  font-size: 36px;           /* un pelín más grande */
+}
+@media (max-width: 600px){
+  .gh-header__inner--home{ gap: 14px; padding-top: 14px; padding-bottom: 14px; }
+  .gh-header__right{ gap: 10px; margin-left: 8px; }
+  .gh-chip{ padding: 10px 12px; }
+  .gh-icon-btn{ width: 42px; height: 42px; }
+  .gh-header__headline{ font-size: 30px; }
+}
+
+/* HEADER estilo index reutilizable */
+
+.gh-header{
+  position: sticky;
+  top: 0;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(114,135,100,.12);
+  z-index: 60;
+}
+
+.gh-header__inner{
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gh-header__left{
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.gh-header__titles{
+  display: flex;
+  flex-direction: column;
+}
+
+.gh-header__kicker{
+  font-size: 14px;
+  color: #728764;
+  margin: 0;
+}
+
+.gh-header__headline{
+  font-size: 34px;
+  margin: 0;
+}
+
+.gh-header__right{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gh-chip{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(114,135,100,.12);
+}
+
+.gh-icon-btn{
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(114,135,100,.12);
+  background: white;
+  cursor: pointer;
+}
+/* HEADER GLOBAL */
+
+.gh-header{
+position:sticky;
+top:0;
+width:100%;
+background:rgba(255,255,255,.92);
+backdrop-filter:blur(12px);
+border-bottom:1px solid rgba(114,135,100,.12);
+z-index:60;
+}
+
+.gh-header__inner{
+max-width:64rem;
+margin:0 auto;
+padding:20px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.gh-header__left{
+display:flex;
+align-items:center;
+gap:16px;
+}
+
+.gh-header__titles{
+display:flex;
+flex-direction:column;
+}
+
+.gh-header__kicker{
+font-size:14px;
+color:#728764;
+margin:0;
+}
+
+.gh-header__headline{
+font-size:36px;
+margin:0;
+}
+
+.gh-header__right{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.gh-chip{
+display:flex;
+align-items:center;
+gap:8px;
+padding:10px 16px;
+border-radius:999px;
+background:rgba(114,135,100,.15);
+}
+
+.gh-icon-btn{
+width:44px;
+height:44px;
+display:grid;
+place-items:center;
+border-radius:999px;
+border:1px solid rgba(114,135,100,.12);
+background:white;
+cursor:pointer;
+}
+
+/* ===== PARCHE FINAL: Header consistente en todas las páginas ===== */
+.gh-header{
+  width: 100%;
+}
+
+.gh-header__inner{
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.gh-header__right{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: nowrap; /* evita que se apilen */
+}
+
+.gh-header__left{
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.gh-header__headline{
+  font-size: 36px;
+  line-height: 1.1;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gh-chip{
+  padding: 12px 16px;
+  border: 1px solid rgba(114,135,100,.14);
+  background: rgba(114,135,100,.10);
+}
+
+.gh-icon-btn{
+  width: 46px;
+  height: 46px;
 }

@@ -2,37 +2,32 @@ document.addEventListener('DOMContentLoaded', () => {
   // seeds counter
   GoHabit.bindSeeds('[data-seeds]');
 
-  async function initNextHabit() {
-    try {
-      const habits = await window.GoHabitAPI.get('/habits');
-      if (habits.data && habits.data.length > 0) {
-        const habit = habits.data[0]; // Just take the first one for the "Next Habit" card
+  // Habit quick complete (demo habit id 1)
+  const btn = document.querySelector('[data-habit-toggle]');
+  if(!btn) return;
 
-        const cardTitle = document.querySelector('.index-task-card__title');
-        if (cardTitle) cardTitle.textContent = habit.name;
+  const habitId = parseInt(btn.getAttribute('data-habit-toggle'), 10);
 
-        const cardIcon = document.querySelector('.index-task-card__icon span');
-        if (cardIcon) cardIcon.textContent = habit.icon || 'eco';
-
-        btn.setAttribute('data-habit-toggle', habit.id);
-
-        // Completion logic
-        btn.addEventListener('click', async () => {
-          try {
-            await window.GoHabitAPI.post(`/habits/${habit.id}/completions`);
-            GoHabit.toast(`¡Has completado: ${habit.name}! 🌟`);
-            paint(true);
-            // Refresh profile data (seeds/lvl)
-            GoHabit.initUser();
-          } catch (err) {
-            GoHabit.toast('Error al marcar hábito: ' + err.message, 'bad');
-          }
-        });
-      }
-    } catch (err) {
-      console.error('Failed to fetch habits:', err);
+  function paint(done){
+    const icon = btn.querySelector('.material-symbols-outlined');
+    if(done){
+      btn.classList.add('is-done');
+      btn.style.background = '#728764';
+      btn.style.color = 'white';
+      if(icon) icon.textContent = 'check';
+    }else{
+      btn.classList.remove('is-done');
+      btn.style.background = '';
+      btn.style.color = '';
+      if(icon) icon.textContent = 'radio_button_unchecked';
     }
   }
 
-  initNextHabit();
+  paint(GoHabit.getHabitDone(habitId));
+
+  btn.addEventListener('click', () => {
+    const {done} = GoHabit.toggleHabit(habitId, { reward: 10 });
+    paint(done);
+    GoHabit.bindSeeds('[data-seeds]')();
+  });
 });
