@@ -195,6 +195,13 @@ body.auth-page{
   color: #334155;
 }
 
+.auth-field__error{
+  display: none;
+  color: #b42318;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
 .auth-input-wrap{
   display: flex;
   align-items: center;

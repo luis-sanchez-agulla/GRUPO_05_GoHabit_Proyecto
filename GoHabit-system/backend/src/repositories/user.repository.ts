@@ -1,17 +1,18 @@
 import { query, execute } from "@/lib/mysql";
 import { UserPrivateProfile, UserPublicProfile } from "@/entities/user.entity";
+import { randomUUID } from "crypto";
 
 export const userRepository = {
     async findAll(): Promise<UserPublicProfile[]> {
         const [rows]: any = await query(
-            'SELECT id, username, firstName, lastName, avatarUrl, level, points FROM users'
+            'SELECT id, username, first_name AS firstName, last_name AS lastName, avatar_url AS avatarUrl, level, points FROM users'
         );
         return rows || [];
     },
 
     async findById(id: string): Promise<UserPrivateProfile | null> {
         const [rows]: any = await query(
-            'SELECT id, email, username, firstName, lastName, avatarUrl, role, points, coins, level, createdAt FROM users WHERE id = ?',
+            'SELECT id, email, username, first_name AS firstName, last_name AS lastName, avatar_url AS avatarUrl, role, points, coins, level, created_at AS createdAt FROM users WHERE id = ?',
             [id]
         );
         return rows && rows.length > 0 ? rows[0] : null;
@@ -19,7 +20,7 @@ export const userRepository = {
 
     async findPublicById(id: string): Promise<UserPublicProfile | null> {
         const [rows]: any = await query(
-            'SELECT id, username, firstName, lastName, avatarUrl, level, points FROM users WHERE id = ?',
+            'SELECT id, username, first_name AS firstName, last_name AS lastName, avatar_url AS avatarUrl, level, points FROM users WHERE id = ?',
             [id]
         );
         return rows && rows.length > 0 ? rows[0] : null;
@@ -49,16 +50,25 @@ export const userRepository = {
         return rows && rows.length > 0;
     },
 
-    async create(data: any): Promise<number> {
-        const [result]: any = await execute(
-            'INSERT INTO users (email, username, password, firstName, lastName) VALUES (?, ?, ?, ?, ?)',
-            [data.email, data.username, data.password, data.firstName, data.lastName]
+    async create(data: any): Promise<string> {
+        const userId = randomUUID();
+        await execute(
+            'INSERT INTO users (id, email, username, password, first_name, last_name, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(3))',
+            [userId, data.email, data.username, data.password, data.firstName, data.lastName]
         );
-        return result.insertId;
+        return userId;
     },
 
     async update(userId: string, data: any): Promise<void> {
-        const keys = Object.keys(data);
+        const fieldMap: Record<string, string> = {
+            firstName: 'first_name',
+            lastName: 'last_name',
+            avatarUrl: 'avatar_url',
+            createdAt: 'created_at',
+            updatedAt: 'updated_at',
+        };
+
+        const keys = Object.keys(data).map((key) => fieldMap[key] || key);
         if (keys.length === 0) return;
 
         const setClause = keys.map(key => `${key} = ?`).join(', ');

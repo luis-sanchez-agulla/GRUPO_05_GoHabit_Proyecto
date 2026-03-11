@@ -19,7 +19,104 @@
 import { aiRepository } from "@/repositories/ai.repository";
 import { NotFoundError } from "@/lib/errors";
 
+type HabitSuggestion = {
+    title: string;
+    reason: string;
+    frequency: string;
+};
+
+type HabitTemplate = HabitSuggestion & { tags: string[] };
+
+const HABIT_LIBRARY: HabitTemplate[] = [
+    {
+        title: "Beber 2L de agua",
+        reason: "Mejora la energia diaria y la concentracion.",
+        frequency: "Diario",
+        tags: ["salud", "agua", "hidratacion", "cansado"],
+    },
+    {
+        title: "Caminar 30 minutos",
+        reason: "Reduce el estres y ayuda a mantenerte activo.",
+        frequency: "5 dias por semana",
+        tags: ["salud", "ejercicio", "estres", "sedentario"],
+    },
+    {
+        title: "Leer 15 paginas",
+        reason: "Fortalece el enfoque y el aprendizaje continuo.",
+        frequency: "Diario",
+        tags: ["lectura", "estudio", "aprender", "mente"],
+    },
+    {
+        title: "Dormir 7-8 horas",
+        reason: "Mejora el rendimiento mental y la recuperacion.",
+        frequency: "Diario",
+        tags: ["sueno", "descanso", "fatiga", "rutina"],
+    },
+    {
+        title: "Planificar el dia 10 minutos",
+        reason: "Ayuda a priorizar y cumplir tareas importantes.",
+        frequency: "Diario",
+        tags: ["productividad", "organizacion", "tareas", "trabajo"],
+    },
+    {
+        title: "Meditar 10 minutos",
+        reason: "Aumenta la atencion y regula la ansiedad.",
+        frequency: "Diario",
+        tags: ["meditacion", "ansiedad", "estres", "bienestar"],
+    },
+    {
+        title: "Preparar comida casera",
+        reason: "Te ayuda a comer mejor y ahorrar dinero.",
+        frequency: "3-4 veces por semana",
+        tags: ["comida", "nutricion", "salud", "ahorro"],
+    },
+    {
+        title: "Estudiar ingles 20 minutos",
+        reason: "Mantiene constancia y progreso medible.",
+        frequency: "Diario",
+        tags: ["idiomas", "ingles", "estudio", "objetivos"],
+    },
+];
+
 export const aiService = {
+    async recommendHabits(_userId: string, message: string) {
+        const normalized = message.toLowerCase();
+        const scored = HABIT_LIBRARY.map((habit) => {
+            const score = habit.tags.reduce((acc, tag) => {
+                return normalized.includes(tag) ? acc + 1 : acc;
+            }, 0);
+            return { habit, score };
+        });
+
+        scored.sort((a, b) => b.score - a.score);
+
+        const top = scored
+            .filter((item) => item.score > 0)
+            .slice(0, 4)
+            .map((item) => ({
+                title: item.habit.title,
+                reason: item.habit.reason,
+                frequency: item.habit.frequency,
+            }));
+
+        if (top.length > 0) {
+            return {
+                input: message,
+                suggestions: top,
+            };
+        }
+
+        // Fallback si no hay coincidencias por palabras clave.
+        return {
+            input: message,
+            suggestions: HABIT_LIBRARY.slice(0, 4).map((habit) => ({
+                title: habit.title,
+                reason: habit.reason,
+                frequency: habit.frequency,
+            })),
+        };
+    },
+
     /**
      * reorganizeTasks — Reorganiza las tareas pendientes del usuario.
      */

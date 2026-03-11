@@ -2,7 +2,8 @@
 
 const API_CONFIG = {
     BASE_URL: `${window.location.origin}/api`,
-    TOKEN_KEY: 'gohabit_token'
+    TOKEN_KEY: 'gohabit_token',
+    USER_KEY: 'gohabit_user'
 };
 
 console.log('GoHabitAPI: Initialized with BASE_URL', API_CONFIG.BASE_URL);
@@ -18,6 +19,27 @@ const api = {
 
     clearToken() {
         localStorage.removeItem(API_CONFIG.TOKEN_KEY);
+    },
+
+    setSession(token, user) {
+        this.setToken(token);
+        if (user) {
+            localStorage.setItem(API_CONFIG.USER_KEY, JSON.stringify(user));
+        }
+    },
+
+    getSessionUser() {
+        try {
+            const raw = localStorage.getItem(API_CONFIG.USER_KEY);
+            return raw ? JSON.parse(raw) : null;
+        } catch {
+            return null;
+        }
+    },
+
+    clearSession() {
+        this.clearToken();
+        localStorage.removeItem(API_CONFIG.USER_KEY);
     },
 
     async request(endpoint, options = {}) {
@@ -43,7 +65,7 @@ const api = {
             const result = await response.json();
 
             if (!response.ok) {
-                throw new Error(result.message || 'Something went wrong');
+                throw new Error(result?.error?.message || result?.message || 'Something went wrong');
             }
 
             return result;

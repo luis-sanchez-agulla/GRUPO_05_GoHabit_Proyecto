@@ -549,12 +549,12 @@ body.dark .index-progress-card__bar {
 
 .index-progress-card--health .index-progress-card__bar-fill {
   background-color: var(--primary);
-  width: 85%;
+  width: 0%;
 }
 
 .index-progress-card--mind .index-progress-card__bar-fill {
   background-color: var(--secondary);
-  width: 40%;
+  width: 0%;
 }
 
 /* Barra full width */

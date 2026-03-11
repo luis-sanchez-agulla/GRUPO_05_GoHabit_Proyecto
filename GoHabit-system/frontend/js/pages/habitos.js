@@ -18,6 +18,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const habits = GoHabit.ensureDefaultHabits();
     container.innerHTML = '';
 
+    if(!habits.length){
+      const empty = document.createElement('div');
+      empty.className = 'habit-card';
+      empty.innerHTML = `
+        <div class="habit-card__icon-container habit-card__icon-container--primary">
+          <span class="material-symbols-outlined">task_alt</span>
+        </div>
+        <div class="habit-card__content">
+          <h3 class="habit-card__title">Todavia no tienes habitos</h3>
+          <p class="habit-card__category">Crea el primero en "Anadir habito"</p>
+        </div>
+      `;
+      container.appendChild(empty);
+      return;
+    }
+
     habits.forEach(h => {
       const wrapper = document.createElement('div');
       wrapper.className = 'habit-card';

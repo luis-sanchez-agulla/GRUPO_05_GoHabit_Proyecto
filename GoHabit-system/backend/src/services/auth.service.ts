@@ -56,7 +56,7 @@ export const authService = {
             password: hashedPassword
         });
 
-        const user = await userRepository.findById(userId.toString());
+        const user = await userRepository.findById(userId);
 
         // Generar token JWT para autenticación inmediata
         const token = signToken(user!.id, user!.role);

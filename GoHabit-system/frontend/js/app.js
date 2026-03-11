@@ -5,9 +5,26 @@
     seeds: 'semillasUsuario',
     habits: 'habitosCompletados',
     habitsList: 'habitosLista',
+    progress: 'progresoUsuario',
     theme: 'gohabitTheme',
     level: 'nivelArbol',
   };
+
+  function getCurrentUserId(){
+    try{
+      const raw = localStorage.getItem('gohabit_user');
+      const user = raw ? JSON.parse(raw) : null;
+      return user?.id ? String(user.id) : 'anon';
+    }catch{
+      return 'anon';
+    }
+  }
+
+  function storageKey(base){
+    // Theme is global; user progress/state is namespaced per user.
+    if(base === STORAGE.theme) return base;
+    return `${base}:${getCurrentUserId()}`;
+  }
 
   function todayKey(d = new Date()){
     const y = d.getFullYear();
@@ -18,22 +35,22 @@
 
   function getJSON(key, fallback){
     try{
-      const v = localStorage.getItem(key);
+      const v = localStorage.getItem(storageKey(key));
       return v ? JSON.parse(v) : fallback;
     }catch{ return fallback; }
   }
 
   function setJSON(key, value){
-    localStorage.setItem(key, JSON.stringify(value));
+    localStorage.setItem(storageKey(key), JSON.stringify(value));
   }
 
   // Seeds
   function getSeeds(){
-    const v = localStorage.getItem(STORAGE.seeds);
-    const n = v ? parseInt(v, 10) : 500;
-    return Number.isFinite(n) ? n : 500;
+    const v = localStorage.getItem(storageKey(STORAGE.seeds));
+    const n = v ? parseInt(v, 10) : 0;
+    return Number.isFinite(n) ? n : 0;
   }
-  function setSeeds(n){ localStorage.setItem(STORAGE.seeds, String(Math.max(0, n|0))); }
+  function setSeeds(n){ localStorage.setItem(storageKey(STORAGE.seeds), String(Math.max(0, n|0))); }
   function addSeeds(delta){ const n = getSeeds() + (delta|0); setSeeds(n); return getSeeds(); }
   function subSeeds(delta){ const n = Math.max(0, getSeeds() - (delta|0)); setSeeds(n); return getSeeds(); }
 
@@ -49,6 +66,26 @@
     st[dateKey][String(habitId)] = !!done;
     setJSON(STORAGE.habits, st);
   }
+
+  function getProgress(){
+    const p = getJSON(STORAGE.progress, null);
+    if(p && typeof p === 'object') return p;
+    return {
+      points: 0,
+      coins: getSeeds(),
+      startedAt: null,
+    };
+  }
+
+  function setProgress(progress){
+    const safe = {
+      points: Math.max(0, Number(progress?.points || 0)),
+      coins: Math.max(0, Number(progress?.coins || 0)),
+      startedAt: progress?.startedAt || null,
+    };
+    setJSON(STORAGE.progress, safe);
+    return safe;
+  }
   function toggleHabit(habitId, opts = {}){
     const {
       reward = 10,
@@ -62,6 +99,16 @@
     const next = !done;
     setHabitDone(habitId, next, dateKey);
     const total = next ? addSeeds(reward) : subSeeds(reward);
+
+    const progress = getProgress();
+    const nextPoints = Math.max(0, progress.points + (next ? reward : -reward));
+    setProgress({
+      ...progress,
+      points: nextPoints,
+      coins: total,
+      startedAt: progress.startedAt || (next ? Date.now() : null),
+    });
+
     toast(next ? toastGood : toastBad, next ? 'good' : 'bad');
     if(typeof onChange === 'function') onChange(next, total);
     return {done: next, total};
@@ -80,17 +127,11 @@
 
   function ensureDefaultHabits(){
     const existing = getHabitsList();
-    if(Array.isArray(existing) && existing.length) return existing;
+    if(Array.isArray(existing)) return existing;
 
-    // Defaults shown in habitos.html
-    const defaults = [
-      { id: 1, titulo: 'Beber 2L de agua', categoria: 'salud', etiqueta: 'Hidratación', icono: 'water_drop', color: 'primary', reward: 10 },
-      { id: 2, titulo: 'Leer 15 páginas', categoria: 'mente', etiqueta: 'Mente', icono: 'menu_book', color: 'purple', reward: 10 },
-      { id: 3, titulo: 'Meditar 10 min', categoria: 'espiritu', etiqueta: 'Espiritualidad', icono: 'self_improvement', color: 'orange', reward: 10 },
-      { id: 4, titulo: 'Caminar 5000 pasos', categoria: 'salud', etiqueta: 'Salud', icono: 'directions_walk', color: 'blue', reward: 10 },
-    ];
-    setHabitsList(defaults);
-    return defaults;
+    // New users start with no pre-created habits.
+    setHabitsList([]);
+    return [];
   }
 
   function nextHabitId(list){
@@ -123,13 +164,13 @@
 
   // Level (very simple for the prototype; later you can compute from XP)
   function getLevel(){
-    const v = localStorage.getItem(STORAGE.level);
-    const n = v ? parseInt(v, 10) : 5;
-    return Number.isFinite(n) ? Math.max(1, n) : 5;
+    const v = localStorage.getItem(storageKey(STORAGE.level));
+    const n = v ? parseInt(v, 10) : 1;
+    return Number.isFinite(n) ? Math.max(1, n) : 1;
   }
   function setLevel(n){
     const val = Math.max(1, Number(n)||1);
-    localStorage.setItem(STORAGE.level, String(val|0));
+    localStorage.setItem(storageKey(STORAGE.level), String(val|0));
     return getLevel();
   }
 
@@ -228,13 +269,15 @@
     // seeds
     getSeeds, setSeeds, addSeeds, subSeeds,
     // habits
-    getHabitDone, setHabitDone, toggleHabit,
+    getHabitDone, setHabitDone, toggleHabit, getHabitsState,
     // habits list
     getHabitsList, setHabitsList, ensureDefaultHabits, addHabit,
     // ui
     toast,
     // level
     getLevel, setLevel,
+    // progress
+    getProgress, setProgress,
     // theme
     theme: { initTheme, toggleTheme, applyTheme },
     // binders

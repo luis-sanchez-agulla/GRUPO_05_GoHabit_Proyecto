@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../css/responsive.css">
   <link rel="stylesheet" href="../css/app.css">
   <link rel="stylesheet" href="../css/perfil.css">
+  <link rel="stylesheet" href="../css/chatbot.css">
 
   <title>Perfil de Usuario</title>
 </head>
@@ -36,8 +37,8 @@
           <span class="material-symbols-outlined">dark_mode</span>
         </button>
 
-        <button type="button" class="gh-icon-btn" aria-label="Ajustes (no implementado)">
-          <span class="material-symbols-outlined">settings</span>
+        <button type="button" class="gh-icon-btn" data-logout aria-label="Cerrar sesion">
+          <span class="material-symbols-outlined">logout</span>
         </button>
       </div>
 
@@ -50,9 +51,8 @@
 
       <section class="perfil-profile-section">
         <div class="perfil-avatar-wrapper">
-          <div class="perfil-avatar"
-               data-alt="Professional headshot of a smiling man named Juan Perez"
-               style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCWNdqHwtkDMyJ-GAgFvztWIwHq-6L1gYmO9SKgjT-uvZpQSRFEksEIWunusIjl6chIHrJmAe80zSz7OTZ8xpZUNcAZEa3p6RBdlQCGmrPWN6uXrSLE-02UZ2buVElTaZ6r3dP8eIUEr0CpAG65uGX2EGby_dVFqHQG3J1MwbtH9p94zgTRzyx5DCf9FhG6J4vWj4AArUJAHrivfBfbje6W9i2duMvQJbWGaUmOnuotX3j3VTs2o258h4Wvv3Nltpng5HSMuLj_ooo");'>
+          <div class="perfil-avatar" data-user-avatar>
+            <span class="material-symbols-outlined perfil-avatar__placeholder">account_circle</span>
           </div>
 
           <div class="perfil-avatar-edit" aria-label="Editar avatar (no implementado)">
@@ -61,8 +61,8 @@
         </div>
 
         <div class="perfil-user-info">
-          <h1 class="perfil-user-info__name">Juan Pérez</h1>
-          <p class="perfil-user-info__email">juan.perez@email.com</p>
+          <h1 class="perfil-user-info__name" data-user-full-name>Usuario</h1>
+          <p class="perfil-user-info__email" data-user-email>sin-email</p>
         </div>
       </section>
 
@@ -77,8 +77,8 @@
               <p class="perfil-stat-card__label">Nivel de Árbol</p>
             </div>
             <div class="perfil-stat-card__content">
-              <p class="perfil-stat-card__value">12</p>
-              <p class="perfil-stat-card__badge perfil-stat-card__badge--green">+2 este mes</p>
+              <p class="perfil-stat-card__value" data-user-level>1</p>
+              <p class="perfil-stat-card__badge perfil-stat-card__badge--green">Estado inicial</p>
             </div>
           </div>
 
@@ -90,8 +90,8 @@
               <p class="perfil-stat-card__label">Días de Racha</p>
             </div>
             <div class="perfil-stat-card__content">
-              <p class="perfil-stat-card__value">15</p>
-              <p class="perfil-stat-card__badge perfil-stat-card__badge--primary">¡Sigue así!</p>
+              <p class="perfil-stat-card__value" data-user-streak>0</p>
+              <p class="perfil-stat-card__badge perfil-stat-card__badge--primary">Empieza hoy</p>
             </div>
           </div>
 
@@ -103,8 +103,8 @@
               <p class="perfil-stat-card__label">Hábitos Totales</p>
             </div>
             <div class="perfil-stat-card__content">
-              <p class="perfil-stat-card__value">75</p>
-              <p class="perfil-stat-card__badge perfil-stat-card__badge--blue">Completados</p>
+              <p class="perfil-stat-card__value" data-user-points>0</p>
+              <p class="perfil-stat-card__badge perfil-stat-card__badge--blue">Puntos actuales</p>
             </div>
           </div>
 
@@ -158,6 +158,10 @@
 
   </div>
 
+  <script src="../js/api.js" defer></script>
+  <script src="../js/router.js" defer></script>
+  <script src="../js/session-user.js" defer></script>
   <script src="../js/app.js" defer></script>
+  <script src="../js/chatbot.js" defer></script>
 </body>
 </html>

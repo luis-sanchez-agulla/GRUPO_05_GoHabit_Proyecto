@@ -141,15 +141,29 @@ body.dark .perfil-header {
   background-repeat: no-repeat;
   aspect-ratio: 1 / 1;
   background-size: cover;
+  background-color: #eef2ea;
   border-radius: 9999px;
   min-height: 8rem;
   width: 8rem;
   border: 4px solid white;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 body.dark .perfil-avatar {
   border-color: #1e293b;
+  background-color: #334155;
+}
+
+.perfil-avatar__placeholder {
+  font-size: 4rem;
+  color: #7a8e6d;
+}
+
+body.dark .perfil-avatar__placeholder {
+  color: #cbd5e1;
 }
 
 .perfil-avatar-edit {
@@ -416,32 +430,32 @@ body.dark .perfil-progress-chart {
 
 .perfil-progress-chart__bar--inactive {
   background-color: rgba(34, 197, 94, 0.2);
-  height: 40%;
+  height: 12%;
 }
 
 .perfil-progress-chart__bar--inactive:nth-child(2) {
-  height: 60%;
+  height: 12%;
 }
 
 .perfil-progress-chart__bar--inactive:nth-child(3) {
-  height: 45%;
+  height: 12%;
 }
 
 .perfil-progress-chart__bar--active {
-  background-color: #22c55e;
-  height: 90%;
+  background-color: rgba(34, 197, 94, 0.2);
+  height: 12%;
 }
 
 .perfil-progress-chart__bar--inactive:nth-child(5) {
-  height: 55%;
+  height: 12%;
 }
 
 .perfil-progress-chart__bar--inactive:nth-child(6) {
-  height: 70%;
+  height: 12%;
 }
 
 .perfil-progress-chart__bar--inactive:nth-child(7) {
-  height: 80%;
+  height: 12%;
 }
 
 .perfil-progress-chart__labels {
