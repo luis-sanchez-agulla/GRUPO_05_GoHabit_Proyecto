@@ -91,8 +91,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.GoHabitAPI.setSession(response.data.token, response.data.user);
                 redirectAfterAuth({ forceOnboarding: true });
             } catch (err) {
-                const message = err?.message || "No se pudo crear la cuenta";
-                setFieldError("register-email", message);
+                const details = err?.details;
+                if (details && typeof details === "object") {
+                    const fieldMap = {
+                        firstName: "register-firstname",
+                        lastName: "register-lastname",
+                        email: "register-email",
+                        username: "register-username",
+                        password: "register-password",
+                    };
+                    let anyMapped = false;
+                    for (const [field, inputId] of Object.entries(fieldMap)) {
+                        if (details[field]?.length) {
+                            setFieldError(inputId, details[field][0]);
+                            anyMapped = true;
+                        }
+                    }
+                    if (!anyMapped) {
+                        setFieldError("register-email", err?.message || "No se pudo crear la cuenta");
+                    }
+                } else {
+                    setFieldError("register-email", err?.message || "No se pudo crear la cuenta");
+                }
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = "Crear cuenta";

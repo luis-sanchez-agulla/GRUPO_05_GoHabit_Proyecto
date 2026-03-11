@@ -65,7 +65,9 @@ const api = {
             const result = await response.json();
 
             if (!response.ok) {
-                throw new Error(result?.error?.message || result?.message || 'Something went wrong');
+                const err = new Error(result?.error?.message || result?.message || 'Something went wrong');
+                err.details = result?.error?.details || null;
+                throw err;
             }
 
             return result;
