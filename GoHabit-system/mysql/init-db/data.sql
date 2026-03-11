@@ -1,4 +1,5 @@
-USE GoHabit;
+CREATE DATABASE IF NOT EXISTS goto;
+USE goto;
 
 INSERT INTO Usuarios (id, nombre, apellidos, email, nacimiento, telefono, monedero, password) VALUES
 (1, 'Carlos',  'García López',    'carlos@gohabit.com',  '1995-03-12', '600111222', 150.00, '1234'),
