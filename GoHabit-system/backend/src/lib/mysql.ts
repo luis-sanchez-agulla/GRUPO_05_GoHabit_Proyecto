@@ -34,10 +34,12 @@ export const getConnection = () => pool.getConnection();
 
 /**
  * query — Utilidad para ejecutar consultas simples.
+ *
  */
 export const query = (sql: string, params?: any[]) => pool.query(sql, params);
 
 /**
- * execute — Utilidad para ejecutar sentencias preparadas.
+ * execute — Utilidad para sentencias preparadas (usa prepared statements).
+ *
  */
 export const execute = (sql: string, params?: any[]) => pool.execute(sql, params);

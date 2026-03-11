@@ -45,11 +45,15 @@ export const adminRepository = {
     },
 
     async updateReward(id: string, data: any): Promise<void> {
-        const keys = Object.keys(data);
-        if (keys.length === 0) return;
+        const ALLOWED_COLUMNS = new Set([
+            'name', 'description', 'cost', 'icon', 'isActive',
+        ]);
 
-        const setClause = keys.map(key => `${key} = ?`).join(', ');
-        const values = Object.values(data);
+        const allowed = Object.keys(data).filter(key => ALLOWED_COLUMNS.has(key));
+        if (allowed.length === 0) return;
+
+        const setClause = allowed.map(key => `${key} = ?`).join(', ');
+        const values    = allowed.map(key => data[key]);
 
         await execute(
             `UPDATE rewards SET ${setClause} WHERE id = ?`,

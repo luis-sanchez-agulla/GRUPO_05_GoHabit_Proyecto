@@ -24,11 +24,17 @@ export const taskRepository = {
     },
 
     async update(id: string, userId: string, data: any): Promise<void> {
-        const keys = Object.keys(data);
-        if (keys.length === 0) return;
 
-        const setClause = keys.map(key => `${key} = ?`).join(', ');
-        const values = Object.values(data);
+        const ALLOWED_COLUMNS = new Set([
+            'title', 'description', 'priority', 'status',
+            'dueDate', 'scheduledAt', 'completedAt',
+        ]);
+
+        const allowed = Object.keys(data).filter(key => ALLOWED_COLUMNS.has(key));
+        if (allowed.length === 0) return;
+
+        const setClause = allowed.map(key => `${key} = ?`).join(', ');
+        const values    = allowed.map(key => data[key]);
 
         await execute(
             `UPDATE tasks SET ${setClause} WHERE id = ? AND userId = ?`,
@@ -41,11 +47,17 @@ export const taskRepository = {
     },
 
     async updateWithConnection(id: string, data: any, connection: any): Promise<void> {
-        const keys = Object.keys(data);
-        if (keys.length === 0) return;
+        
+        const ALLOWED_COLUMNS = new Set([
+            'title', 'description', 'priority', 'status',
+            'dueDate', 'scheduledAt', 'completedAt',
+        ]);
 
-        const setClause = keys.map(key => `${key} = ?`).join(', ');
-        const values = Object.values(data);
+        const allowed = Object.keys(data).filter(key => ALLOWED_COLUMNS.has(key));
+        if (allowed.length === 0) return;
+
+        const setClause = allowed.map(key => `${key} = ?`).join(', ');
+        const values    = allowed.map(key => data[key]);
 
         await connection.execute(
             `UPDATE tasks SET ${setClause} WHERE id = ?`,

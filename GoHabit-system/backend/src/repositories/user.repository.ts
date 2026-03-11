@@ -60,19 +60,19 @@ export const userRepository = {
     },
 
     async update(userId: string, data: any): Promise<void> {
+
         const fieldMap: Record<string, string> = {
-            firstName: 'first_name',
-            lastName: 'last_name',
-            avatarUrl: 'avatar_url',
-            createdAt: 'created_at',
-            updatedAt: 'updated_at',
+            firstName:  'first_name',
+            lastName:   'last_name',
+            avatarUrl:  'avatar_url',
+            username:   'username',
         };
 
-        const keys = Object.keys(data).map((key) => fieldMap[key] || key);
-        if (keys.length === 0) return;
+        const allowed = Object.keys(data).filter((key) => key in fieldMap);
+        if (allowed.length === 0) return;
 
-        const setClause = keys.map(key => `${key} = ?`).join(', ');
-        const values = Object.values(data);
+        const setClause = allowed.map((key) => `${fieldMap[key]} = ?`).join(', ');
+        const values    = allowed.map((key) => data[key]);
 
         await execute(
             `UPDATE users SET ${setClause} WHERE id = ?`,
