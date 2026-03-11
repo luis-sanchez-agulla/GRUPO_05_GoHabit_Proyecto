@@ -151,13 +151,39 @@ body.dark .avatar-header__title {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  max-width: 28rem;
+  max-width: 42rem;
   margin: 0 auto;
-  background: linear-gradient(to bottom, #e0f2fe, rgba(114, 135, 100, 0.1));
-  border-radius: 0.75rem;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255,255,255,.75) 0%, rgba(255,255,255,.2) 35%, rgba(255,255,255,0) 68%),
+    linear-gradient(180deg, #dff4ff 0%, #e9f8ef 45%, #d1eecf 100%);
+  border-radius: 1rem;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(114, 135, 100, 0.2);
+  box-shadow: 0 16px 34px rgba(42, 77, 35, 0.14);
+  border: 1px solid rgba(114, 135, 100, 0.25);
+}
+
+.avatar-tree-display::before {
+  content: "";
+  position: absolute;
+  left: -12%;
+  right: -12%;
+  bottom: -34%;
+  height: 62%;
+  border-radius: 50% 50% 0 0;
+  background: linear-gradient(180deg, #76ba65 0%, #5a9a4e 100%);
+  z-index: 0;
+}
+
+.avatar-tree-display::after {
+  content: "";
+  position: absolute;
+  right: 9%;
+  top: 10%;
+  width: 94px;
+  height: 94px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 237, 143, .95) 0%, rgba(255, 237, 143, .45) 44%, rgba(255, 237, 143, 0) 74%);
+  z-index: 0;
 }
 
 .avatar-tree-container {
@@ -166,15 +192,30 @@ body.dark .avatar-header__title {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: .8rem;
+  z-index: 2;
+  isolation: isolate;
 }
 
 .avatar-tree-image {
-  width: 100%;
-  height: 100%;
+  width: 114%;
+  height: 114%;
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
+  transform-origin: center bottom;
+  filter: drop-shadow(0 24px 38px rgba(32, 64, 37, 0.28));
+}
+
+.avatar-tree-image.gh-avatar-live {
+  animation: ghAvatarFloat 3.4s ease-in-out infinite;
+  mix-blend-mode: multiply;
+  opacity: 0.98;
+}
+
+@keyframes ghAvatarFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.02); }
 }
 
 .avatar-tree-badge {
@@ -187,6 +228,7 @@ body.dark .avatar-header__title {
   border-radius: 9999px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(114, 135, 100, 0.2);
+  z-index: 3;
 }
 
 .avatar-tree-badge__text {

@@ -11,6 +11,8 @@ services:
       JWT_SECRET: "docker-secret-cambiar-en-produccion-min-16"
       JWT_EXPIRES_IN: "7d"
       NODE_ENV: "production"
+      GOOGLE_API_KEY: "AIzaSyD0znRlcT8cgcteeVoJHDQD0-lDNrD7UQA"
+      GEMINI_MODEL: "${GEMINI_MODEL:-gemini-1.5-flash}"
     depends_on:
       mysql:
         condition: service_healthy
