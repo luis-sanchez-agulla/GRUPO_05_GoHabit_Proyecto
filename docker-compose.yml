@@ -86,9 +86,13 @@ services:
       - mysql_data:/var/lib/mysql # persistencia (tablas/índices/datos)
       - ./GoHabit-system/mysql/conf.d:/etc/mysql/conf.d:ro # configuración extra (.cnf), solo lectura
 
-      # Añadido por Luis 
-      - ./GoHabit-system/mysql/init-db:/docker-entrypoint-initdb.d/01-init-db:ro
-      - ./GoHabit-system/mysql/init-scripts:/docker-entrypoint-initdb.d/02-init-scripts:ro # creacion de usuarios-roles-vistas-plugins
+      # Scripts de inicialización (deben ir como archivos en la raíz de /docker-entrypoint-initdb.d)
+      - ./GoHabit-system/mysql/init-db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./GoHabit-system/mysql/init-db/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
+      - ./GoHabit-system/mysql/init-db/queries.sql:/docker-entrypoint-initdb.d/03-queries.sql:ro
+      - ./GoHabit-system/mysql/init-scripts/init-plugins.sql:/docker-entrypoint-initdb.d/11-init-plugins.sql:ro
+      - ./GoHabit-system/mysql/init-scripts/init-users-roles.sql:/docker-entrypoint-initdb.d/12-init-users-roles.sql:ro
+      - ./GoHabit-system/mysql/init-scripts/init-views.sql:/docker-entrypoint-initdb.d/13-init-views.sql:ro
 
     healthcheck:
       # indica cuándo MySQL está "listo"
