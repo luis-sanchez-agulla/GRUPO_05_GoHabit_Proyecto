@@ -26,8 +26,10 @@ export const updateProfileSchema = z.object({
 });
 
 export const updateUserRoleSchema = z.object({
-    userId: z.string(),
-    role: z.enum(["USER", "ADMIN"]),
+    userId: z.string().min(1, "User ID requerido"),
+    role: z.enum(["USER", "ADMIN"], {
+        errorMap: () => ({ message: "El rol debe ser 'USER' o 'ADMIN'" }),
+    }),
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
