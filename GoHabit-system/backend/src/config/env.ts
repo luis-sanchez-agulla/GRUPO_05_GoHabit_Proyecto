@@ -39,6 +39,10 @@ const envSchema = z.object({
 
     // Puerto del servidor (z.coerce.number() convierte string "3000" → number 3000)
     PORT: z.coerce.number().default(3000),
+
+    // API key opcional para IA real (Gemini). Si no existe, se usa fallback heuristico.
+    GOOGLE_API_KEY: z.string().optional(),
+    GEMINI_MODEL: z.string().default("gemini-1.5-flash"),
 });
 
 /**

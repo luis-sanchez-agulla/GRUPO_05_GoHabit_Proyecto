@@ -13,8 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     { min: 3,  name: 'Arbolito',    img: '../assets/avatar/lv3.png' },
     { min: 5,  name: 'Roble Joven', img: '../assets/avatar/lv5.png' },
     { min: 8,  name: 'Roble Fuerte',img: '../assets/avatar/lv8.png' },
-    { min: 12, name: 'Roble Épico', img: '../assets/avatar/lv12.png' },
+    { min: 12, name: 'Roble Epico', img: '../assets/avatar/lv12.png' },
   ];
+
+  const FALLBACK_IMG = '../assets/logo.png';
 
   const level = GoHabit.getLevel();
 
@@ -24,12 +26,30 @@ document.addEventListener('DOMContentLoaded', () => {
     .sort((a,b) => a.min - b.min)
     .reduce((acc, s) => (level >= s.min ? s : acc), STAGES[0]);
 
-  // Apply image
-  document.querySelectorAll('[data-avatar-image]').forEach(el => {
-    // If your images are local and you open with file://, some browsers may block.
-    // Recomendación: usar Live Server (VSCode) para que carguen perfecto.
-    el.style.backgroundImage = `url("${stage.img}")`;
-  });
+  function preload(src){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(src);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  // Apply image with fallback so avatar is always visible.
+  Promise.resolve()
+    .then(() => preload(stage.img))
+    .then((src) => {
+      document.querySelectorAll('[data-avatar-image]').forEach(el => {
+        el.style.backgroundImage = `url("${src}")`;
+        el.classList.add('gh-avatar-live');
+      });
+    })
+    .catch(() => {
+      document.querySelectorAll('[data-avatar-image]').forEach(el => {
+        el.style.backgroundImage = `url("${FALLBACK_IMG}")`;
+        el.classList.add('gh-avatar-live');
+      });
+    });
 
   // Update labels (if present)
   const levelLabel = document.querySelector('[data-avatar-level]');

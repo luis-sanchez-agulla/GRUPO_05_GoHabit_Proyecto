@@ -22,6 +22,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
 
+  function isScheduledForDate(habit, date) {
+    const freq = Array.isArray(habit?.frecuencia) ? habit.frecuencia : [];
+    if (!freq.length) return true;
+    return freq.includes(date.getDay());
+  }
+
+  function hasMissedScheduledDay(habit, date, state) {
+    // Recovery window: last 14 days
+    for (let i = 1; i <= 14; i++) {
+      const d = new Date(date);
+      d.setDate(date.getDate() - i);
+      if (!isScheduledForDate(habit, d)) continue;
+      const key = dk(d);
+      const done = !!(state?.[key]?.[String(habit.id)]);
+      if (!done) return true;
+    }
+    return false;
+  }
+
+  function shouldShowForDate(habit, date, state) {
+    return isScheduledForDate(habit, date) || hasMissedScheduledDay(habit, date, state);
+  }
+
   /* ── DAY VIEW ─────────────────────────────────────────────────── */
   function renderDay(date) {
     const container = dayView.querySelector('.calendario-day-habits');
@@ -33,18 +56,25 @@ document.addEventListener('DOMContentLoaded', () => {
       date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })
     );
 
-    if (!habits.length) {
+    const dueHabits = habits.filter((h) => shouldShowForDate(h, date, state));
+
+    if (!dueHabits.length) {
       container.innerHTML = `
         <div class="calendario-empty-state">
           <span class="material-symbols-outlined">event_busy</span>
-          <p>No tienes hábitos todavía.</p>
-          <a href="anadirHabito.html" class="calendario-empty-link">Añadir hábito</a>
+          <p>Hoy no tienes habitos programados.</p>
+          <a href="anadirHabito.html" class="calendario-empty-link">Configurar habitos</a>
         </div>`;
       return;
     }
 
-    container.innerHTML = habits.map(h => {
+    container.innerHTML = dueHabits.map(h => {
       const done = !!(state?.[dateKey]?.[String(h.id)]);
+      const scheduledToday = isScheduledForDate(h, date);
+      const statusText = done
+        ? 'Completado'
+        : (scheduledToday ? 'Pendiente hoy' : 'Recuperacion pendiente');
+
       return `
         <div class="calendario-habit-card${done ? ' calendario-habit-card--done' : ''}">
           <div class="calendario-habit-card__icon-wrap">
@@ -54,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <h4 class="calendario-habit-card__title">${h.titulo}</h4>
             <div class="calendario-habit-card__status">
               <span class="material-symbols-outlined">${done ? 'check_circle' : 'radio_button_unchecked'}</span>
-              <span>${done ? 'Completado' : 'Pendiente'}</span>
+              <span>${statusText}</span>
             </div>
           </div>
         </div>`;
@@ -79,8 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const dateKey = dk(d);
       const isToday = dateKey === todayDk;
       const dayState = state?.[dateKey] || {};
+      const dueHabits = habits.filter((h) => isScheduledForDate(h, d));
 
-      const dots = habits.slice(0, 3).map(h => {
+      const dots = dueHabits.slice(0, 3).map(h => {
         const done = !!(dayState[String(h.id)]);
         return `<div class="calendario-habit-dot${done ? ' done' : ''}"></div>`;
       }).join('') || '<div class="calendario-habit-dot"></div>';
@@ -101,15 +132,18 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         summaryList.innerHTML = habits.map(h => {
           let count = 0;
+          let planned = 0;
           for (let i = 0; i < 7; i++) {
             const d = new Date(weekStart);
             d.setDate(weekStart.getDate() + i);
+            if (!isScheduledForDate(h, d)) continue;
+            planned++;
             if (state?.[dk(d)]?.[String(h.id)]) count++;
           }
           return `
             <div class="calendario-habit-item">
               <span class="calendario-habit-item__name">${h.titulo}</span>
-              <span class="calendario-habit-item__progress">${count}/7</span>
+              <span class="calendario-habit-item__progress">${count}/${planned || 0}</span>
             </div>`;
         }).join('');
       }
@@ -141,8 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const dateKey = dk(d);
       const isToday = dateKey === todayDk;
       const dayState = state?.[dateKey] || {};
-      const completed = Object.values(dayState).filter(Boolean).length;
-      const total     = habits.length;
+      const dueHabits = habits.filter((h) => isScheduledForDate(h, d));
+      const completed = dueHabits.filter((h) => !!dayState[String(h.id)]).length;
+      const total     = dueHabits.length;
 
       let indicator = '';
       if (total > 0) {

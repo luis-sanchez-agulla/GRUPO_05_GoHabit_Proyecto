@@ -27,14 +27,22 @@
     const days = [];
     const now = new Date();
 
+    function isScheduledForDate(habit, date) {
+      const freq = Array.isArray(habit?.frecuencia) ? habit.frecuencia : [];
+      if (!freq.length) return true;
+      return freq.includes(date.getDay());
+    }
+
     for (let i = 6; i >= 0; i--) {
       const d = new Date(now);
       d.setDate(now.getDate() - i);
       const key = window.GoHabit?.todayKey?.(d);
       const doneMap = habitsState?.[key] || {};
-      const doneCount = Object.values(doneMap).filter(Boolean).length;
-      const ratio = habits.length ? doneCount / habits.length : 0;
-      days.push({ key, date: d, doneCount, ratio });
+      const dueHabits = habits.filter((h) => isScheduledForDate(h, d));
+      const doneCount = dueHabits.filter((h) => !!doneMap[String(h.id)]).length;
+      const dueCount = dueHabits.length;
+      const ratio = dueCount ? doneCount / dueCount : 0;
+      days.push({ key, date: d, doneCount, dueCount, ratio });
     }
 
     return { habits, days };

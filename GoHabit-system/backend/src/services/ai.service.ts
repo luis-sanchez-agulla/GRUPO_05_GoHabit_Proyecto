@@ -18,6 +18,7 @@
 
 import { aiRepository } from "@/repositories/ai.repository";
 import { NotFoundError } from "@/lib/errors";
+import { env } from "@/config/env";
 
 type HabitSuggestion = {
     title: string;
@@ -78,43 +79,134 @@ const HABIT_LIBRARY: HabitTemplate[] = [
     },
 ];
 
+function heuristicRecommendations(message: string) {
+    const normalized = message.toLowerCase();
+    const scored = HABIT_LIBRARY.map((habit) => {
+        const score = habit.tags.reduce((acc, tag) => {
+            return normalized.includes(tag) ? acc + 1 : acc;
+        }, 0);
+        return { habit, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+
+    const top = scored
+        .filter((item) => item.score > 0)
+        .slice(0, 4)
+        .map((item) => ({
+            title: item.habit.title,
+            reason: item.habit.reason,
+            frequency: item.habit.frequency,
+        }));
+
+    if (top.length > 0) {
+        return {
+            provider: "heuristic",
+            input: message,
+            suggestions: top,
+        };
+    }
+
+    return {
+        provider: "heuristic",
+        input: message,
+        suggestions: HABIT_LIBRARY.slice(0, 4).map((habit) => ({
+            title: habit.title,
+            reason: habit.reason,
+            frequency: habit.frequency,
+        })),
+    };
+}
+
+async function geminiRecommendations(message: string) {
+    const key = env.GOOGLE_API_KEY;
+    if (!key) {
+        throw new Error("GOOGLE_API_KEY not configured");
+    }
+
+    const model = env.GEMINI_MODEL || "gemini-1.5-flash";
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
+        key,
+    )}`;
+
+    const prompt = [
+        "Eres un coach de habitos.",
+        "Devuelve exactamente un JSON valido, sin markdown, con esta forma:",
+        '{"suggestions":[{"title":"...","reason":"...","frequency":"..."}]}',
+        "Reglas:",
+        "- Entre 3 y 4 sugerencias.",
+        "- Español.",
+        "- title max 50 chars.",
+        "- reason max 120 chars.",
+        "- frequency max 30 chars.",
+        `Contexto del usuario: ${message}`,
+    ].join("\n");
+
+    const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 450,
+                responseMimeType: "application/json",
+            },
+        }),
+    });
+
+    if (!response.ok) {
+        const txt = await response.text();
+        throw new Error(`Gemini error ${response.status}: ${txt.slice(0, 200)}`);
+    }
+
+    const raw = await response.json();
+    const text = raw?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text || typeof text !== "string") {
+        throw new Error("Gemini returned empty content");
+    }
+
+    let parsed: any;
+    try {
+        parsed = JSON.parse(text);
+    } catch {
+        const match = text.match(/\{[\s\S]*\}/);
+        if (!match) throw new Error("Gemini JSON parse failed");
+        parsed = JSON.parse(match[0]);
+    }
+
+    const suggestions = Array.isArray(parsed?.suggestions)
+        ? parsed.suggestions
+              .slice(0, 4)
+              .map((s: any) => ({
+                  title: String(s?.title || "Habito recomendado").slice(0, 50),
+                  reason: String(s?.reason || "Te ayudara a mantener constancia.").slice(0, 120),
+                  frequency: String(s?.frequency || "Diario").slice(0, 30),
+              }))
+              .filter((s: HabitSuggestion) => s.title.trim().length > 0)
+        : [];
+
+    if (!suggestions.length) {
+        throw new Error("Gemini returned no suggestions");
+    }
+
+    return {
+        provider: "gemini",
+        input: message,
+        suggestions,
+    };
+}
+
 export const aiService = {
     async recommendHabits(_userId: string, message: string) {
-        const normalized = message.toLowerCase();
-        const scored = HABIT_LIBRARY.map((habit) => {
-            const score = habit.tags.reduce((acc, tag) => {
-                return normalized.includes(tag) ? acc + 1 : acc;
-            }, 0);
-            return { habit, score };
-        });
-
-        scored.sort((a, b) => b.score - a.score);
-
-        const top = scored
-            .filter((item) => item.score > 0)
-            .slice(0, 4)
-            .map((item) => ({
-                title: item.habit.title,
-                reason: item.habit.reason,
-                frequency: item.habit.frequency,
-            }));
-
-        if (top.length > 0) {
-            return {
-                input: message,
-                suggestions: top,
-            };
+        try {
+            return await geminiRecommendations(message);
+        } catch (err) {
+            console.warn("AI provider fallback to heuristic:", (err as Error)?.message || err);
+            return heuristicRecommendations(message);
         }
-
-        // Fallback si no hay coincidencias por palabras clave.
-        return {
-            input: message,
-            suggestions: HABIT_LIBRARY.slice(0, 4).map((habit) => ({
-                title: habit.title,
-                reason: habit.reason,
-                frequency: habit.frequency,
-            })),
-        };
     },
 
     /**
