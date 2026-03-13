@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   // seeds counter
-  GoHabit.bindSeeds('[data-seeds]');
+  const refreshSeeds = GoHabit.bindSeeds('[data-seeds]');
 
   const btn        = document.querySelector('[data-habit-toggle]');
   const titleEl    = document.querySelector('.index-task-card__title');
@@ -53,6 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
   btn.addEventListener('click', () => {
     const { done } = GoHabit.toggleHabit(habitId, { reward: firstHabit.reward || 10 });
     paint(done);
-    GoHabit.bindSeeds('[data-seeds]')();
+    refreshSeeds();
   });
 });

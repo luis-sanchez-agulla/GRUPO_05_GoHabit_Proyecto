@@ -8,8 +8,14 @@
 
   function getMergedUser(baseUser) {
     const localProgress = window.GoHabit?.getProgress?.() || { points: 0, coins: 0 };
-    const points = Math.max(Number(baseUser?.points || 0), Number(localProgress.points || 0));
-    const coins = Math.max(Number(baseUser?.coins || 0), Number(localProgress.coins || 0));
+    // Once local progress starts, prefer it so unchecking habits can reduce XP/coins.
+    const hasLocalProgress = localProgress?.startedAt != null;
+    const points = hasLocalProgress
+      ? Math.max(0, Number(localProgress.points || 0))
+      : Math.max(Number(baseUser?.points || 0), Number(localProgress.points || 0));
+    const coins = hasLocalProgress
+      ? Math.max(0, Number(localProgress.coins || 0))
+      : Math.max(Number(baseUser?.coins || 0), Number(localProgress.coins || 0));
     const levelFromPoints = 1 + Math.floor(points / 100);
     const level = Math.max(Number(baseUser?.level || 1), levelFromPoints);
 

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  GoHabit.bindSeeds('[data-seeds]');
+  const refreshSeeds = GoHabit.bindSeeds('[data-seeds]');
 
   const container = document.querySelector('.habitos-cards-container');
   if(!container) return;
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
       input.addEventListener('change', () => {
         const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
         GoHabit.toggleHabit(h.id, { reward });
-        GoHabit.bindSeeds('[data-seeds]')();
+        refreshSeeds();
       });
 
       container.appendChild(wrapper);

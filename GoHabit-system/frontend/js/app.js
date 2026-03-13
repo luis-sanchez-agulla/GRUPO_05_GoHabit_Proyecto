@@ -86,6 +86,50 @@
     setJSON(STORAGE.progress, safe);
     return safe;
   }
+
+  function levelFromPoints(points){
+    return 1 + Math.floor(Math.max(0, Number(points) || 0) / 100);
+  }
+
+  function syncProgressUI(){
+    const progress = getProgress();
+    const points = Math.max(0, Number(progress?.points || 0));
+    const level = levelFromPoints(points);
+    const xpTarget = 1000;
+    const xpPct = Math.max(0, Math.min(100, Math.round((points / xpTarget) * 100)));
+
+    document.querySelectorAll('[data-user-points]').forEach((el) => {
+      el.textContent = String(points);
+    });
+
+    document.querySelectorAll('[data-user-level]').forEach((el) => {
+      el.textContent = String(level);
+    });
+
+    const xpValue = document.querySelector('.habitos-xp-value');
+    if(xpValue) xpValue.textContent = `${points} / ${xpTarget} XP`;
+
+    const xpFill = document.querySelector('.habitos-xp-fill');
+    if(xpFill) xpFill.style.width = `${xpPct}%`;
+  }
+
+  function syncSessionUserProgress(points, coins){
+    try{
+      const raw = localStorage.getItem('gohabit_user');
+      if(!raw) return;
+      const user = JSON.parse(raw);
+      const merged = {
+        ...user,
+        points: Math.max(0, Number(points) || 0),
+        coins: Math.max(0, Number(coins) || 0),
+        level: levelFromPoints(points),
+      };
+      localStorage.setItem('gohabit_user', JSON.stringify(merged));
+    }catch{
+      // Ignore malformed cached user data.
+    }
+  }
+
   function toggleHabit(habitId, opts = {}){
     const {
       reward = 10,
@@ -109,7 +153,24 @@
       startedAt: progress.startedAt || (next ? Date.now() : null),
     });
 
-    toast(next ? toastGood : toastBad, next ? 'good' : 'bad');
+    syncSessionUserProgress(nextPoints, total);
+    syncProgressUI();
+
+    window.dispatchEvent(new CustomEvent('gohabit:progress-changed', {
+      detail: {
+        habitId: String(habitId),
+        done: next,
+        reward,
+        points: nextPoints,
+        coins: total,
+        level: levelFromPoints(nextPoints),
+        dateKey,
+      },
+    }));
+
+    const toastKind = next ? 'good' : 'bad';
+    toast(next ? toastGood : toastBad, toastKind, { icon: 'eco' });
+    toast(`${next ? '+' : '-'}${reward} XP`, toastKind, { icon: 'bolt' });
     if(typeof onChange === 'function') onChange(next, total);
     return {done: next, total};
   }
@@ -175,14 +236,37 @@
   }
 
   // Toast
-  function toast(message, kind = 'good'){
+  function getToastHost(){
+    let host = document.getElementById('gh-toast-host');
+    if(host) return host;
+
+    host = document.createElement('div');
+    host.id = 'gh-toast-host';
+    host.style.position = 'fixed';
+    host.style.top = '20px';
+    host.style.right = '20px';
+    host.style.display = 'flex';
+    host.style.flexDirection = 'column';
+    host.style.gap = '10px';
+    host.style.zIndex = '10000';
+    host.style.pointerEvents = 'none';
+    document.body.appendChild(host);
+    return host;
+  }
+
+  function toast(message, kind = 'good', opts = {}){
+    const { icon: iconName, duration = 2600 } = opts;
     const el = document.createElement('div');
     el.className = `gh-toast gh-toast--${kind === 'bad' ? 'bad' : 'good'}`;
     el.style.animation = 'ghSlideIn .18s ease-out';
+    el.style.position = 'relative';
+    el.style.top = '0';
+    el.style.right = '0';
+    el.style.pointerEvents = 'auto';
 
     const icon = document.createElement('span');
     icon.className = 'material-symbols-outlined';
-    icon.textContent = kind === 'bad' ? 'warning' : 'eco';
+    icon.textContent = iconName || (kind === 'bad' ? 'warning' : 'eco');
 
     const msg = document.createElement('div');
     msg.style.fontWeight = '700';
@@ -190,12 +274,12 @@
 
     el.appendChild(icon);
     el.appendChild(msg);
-    document.body.appendChild(el);
+    getToastHost().appendChild(el);
 
     window.setTimeout(() => {
       el.style.animation = 'ghSlideOut .18s ease-in';
       window.setTimeout(() => el.remove(), 200);
-    }, 2600);
+    }, duration);
   }
 
   // Theme
@@ -278,6 +362,7 @@
     getLevel, setLevel,
     // progress
     getProgress, setProgress,
+    syncProgressUI,
     // theme
     theme: { initTheme, toggleTheme, applyTheme },
     // binders
@@ -290,5 +375,6 @@
     initTheme();
     wireThemeButtons();
     initNav();
+    syncProgressUI();
   });
 })();
