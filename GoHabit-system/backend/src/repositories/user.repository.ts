@@ -52,9 +52,11 @@ export const userRepository = {
 
     async create(data: any): Promise<string> {
         const userId = randomUUID();
+        const firstName = data.firstName ?? null;
+        const lastName = data.lastName ?? null;
         await execute(
             'INSERT INTO users (id, email, username, password, first_name, last_name, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(3))',
-            [userId, data.email, data.username, data.password, data.firstName, data.lastName]
+            [userId, data.email, data.username, data.password, firstName, lastName]
         );
         return userId;
     },
