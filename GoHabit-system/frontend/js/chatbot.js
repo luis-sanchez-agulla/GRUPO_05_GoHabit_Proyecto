@@ -1,20 +1,5 @@
 /* chatbot.js – floating AI assistant bubble for GoHabit */
 (function () {
-  const MOTIVATIONAL = [
-    '¡Cada pequeño paso cuenta! Sigue adelante 💪',
-    'Los grandes hábitos empiezan con un solo día. ¡Tú puedes!',
-    'La constancia es la clave del éxito. ¡Vas genial!',
-    '¡Recuerda por qué empezaste! Hoy es un buen día para crecer 🌱',
-    'El progreso, por pequeño que sea, siempre vale la pena 🏆',
-    '¡Cada hábito completado te acerca más a tu mejor versión!',
-    'No pares. Lo que haces hoy construye quien serás mañana 🚀',
-    'Confía en el proceso. ¡Estás haciendo un trabajo increíble!',
-  ];
-
-  function randomMotivation() {
-    return MOTIVATIONAL[Math.floor(Math.random() * MOTIVATIONAL.length)];
-  }
-
   function createChatbot() {
     if (document.getElementById('gh-chatbot-bubble')) return;
 
@@ -51,7 +36,7 @@
         <span class="material-symbols-outlined">smart_toy</span>
         <div>
           <p class="gh-chatbot-panel__title">Asistente GoHabit</p>
-          <p class="gh-chatbot-panel__subtitle">IA de hábitos</p>
+          <p class="gh-chatbot-panel__subtitle">Recomendaciones de hábitos con IA</p>
         </div>
         <button class="gh-chatbot-close" id="gh-chatbot-close" aria-label="Cerrar">
           <span class="material-symbols-outlined">close</span>
@@ -60,16 +45,15 @@
 
       <div class="gh-chatbot-messages" id="gh-chatbot-messages">
         <div class="gh-chatbot-msg gh-chatbot-msg--bot">
-          <p class="gh-chatbot-msg__text">Hola. Soy tu asistente de habitos. Cuentame tus rutinas, retos o metas y te sugerire habitos personalizados.</p>
+          <p class="gh-chatbot-msg__text">Hola. Soy tu asistente de hábitos. Cuéntame tus rutinas, retos o metas y te sugeriré hábitos personalizados usando IA.</p>
         </div>
-        <div class="gh-chatbot-msg gh-chatbot-msg--motivation" id="gh-chatbot-motivation"></div>
       </div>
 
       <form class="gh-chatbot-form" id="gh-chatbot-form">
         <textarea
           id="gh-chatbot-input"
           class="gh-chatbot-input"
-          placeholder="Ej: Quiero dormir mejor y reducir el estres"
+          placeholder="Ej: Quiero dormir mejor y reducir el estrés"
           rows="2"
           maxlength="500"
         ></textarea>
@@ -89,12 +73,6 @@
       open = !open;
       panel.classList.toggle('gh-chatbot-panel--hidden', !open);
       if (open) {
-        // Show motivational message
-        const motEl = document.getElementById('gh-chatbot-motivation');
-        if (motEl) {
-          motEl.textContent = randomMotivation();
-          motEl.style.display = 'block';
-        }
         document.getElementById('gh-chatbot-input')?.focus();
       }
     }
@@ -168,7 +146,7 @@
 
       const typingEl = document.createElement('div');
       typingEl.className = 'gh-chatbot-msg gh-chatbot-msg--bot gh-chatbot-typing';
-      typingEl.innerHTML = '<p class="gh-chatbot-msg__text">Pensando<span class="gh-chatbot-dots">...</span></p>';
+      typingEl.innerHTML = '<p class="gh-chatbot-msg__text">Analizando con IA<span class="gh-chatbot-dots">...</span></p>';
       const box = document.getElementById('gh-chatbot-messages');
       box.appendChild(typingEl);
       box.scrollTop = box.scrollHeight;
@@ -176,19 +154,21 @@
       try {
         const response = await window.GoHabitAPI.post('/ai/recommend', { message });
         const suggestions = response?.data?.suggestions || [];
+        const provider = response?.data?.provider || 'unknown';
 
         typingEl.remove();
 
         if (!suggestions.length) {
           appendMsg('No pude generar sugerencias ahora mismo. Intenta describir más detalladamente tus metas.', 'bot');
         } else {
-          appendMsg(`Aqui tienes ${suggestions.length} habito(s) que podrian ayudarte:`, 'bot');
+          const providerLabel = provider === 'gemini' ? '(Gemini AI)' : '(Contexto local)';
+          appendMsg(`He analizado tu entrada y tengo ${suggestions.length} hábito(s) personalizados para ti ${providerLabel}:`, 'bot');
           suggestions.forEach(s => appendSuggestion(s));
-          appendMsg(randomMotivation(), 'bot');
         }
       } catch (err) {
         typingEl.remove();
         appendMsg('Hubo un error al conectar con el asistente. Comprueba tu conexión e inténtalo de nuevo.', 'bot');
+        console.error('Chatbot error:', err);
       } finally {
         sendBtn.disabled = false;
         input.focus();

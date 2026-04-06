@@ -59,5 +59,45 @@ export const aiRepository = {
         );
 
         return completionTimes || [];
+    },
+
+    async saveConversation(userId: string, userMessage: string, aiResponse: any): Promise<void> {
+        const responseStr = typeof aiResponse === 'string' ? aiResponse : JSON.stringify(aiResponse);
+        const provider = aiResponse?.provider || 'heuristic';
+        const contextUsed = aiResponse?.contextUsed ? 1 : 0;
+        const suggestionsCount = aiResponse?.suggestions?.length || 0;
+
+        await query(
+            `INSERT INTO ai_conversations (userId, userMessage, aiResponse, provider, contextUsed, suggestionsCount)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [userId, userMessage, responseStr, provider, contextUsed, suggestionsCount]
+        );
+    },
+
+    async getRecentConversations(userId: string, limit: number = 5): Promise<any[]> {
+        const [conversations]: any = await query(
+            `SELECT userMessage, aiResponse, provider, createdAt
+             FROM ai_conversations
+             WHERE userId = ?
+             ORDER BY createdAt DESC
+             LIMIT ?`,
+            [userId, limit]
+        );
+        return conversations?.reverse() || []; // Return in chronological order
+    },
+
+    async getUserConversationStats(userId: string): Promise<any> {
+        const [stats]: any = await query(
+            `SELECT 
+                COUNT(*) as totalConversations,
+                SUM(CASE WHEN provider = 'gemini' THEN 1 ELSE 0 END) as geminiConversations,
+                SUM(CASE WHEN contextUsed = 1 THEN 1 ELSE 0 END) as contextAwareConversations,
+                AVG(suggestionsCount) as avgSuggestionsPerConversation,
+                MAX(createdAt) as lastConversation
+             FROM ai_conversations
+             WHERE userId = ?`,
+            [userId]
+        );
+        return stats?.[0] || {};
     }
 };
