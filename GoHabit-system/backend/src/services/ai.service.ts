@@ -19,6 +19,11 @@ type HabitSuggestion = {
     title: string;
     reason: string;
     frequency: string;
+    recommendedDays?: string[];
+    scheduleHint?: string;
+    icon?: string;
+    category?: string;
+    xpReward?: number;
 };
 
 type TaskReorganization = {
@@ -37,6 +42,8 @@ type HabitTheme = {
     frequency: string;
     keywords: string[];
 };
+
+const WEEKDAY_LABELS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"] as const;
 
 function normalizeText(text: string) {
     return text
@@ -248,6 +255,7 @@ function buildIntentHabitSuggestion(message: string): HabitSuggestion | null {
         title: toTitleCase(titleBase).slice(0, 80),
         reason: "Transforma tu objetivo en una accion concreta y facil de medir para sostener la constancia.",
         frequency,
+        recommendedDays: [],
     };
 }
 
@@ -277,6 +285,152 @@ function mergeUniqueSuggestions(suggestions: HabitSuggestion[]) {
         seen.add(key);
         return true;
     });
+}
+
+function canonicalWeekday(day: string) {
+    const normalized = sanitizeText(day);
+    const map: Record<string, string> = {
+        lunes: "Lunes",
+        martes: "Martes",
+        miercoles: "Miércoles",
+        jueves: "Jueves",
+        viernes: "Viernes",
+        sabado: "Sábado",
+        domingo: "Domingo",
+    };
+
+    return map[normalized] || null;
+}
+
+function uniqueWeekdays(days: string[]) {
+    const seen = new Set<string>();
+    return days
+        .map((day) => canonicalWeekday(day) || day.trim())
+        .filter((day) => {
+            const key = sanitizeText(day);
+            if (!key || seen.has(key)) {
+                return false;
+            }
+            seen.add(key);
+            return true;
+        });
+}
+
+function buildRecommendedSchedule(frequency: string, title = "") {
+    const normalized = sanitizeText(`${frequency} ${title}`);
+
+    if (/\b(diario|cada dia|todos los dias)\b/.test(normalized)) {
+        return {
+            recommendedDays: [...WEEKDAY_LABELS],
+            scheduleHint: "Todos los días",
+        };
+    }
+
+    const countMatch = normalized.match(/(\d{1,2})\s*(?:veces?|dias?)/);
+    if (countMatch) {
+        const count = Number(countMatch[1]);
+        if (count <= 0) {
+            return { recommendedDays: ["Lunes", "Miércoles", "Viernes"], scheduleHint: "Repartido durante la semana" };
+        }
+
+        if (count >= 7) {
+            return {
+                recommendedDays: [...WEEKDAY_LABELS],
+                scheduleHint: `${count} veces por semana`,
+            };
+        }
+
+        const map: Record<number, string[]> = {
+            1: ["Lunes"],
+            2: ["Martes", "Jueves"],
+            3: ["Lunes", "Miércoles", "Viernes"],
+            4: ["Lunes", "Martes", "Jueves", "Sábado"],
+            5: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"],
+            6: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+        };
+
+        return {
+            recommendedDays: map[count] || [...WEEKDAY_LABELS],
+            scheduleHint: `${count} veces por semana`,
+        };
+    }
+
+    if (/\b(semanal|cada semana)\b/.test(normalized)) {
+        return {
+            recommendedDays: ["Lunes"],
+            scheduleHint: "Una vez por semana",
+        };
+    }
+
+    if (/\b(mensual|cada mes)\b/.test(normalized)) {
+        return {
+            recommendedDays: ["Primer lunes del mes"],
+            scheduleHint: "Una vez al mes",
+        };
+    }
+
+    if (/\b(gym|gimnasio|entrenar|pesas|fitness)\b/.test(normalized)) {
+        return {
+            recommendedDays: ["Lunes", "Miércoles", "Viernes"],
+            scheduleHint: "3 días repartidos",
+        };
+    }
+
+    if (/\b(estudiar|estudio|leer|lectura|sueno|dormir)\b/.test(normalized)) {
+        return {
+            recommendedDays: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"],
+            scheduleHint: "De lunes a viernes",
+        };
+    }
+
+    return {
+        recommendedDays: ["Lunes", "Miércoles", "Viernes"],
+        scheduleHint: "Repartido durante la semana",
+    };
+}
+
+function suggestXpReward(suggestion: HabitSuggestion) {
+    const normalized = sanitizeText(`${suggestion.title} ${suggestion.frequency}`);
+    const days = suggestion.recommendedDays?.length || 0;
+
+    let base = 10;
+
+    if (days >= 6 || /diario|todos los dias/.test(normalized)) {
+        base = 18;
+    } else if (days >= 4) {
+        base = 14;
+    } else if (days >= 2) {
+        base = 12;
+    }
+
+    if (/gimnasio|entrenar|pesas|deporte|correr/.test(normalized)) {
+        base += 6;
+    }
+
+    if (/estudiar|lectura|leer|enfoque|meditar/.test(normalized)) {
+        base += 3;
+    }
+
+    if (/antes de cada sesion|al terminar/.test(normalized)) {
+        base -= 2;
+    }
+
+    return Math.max(8, Math.min(35, base));
+}
+
+function decorateSuggestion(suggestion: HabitSuggestion): HabitSuggestion {
+    const schedule = buildRecommendedSchedule(suggestion.frequency, suggestion.title);
+    const recommendedDays = uniqueWeekdays(suggestion.recommendedDays?.length ? suggestion.recommendedDays : schedule.recommendedDays);
+
+    return {
+        ...suggestion,
+        frequency: suggestion.frequency || schedule.scheduleHint,
+        recommendedDays,
+        scheduleHint: suggestion.scheduleHint || schedule.scheduleHint,
+        icon: suggestion.icon || "task_alt",
+        category: suggestion.category || "salud",
+        xpReward: Number(suggestion.xpReward || 0) > 0 ? Number(suggestion.xpReward) : suggestXpReward(suggestion),
+    };
 }
 
 const HABIT_THEMES: HabitTheme[] = [
@@ -353,11 +507,11 @@ function buildContextualRecommendations(message: string) {
             intentSuggestion,
             ...matched,
             ...buildSupportSuggestions(intentSuggestion),
-        ]).slice(0, 4);
+        ]).slice(0, 4).map(decorateSuggestion);
     }
 
     if (matched.length > 0) {
-        return matched;
+        return matched.map(decorateSuggestion);
     }
 
     return [
@@ -376,7 +530,7 @@ function buildContextualRecommendations(message: string) {
             reason: "Ver tu progreso facilita mantener constancia y detectar que te esta frenando.",
             frequency: "Diario",
         },
-    ];
+    ].map(decorateSuggestion);
 }
 
 /**
@@ -399,7 +553,7 @@ async function geminiRecommendations(userId: string, message: string) {
         const userContext = await aiRepository.getUserHabitPatterns(userId);
         const currentHabits = userContext.habits?.map((h: any) => `- ${h.title} (${h.frequency})`).join("\n") || "None";
         
-        const model = env.GEMINI_MODEL || "gemini-1.5-flash";
+        const model = env.GEMINI_MODEL || "gemini-2.0-flash";
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
 
         const systemContext = [
@@ -422,9 +576,12 @@ async function geminiRecommendations(userId: string, message: string) {
             "4. Vary suggestions - don't repeat the same habits if they already exist",
             "5. Consider time constraints - balance shorter and longer habits",
             "6. If the message is short or informal, infer intent from the strongest keywords and context",
+            "7. Include recommendedDays as an array of Spanish weekday names when possible",
+            "8. Add scheduleHint when the habit should be done on a cadence instead of fixed weekdays",
+            "9. Add xpReward integer between 8 and 35 based on effort and weekly consistency",
             "",
             "JSON Response Format (EXACTLY this structure):",
-            `{"suggestions":[{"title":"Specific habit name","reason":"Personal reason based on user context and goals","frequency":"Recommended frequency"}]}`,
+            `{"suggestions":[{"title":"Specific habit name","reason":"Personal reason based on user context and goals","frequency":"Recommended frequency","recommendedDays":["Lunes","Miércoles","Viernes"],"scheduleHint":"Optional short note","xpReward":14}]}`,
         ].join("\n");
 
         const response = await fetch(endpoint, {
@@ -463,10 +620,15 @@ async function geminiRecommendations(userId: string, message: string) {
         const suggestions = Array.isArray(parsed?.suggestions)
             ? parsed.suggestions
                   .slice(0, 4)
-                  .map((s: any) => ({
+                  .map((s: any) => decorateSuggestion({
                       title: String(s?.title || "Recommended Habit").slice(0, 80),
                       reason: String(s?.reason || "Will help you progress towards your goals.").slice(0, 180),
                       frequency: String(s?.frequency || "Daily").slice(0, 40),
+                      recommendedDays: Array.isArray(s?.recommendedDays) ? s.recommendedDays.map(String) : [],
+                      scheduleHint: typeof s?.scheduleHint === "string" ? s.scheduleHint.slice(0, 80) : undefined,
+                      icon: typeof s?.icon === "string" ? s.icon.slice(0, 50) : undefined,
+                      category: typeof s?.category === "string" ? s.category.slice(0, 50) : undefined,
+                      xpReward: Number(s?.xpReward || 0),
                   }))
                   .filter((s: HabitSuggestion) => s.title.trim().length > 0)
             : [];
@@ -527,7 +689,7 @@ async function geminiTaskReorganization(userId: string, tasks: any[], userContex
 
     const productivityHours = userContext?.productivityTimes?.map((p: any) => p.hour).slice(0, 3).join(", ") || "Not analyzed yet";
 
-    const model = env.GEMINI_MODEL || "gemini-1.5-flash";
+    const model = env.GEMINI_MODEL || "gemini-2.0-flash";
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
 
     const prompt = [

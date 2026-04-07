@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const titulo = document.getElementById('nombreHabito')?.value?.trim();
@@ -68,18 +68,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const map = iconForCategory(state.categoria);
 
-    GoHabit.addHabit({
+    let aiReward = 10;
+    try {
+      if (window.GoHabitAPI?.post) {
+        const aiMessage = `Quiero crear este hábito: ${titulo}. Categoría: ${state.categoria}. Meta: ${metaValor} ${metaUnidad}. Frecuencia semanal: ${state.frecuencia.length} días.`;
+        const aiResponse = await window.GoHabitAPI.post('/ai/recommend', { message: aiMessage });
+        const firstSuggestion = aiResponse?.data?.suggestions?.[0];
+        const maybeReward = Number(firstSuggestion?.xpReward || 0);
+        if (Number.isFinite(maybeReward) && maybeReward > 0) {
+          aiReward = maybeReward;
+        }
+      }
+    } catch {
+      // Fallback local si IA no está disponible.
+      aiReward = Math.max(8, Math.min(20, 8 + Math.ceil(state.frecuencia.length * 1.5)));
+    }
+
+    const created = GoHabit.addHabit({
       titulo: `${titulo} (${metaTxt})`,
       categoria: state.categoria,
       etiqueta: map.etiqueta || metaLabel,
       icono: map.icono,
       color: map.color,
-      reward: 10,
+      reward: aiReward,
       frecuencia: state.frecuencia.slice(),
       metaValor,
       metaUnidad,
       recordatorio,
     });
+
+    if(!created || created.error){
+      GoHabit.toast(created?.message || `Máximo ${GoHabit.getHabitLimitPerDay()} hábitos por día.`, 'bad');
+      return;
+    }
 
     GoHabit.toast('Hábito guardado ✅', 'good');
     window.location.href = 'habitos.html';

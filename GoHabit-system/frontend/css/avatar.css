@@ -360,6 +360,139 @@ body.dark .avatar-stat-card__value--streak {
   border-radius: 9999px;
 }
 
+/* ================================================
+   COSMETICS OVERLAY + INVENTORY
+   ================================================ */
+
+.avatar-cosmetic {
+  position: absolute;
+  z-index: 4;
+  text-shadow: 0 6px 12px rgba(0, 0, 0, 0.22);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.avatar-cosmetic--common {
+  color: #475569;
+}
+
+.avatar-cosmetic--rare {
+  color: #4f46e5;
+}
+
+.avatar-cosmetic--epic {
+  color: #d97706;
+}
+
+.avatar-cosmetic--head {
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.3rem;
+}
+
+.avatar-cosmetic--face {
+  top: 42%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+}
+
+.avatar-cosmetic--aura {
+  top: 16%;
+  right: 18%;
+  font-size: 2.1rem;
+}
+
+.avatar-cosmetic--companion {
+  bottom: 20%;
+  left: 22%;
+  font-size: 2rem;
+}
+
+.avatar-inventory {
+  margin: 1rem;
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(114, 135, 100, 0.2);
+  padding: 1rem;
+}
+
+body.dark .avatar-inventory {
+  background: rgba(17, 24, 39, 0.82);
+}
+
+.avatar-inventory__title {
+  margin: 0 0 0.85rem;
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+body.dark .avatar-inventory__title {
+  color: #e2e8f0;
+}
+
+.avatar-inventory__list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.avatar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 0.55rem;
+  background: rgba(248, 250, 252, 0.8);
+}
+
+.avatar-item--rare {
+  border-color: rgba(79, 70, 229, 0.45);
+}
+
+.avatar-item--epic {
+  border-color: rgba(217, 119, 6, 0.45);
+}
+
+.avatar-item__icon {
+  font-size: 1.3rem;
+  color: var(--primary-dark);
+}
+
+.avatar-item__meta {
+  flex: 1;
+}
+
+.avatar-item__name {
+  margin: 0;
+  font-weight: 600;
+}
+
+.avatar-item__rarity {
+  margin: 0.15rem 0 0;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.avatar-item__btn {
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+}
+
+.avatar-item__btn:hover {
+  background: var(--primary-dark);
+}
+
+.avatar-inventory__empty {
+  margin: 0;
+  color: #64748b;
+}
+
 .avatar-stat-card__subtitle {
   color: #94a3b8;
   font-size: 0.75rem;

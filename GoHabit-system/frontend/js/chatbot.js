@@ -1,5 +1,42 @@
 /* chatbot.js – floating AI assistant bubble for GoHabit */
 (function () {
+  const WEEKDAY_TO_INDEX = {
+    domingo: 0,
+    lunes: 1,
+    martes: 2,
+    miercoles: 3,
+    miércoles: 3,
+    jueves: 4,
+    viernes: 5,
+    sabado: 6,
+    sábado: 6,
+  };
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, (ch) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[ch]));
+  }
+
+  function normalizeDays(days) {
+    return Array.from(new Set((Array.isArray(days) ? days : [])
+      .map((day) => String(day || '').trim())
+      .filter(Boolean)));
+  }
+
+  function daysToFrequency(days) {
+    return normalizeDays(days)
+      .map((day) => {
+        const key = day.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        return WEEKDAY_TO_INDEX[key];
+      })
+      .filter((value) => typeof value === 'number');
+  }
+
   function createChatbot() {
     if (document.getElementById('gh-chatbot-bubble')) return;
 
@@ -86,7 +123,7 @@
       if (!box) return;
       const div = document.createElement('div');
       div.className = `gh-chatbot-msg gh-chatbot-msg--${role}`;
-      div.innerHTML = `<p class="gh-chatbot-msg__text">${text}</p>`;
+      div.innerHTML = `<p class="gh-chatbot-msg__text">${escapeHtml(text)}</p>`;
       box.appendChild(div);
       box.scrollTop = box.scrollHeight;
     }
@@ -98,31 +135,45 @@
       const title     = suggestion?.title || 'Hábito sugerido';
       const reason    = suggestion?.reason || '';
       const frequency = suggestion?.frequency || '';
+      const recommendedDays = normalizeDays(suggestion?.recommendedDays);
+      const scheduleHint = suggestion?.scheduleHint || frequency;
       const icono     = suggestion?.icon || suggestion?.icono || 'task_alt';
       const categoria = suggestion?.category || suggestion?.categoria || 'salud';
+      const daysLabel = recommendedDays.length ? recommendedDays.join(', ') : scheduleHint;
 
       const div = document.createElement('div');
       div.className = 'gh-chatbot-suggestion';
       div.innerHTML = `
         <div class="gh-chatbot-suggestion__header">
-          <span class="material-symbols-outlined">${icono}</span>
-          <strong>${title}</strong>
+          <span class="material-symbols-outlined">${escapeHtml(icono)}</span>
+          <strong>${escapeHtml(title)}</strong>
         </div>
-        ${reason    ? `<p class="gh-chatbot-suggestion__reason">${reason}</p>` : ''}
-        ${frequency ? `<p class="gh-chatbot-suggestion__freq"><strong>Frecuencia:</strong> ${frequency}</p>` : ''}
-        <button class="gh-chatbot-suggestion__add" data-title="${title}" data-icon="${icono}" data-cat="${categoria}">
+        ${reason    ? `<p class="gh-chatbot-suggestion__reason">${escapeHtml(reason)}</p>` : ''}
+        ${frequency ? `<p class="gh-chatbot-suggestion__freq"><strong>Frecuencia:</strong> ${escapeHtml(frequency)}</p>` : ''}
+        <p class="gh-chatbot-suggestion__freq"><strong>Días recomendados:</strong> ${escapeHtml(daysLabel)}</p>
+        <p class="gh-chatbot-suggestion__freq"><strong>XP sugerida:</strong> ${escapeHtml(String(suggestion?.xpReward || 10))}</p>
+        <button class="gh-chatbot-suggestion__add" data-title="${escapeHtml(title)}" data-icon="${escapeHtml(icono)}" data-cat="${escapeHtml(categoria)}" data-days="${escapeHtml(recommendedDays.join('|'))}" data-xp="${escapeHtml(String(suggestion?.xpReward || 10))}">
           <span class="material-symbols-outlined">add_circle</span> Añadir hábito
         </button>
       `;
 
       div.querySelector('.gh-chatbot-suggestion__add').addEventListener('click', function () {
         const btn = this;
-        GoHabit.addHabit({
+        const days = (btn.dataset.days || '').split('|').filter(Boolean);
+        const created = GoHabit.addHabit({
           titulo:    btn.dataset.title,
           icono:     btn.dataset.icon,
           categoria: btn.dataset.cat,
           etiqueta:  btn.dataset.cat,
+          reward: Number(btn.dataset.xp || 10),
+          frecuencia: daysToFrequency(days).length ? daysToFrequency(days) : [1,2,3,4,5],
         });
+
+        if(!created || created.error){
+          appendMsg(created?.message || `Máximo ${GoHabit.getHabitLimitPerDay()} hábitos por día.`, 'bot');
+          return;
+        }
+
         btn.textContent = 'Anadido';
         btn.disabled = true;
         btn.style.background = '#728764';

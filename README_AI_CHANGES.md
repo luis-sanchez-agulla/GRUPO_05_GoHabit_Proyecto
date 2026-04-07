@@ -162,7 +162,7 @@ POST /api/ai/reorganize
 ### Verificar `.env`:
 ```env
 GOOGLE_API_KEY=sk-proj-xxxxxxxxxxxxx  # ✅ Ya debe estar
-GEMINI_MODEL=gemini-1.5-flash         # (opcional)
+GEMINI_MODEL=gemini-2.0-flash         # (opcional)
 DATABASE_URL=mysql://...              # ✅ Ya debe estar
 ```
 

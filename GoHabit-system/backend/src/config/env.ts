@@ -42,7 +42,7 @@ const envSchema = z.object({
 
     // API key opcional para IA real (Gemini). Si no existe, se usa fallback heuristico.
     GOOGLE_API_KEY: z.string().optional(),
-    GEMINI_MODEL: z.string().default("gemini-1.5-flash"),
+    GEMINI_MODEL: z.string().default("gemini-2.0-flash"),
 });
 
 /**

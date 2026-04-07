@@ -9,11 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const iconWrap   = document.querySelector('.index-task-card__icon .material-symbols-outlined');
   if (!btn || !titleEl || !progressEl) return;
 
-  const habits    = GoHabit.ensureDefaultHabits();
+  const habits    = GoHabit.getDueHabitsForDate(new Date());
   const firstHabit = habits[0];
 
   if (!firstHabit) {
-    titleEl.textContent    = 'Sin hábitos todavía';
+    titleEl.textContent    = 'Sin hábitos para hoy';
     progressEl.textContent = '0 / 0';
     btn.disabled           = true;
     btn.style.opacity      = '0.5';

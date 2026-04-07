@@ -237,7 +237,7 @@ Esperado:
 ## 📝 Notas de Desarrollo
 
 - **API Key:**  Debe estar en `.env` como `GOOGLE_API_KEY`
-- **Modelo:** Usa `gemini-1.5-flash` por defecto (configurable)
+- **Modelo:** Usa `gemini-2.0-flash` por defecto (configurable)
 - **Validación:** Los schemas Zod siguen siendo válidos
 - **Errores:** Se manejan gracefully con fallback
 - **Logs:** Incluyen debug info con `[AI]` prefix

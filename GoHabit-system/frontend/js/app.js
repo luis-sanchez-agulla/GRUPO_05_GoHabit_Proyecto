@@ -6,6 +6,8 @@
     habits: 'habitosCompletados',
     habitsList: 'habitosLista',
     progress: 'progresoUsuario',
+    cosmeticsInventory: 'inventarioCosmeticos',
+    cosmeticsEquipped: 'cosmeticosEquipados',
     theme: 'gohabitTheme',
     level: 'nivelArbol',
   };
@@ -44,15 +46,29 @@
     localStorage.setItem(storageKey(key), JSON.stringify(value));
   }
 
+  function updateProgressCoinsOnSeedChange(coins){
+    const current = getProgress();
+    setProgress({
+      ...current,
+      coins: Math.max(0, Number(coins) || 0),
+      startedAt: current.startedAt || Date.now(),
+    });
+  }
+
   // Seeds
   function getSeeds(){
     const v = localStorage.getItem(storageKey(STORAGE.seeds));
     const n = v ? parseInt(v, 10) : 0;
     return Number.isFinite(n) ? n : 0;
   }
-  function setSeeds(n){ localStorage.setItem(storageKey(STORAGE.seeds), String(Math.max(0, n|0))); }
-  function addSeeds(delta){ const n = getSeeds() + (delta|0); setSeeds(n); return getSeeds(); }
-  function subSeeds(delta){ const n = Math.max(0, getSeeds() - (delta|0)); setSeeds(n); return getSeeds(); }
+  function setSeeds(n){
+    const safe = Math.max(0, n|0);
+    localStorage.setItem(storageKey(STORAGE.seeds), String(safe));
+    updateProgressCoinsOnSeedChange(safe);
+    return safe;
+  }
+  function addSeeds(delta){ const n = getSeeds() + (delta|0); return setSeeds(n); }
+  function subSeeds(delta){ const n = Math.max(0, getSeeds() - (delta|0)); return setSeeds(n); }
 
   // Habits state (per day)
   function getHabitsState(){ return getJSON(STORAGE.habits, {}); }
@@ -195,6 +211,51 @@
     return [];
   }
 
+  function getHabitLimitPerDay(){
+    return 5;
+  }
+
+  function normalizeFrequencyDays(days){
+    const source = Array.isArray(days) ? days : [];
+    const unique = [];
+    source.forEach((value) => {
+      const day = Number(value);
+      if(Number.isInteger(day) && day >= 0 && day <= 6 && !unique.includes(day)){
+        unique.push(day);
+      }
+    });
+    return unique;
+  }
+
+  function isHabitScheduledForDay(habit, day){
+    const freq = normalizeFrequencyDays(habit?.frecuencia);
+    if(!freq.length) return true;
+    return freq.includes(Number(day));
+  }
+
+  function getDueHabitsForDate(date = new Date()){
+    const day = date.getDay();
+    const habits = ensureDefaultHabits();
+    return habits.filter((habit) => isHabitScheduledForDay(habit, day));
+  }
+
+  function validateFrequencyAgainstDailyLimit(existingHabits, newFrequency){
+    const frequency = normalizeFrequencyDays(newFrequency);
+    const limit = getHabitLimitPerDay();
+    if(!frequency.length){
+      return { ok: false, reason: 'Selecciona al menos un día de frecuencia.' };
+    }
+
+    for(const day of frequency){
+      const count = existingHabits.filter((habit) => isHabitScheduledForDay(habit, day)).length;
+      if(count >= limit){
+        return { ok: false, reason: `Ya tienes ${limit} hábitos para el día ${day}.` };
+      }
+    }
+
+    return { ok: true, reason: '' };
+  }
+
   function nextHabitId(list){
     const ids = (list || []).map(h => Number(h.id) || 0);
     const max = ids.length ? Math.max(...ids) : 0;
@@ -204,6 +265,7 @@
   function addHabit(habit){
     const list = ensureDefaultHabits().slice();
     const id = nextHabitId(list);
+    const frequency = normalizeFrequencyDays(habit?.frecuencia);
     const safe = {
       id,
       titulo: String(habit?.titulo || habit?.nombre || 'Nuevo hábito').trim() || 'Nuevo hábito',
@@ -212,15 +274,121 @@
       icono: String(habit?.icono || 'task_alt'),
       color: String(habit?.color || 'primary'),
       reward: Number(habit?.reward ?? 10) || 10,
-      frecuencia: Array.isArray(habit?.frecuencia) ? habit.frecuencia : [1,2,3,4,5],
+      frecuencia: frequency.length ? frequency : [1,2,3,4,5],
       metaValor: Number(habit?.metaValor ?? 1) || 1,
       metaUnidad: String(habit?.metaUnidad || 'veces'),
       recordatorio: !!habit?.recordatorio,
       creadoEn: Date.now(),
     };
+
+    const limitValidation = validateFrequencyAgainstDailyLimit(list, safe.frecuencia);
+    if(!limitValidation.ok){
+      return {
+        error: true,
+        message: limitValidation.reason || `Límite de ${getHabitLimitPerDay()} hábitos por día alcanzado.`,
+      };
+    }
+
     list.push(safe);
     setHabitsList(list);
     return safe;
+  }
+
+  function removeHabit(habitId){
+    const idStr = String(habitId);
+    const list = ensureDefaultHabits().slice();
+    const nextList = list.filter((habit) => String(habit?.id) !== idStr);
+
+    if(nextList.length === list.length){
+      return false;
+    }
+
+    setHabitsList(nextList);
+
+    // Clean completion state for removed habit across all stored days.
+    const state = getHabitsState();
+    Object.keys(state).forEach((dateKey) => {
+      if(state?.[dateKey] && Object.prototype.hasOwnProperty.call(state[dateKey], idStr)){
+        delete state[dateKey][idStr];
+        if(!Object.keys(state[dateKey]).length){
+          delete state[dateKey];
+        }
+      }
+    });
+    setJSON(STORAGE.habits, state);
+
+    return true;
+  }
+
+  // Cosmetics (loot/chests)
+  function getCosmeticsInventory(){
+    const inventory = getJSON(STORAGE.cosmeticsInventory, []);
+    return Array.isArray(inventory) ? inventory : [];
+  }
+
+  function setCosmeticsInventory(list){
+    const safe = Array.isArray(list) ? list : [];
+    setJSON(STORAGE.cosmeticsInventory, safe);
+    return safe;
+  }
+
+  function hasCosmetic(itemId){
+    return getCosmeticsInventory().some((item) => String(item?.id) === String(itemId));
+  }
+
+  function unlockCosmetic(item){
+    const inventory = getCosmeticsInventory();
+    const id = String(item?.id || '').trim();
+    if(!id) return { added: false, item: null };
+
+    if(inventory.some((entry) => String(entry?.id) === id)){
+      return { added: false, item: inventory.find((entry) => String(entry?.id) === id) || null };
+    }
+
+    const safeItem = {
+      id,
+      name: String(item?.name || 'Objeto misterioso'),
+      icon: String(item?.icon || 'star'),
+      slot: String(item?.slot || 'aura'),
+      rarity: String(item?.rarity || 'common'),
+      sourceChest: String(item?.sourceChest || 'madera'),
+      obtainedAt: Date.now(),
+    };
+
+    inventory.push(safeItem);
+    setCosmeticsInventory(inventory);
+    return { added: true, item: safeItem };
+  }
+
+  function getCosmeticsEquipped(){
+    const equipped = getJSON(STORAGE.cosmeticsEquipped, {});
+    return equipped && typeof equipped === 'object' ? equipped : {};
+  }
+
+  function setCosmeticsEquipped(equipped){
+    const safe = equipped && typeof equipped === 'object' ? equipped : {};
+    setJSON(STORAGE.cosmeticsEquipped, safe);
+    return safe;
+  }
+
+  function equipCosmetic(itemId){
+    const inventory = getCosmeticsInventory();
+    const item = inventory.find((entry) => String(entry?.id) === String(itemId));
+    if(!item) return null;
+
+    const equipped = getCosmeticsEquipped();
+    equipped[item.slot] = item.id;
+    setCosmeticsEquipped(equipped);
+    return item;
+  }
+
+  function unequipCosmetic(slot){
+    const equipped = getCosmeticsEquipped();
+    if(Object.prototype.hasOwnProperty.call(equipped, slot)){
+      delete equipped[slot];
+      setCosmeticsEquipped(equipped);
+    }
+    return equipped;
   }
 
   // Level (very simple for the prototype; later you can compute from XP)
@@ -355,7 +523,14 @@
     // habits
     getHabitDone, setHabitDone, toggleHabit, getHabitsState,
     // habits list
-    getHabitsList, setHabitsList, ensureDefaultHabits, addHabit,
+    getHabitsList, setHabitsList, ensureDefaultHabits, addHabit, removeHabit,
+    getHabitLimitPerDay, getDueHabitsForDate,
+    isHabitScheduledForDay,
+    // cosmetics
+    getCosmeticsInventory, setCosmeticsInventory,
+    hasCosmetic, unlockCosmetic,
+    getCosmeticsEquipped, setCosmeticsEquipped,
+    equipCosmetic, unequipCosmetic,
     // ui
     toast,
     // level

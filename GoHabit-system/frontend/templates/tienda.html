@@ -52,79 +52,77 @@
       <div class="tienda-hero-section">
         <div class="tienda-hero">
           <div class="tienda-hero__content">
-            <h2 class="tienda-hero__title">Colección de Primavera</h2>
-            <p class="tienda-hero__subtitle">Personaliza tu árbol con objetos únicos</p>
+            <h2 class="tienda-hero__title">Cofres de la Semana</h2>
+            <p class="tienda-hero__subtitle">Abre cofres y consigue objetos aleatorios para tu muñeco</p>
           </div>
-          <span class="material-symbols-outlined tienda-hero__icon">park</span>
+          <span class="material-symbols-outlined tienda-hero__icon">deployed_code_history</span>
         </div>
       </div>
 
-      <h2 class="tienda-products-title">Accesorios para tu Árbol</h2>
+      <h2 class="tienda-products-title">Elige un Cofre</h2>
 
       <div class="tienda-products-grid">
-        <div class="product-card">
+        <div class="product-card chest-card chest-card--wood">
           <div class="product-card__image">
-            <span class="material-symbols-outlined product-card__icon">nest_eco</span>
+            <span class="material-symbols-outlined product-card__icon">deployed_code</span>
             <div class="product-card__image-overlay"></div>
           </div>
           <div class="product-card__info">
-            <p class="product-card__name">Nido de Pájaros</p>
+            <p class="product-card__name">Cofre de Madera</p>
             <div class="product-card__price-container">
               <span class="material-symbols-outlined product-card__price-icon">eco</span>
-              <p class="product-card__price">120 Semillas</p>
+              <p class="product-card__price">80 Semillas</p>
             </div>
+            <p class="chest-card__hint">Mayormente objetos comunes</p>
           </div>
-          <a href="objeto.html" class="product-card__button">
-            <span class="material-symbols-outlined product-card__button-icon">shopping_cart</span>
-            Comprar
-          </a>
+          <button class="product-card__button" data-open-chest="madera">
+            <span class="material-symbols-outlined product-card__button-icon">lock_open</span>
+            Abrir
+          </button>
         </div>
 
-        <div class="product-card">
+        <div class="product-card chest-card chest-card--silver">
           <div class="product-card__image">
-            <span class="material-symbols-outlined product-card__icon">local_florist</span>
+            <span class="material-symbols-outlined product-card__icon">deployed_code_alert</span>
             <div class="product-card__image-overlay"></div>
           </div>
           <div class="product-card__info">
-            <p class="product-card__name">Flores de Cerezo</p>
+            <p class="product-card__name">Cofre de Plata</p>
             <div class="product-card__price-container">
               <span class="material-symbols-outlined product-card__price-icon">eco</span>
-              <p class="product-card__price">200 Semillas</p>
+              <p class="product-card__price">180 Semillas</p>
             </div>
+            <p class="chest-card__hint">Buen balance de raros</p>
           </div>
-          <a href="objeto.html" class="product-card__button">
-            <span class="material-symbols-outlined product-card__button-icon">shopping_cart</span>
-            Comprar
-          </a>
+          <button class="product-card__button" data-open-chest="plata">
+            <span class="material-symbols-outlined product-card__button-icon">lock_open</span>
+            Abrir
+          </button>
         </div>
 
-        <div class="product-card">
+        <div class="product-card chest-card chest-card--gold">
           <div class="product-card__image">
-            <span class="material-symbols-outlined product-card__icon">fence</span>
+            <span class="material-symbols-outlined product-card__icon">deployed_code_update</span>
             <div class="product-card__image-overlay"></div>
           </div>
           <div class="product-card__info">
-            <p class="product-card__name">Valla de Madera</p>
+            <p class="product-card__name">Cofre de Oro</p>
             <div class="product-card__price-container">
               <span class="material-symbols-outlined product-card__price-icon">eco</span>
-              <p class="product-card__price">150 Semillas</p>
+              <p class="product-card__price">320 Semillas</p>
             </div>
+            <p class="chest-card__hint">Alta probabilidad de épicos</p>
           </div>
-          <a href="objeto.html" class="product-card__button">
-            <span class="material-symbols-outlined product-card__button-icon">shopping_cart</span>
-            Comprar
-          </a>
-        </div>
-
-        <div class="product-card product-card--coming-soon">
-          <div class="product-card__image">
-            <span class="material-symbols-outlined product-card__icon">lock</span>
-          </div>
-          <div class="product-card__info">
-            <p class="product-card__coming-soon-text">Más objetos pronto...</p>
-          </div>
+          <button class="product-card__button" data-open-chest="oro">
+            <span class="material-symbols-outlined product-card__button-icon">lock_open</span>
+            Abrir
+          </button>
         </div>
       </div>
+
+      <section class="loot-result" data-loot-result>
+        <p class="loot-result__placeholder">Tu próximo objeto aparecerá aquí al abrir un cofre.</p>
+      </section>
     </main>
 
     <!-- ✅ Bottom Navigation -->
@@ -145,6 +143,7 @@
   <script src="../js/session-user.js" defer></script>
   <script src="../js/app.js" defer></script>
   <script src="../js/pages/bindSeeds.js" defer></script>
+  <script src="../js/pages/tienda-cofres.js" defer></script>
   <script src="../js/chatbot.js" defer></script>
 </body>
 </html>
