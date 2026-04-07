@@ -12,6 +12,7 @@
 import { pool } from "@/lib/mysql";
 import { habitRepository } from "@/repositories/habit.repository";
 import { userService } from "@/services/user.service";
+import { aiService } from "@/services/ai.service";
 import { NotFoundError } from "@/lib/errors";
 import { POINTS, COINS } from "@/lib/constants";
 
@@ -70,16 +71,24 @@ export const habitService = {
     /**
      * complete — Marca un hábito como completado (registra una completion).
      */
-    async complete(habitId: string, userId: string, note?: string) {
+    async complete(habitId: string, userId: string, note?: string, image?: string) {
         const habit = await habitRepository.findById(habitId);
         if (!habit || habit.userId !== userId) throw new NotFoundError("Habit");
+
+        if (image) {
+            const audit = await aiService.verifyHabitImage(habit.title, image);
+            if (!audit.verified) {
+                // Return an error object instead of throwing avoiding generic 500
+                throw new Error(`Verificación de imagen fallida: ${audit.reason}`);
+            }
+        }
 
         const connection = await pool.getConnection();
         await connection.beginTransaction();
 
         try {
             // 1. Crear el registro de completion
-            const completionId = await habitRepository.createCompletion(habitId, userId, note, connection);
+            const completionId = await habitRepository.createCompletion(habitId, userId, note, image, connection);
 
             // 2. Sumar puntos y monedas al usuario (usando el servicio centralizado)
             await userService.addProgress(userId, POINTS.HABIT_COMPLETION, COINS.HABIT_COMPLETION, connection);

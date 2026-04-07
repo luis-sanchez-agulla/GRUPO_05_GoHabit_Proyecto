@@ -17,7 +17,13 @@ export const recommendHabitsSchema = z.object({
         .string()
         .min(1, "Mensaje requerido")
         .max(500, "El mensaje no puede exceder 500 caracteres")
-        .transform((msg: string) => msg.trim()),  // Elimina espacios al inicio/final
+        .transform((msg: string) => msg.trim()),
+    history: z.array(
+        z.object({
+            role: z.enum(["user", "model"]),
+            text: z.string()
+        })
+    ).optional(),
 });
 
 /**

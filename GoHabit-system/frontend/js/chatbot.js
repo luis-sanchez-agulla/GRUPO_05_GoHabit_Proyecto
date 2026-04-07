@@ -105,6 +105,7 @@
 
     // ── State ─────────────────────────────────────────────────────
     let open = false;
+    let conversationHistory = [];
 
     function togglePanel() {
       open = !open;
@@ -192,6 +193,7 @@
       if (!message) return;
 
       appendMsg(message, 'user');
+      conversationHistory.push({ role: 'user', text: message });
       input.value = '';
       sendBtn.disabled = true;
 
@@ -203,7 +205,10 @@
       box.scrollTop = box.scrollHeight;
 
       try {
-        const response = await window.GoHabitAPI.post('/ai/recommend', { message });
+        const response = await window.GoHabitAPI.post('/ai/recommend', { 
+            message,
+            history: conversationHistory
+        });
         const suggestions = response?.data?.suggestions || [];
         const provider = response?.data?.provider || 'unknown';
 
@@ -211,10 +216,14 @@
 
         if (!suggestions.length) {
           appendMsg('No pude generar sugerencias ahora mismo. Intenta describir más detalladamente tus metas.', 'bot');
+          conversationHistory.push({ role: 'model', text: 'No pude generar sugerencias.' });
         } else {
           const providerLabel = provider === 'gemini' ? '(Gemini AI)' : '(Contexto local)';
           appendMsg(`He analizado tu entrada y tengo ${suggestions.length} hábito(s) personalizados para ti ${providerLabel}:`, 'bot');
           suggestions.forEach(s => appendSuggestion(s));
+          
+          const suggestionsText = suggestions.map(s => s.title).join(', ');
+          conversationHistory.push({ role: 'model', text: `Te sugerí los siguientes hábitos: ${suggestionsText}` });
         }
       } catch (err) {
         typingEl.remove();

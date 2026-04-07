@@ -6,7 +6,7 @@ INSERT INTO users (id, email, username, password, role, first_name, last_name, p
 ('e701da1a-244a-43a9-8555-434a477f113d', 'carlos@gohabit.com', 'carlos_dev', '$2a$10$X7sKz.QZ1Z5Z5Z5Z5Z5Z5eZZ5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z', 'USER', 'Carlos', 'García', 150, 100, 5, 3),
 ('b802eb2b-355b-54ba-9666-545a588g224e', 'laura@gohabit.com', 'laura_dev', '$2a$10$X7sKz.QZ1Z5Z5Z5Z5Z5Z5eZZ5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z', 'USER', 'Laura', 'Martínez', 80, 50, 2, 1),
 ('c903fc3c-466c-65cb-0777-656b699h335f', 'sergio@gohabit.com', 'sergio_dev', '$2a$10$X7sKz.QZ1Z5Z5Z5Z5Z5Z5eZZ5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z', 'USER', 'Sergio', 'Pérez', 200, 150, 7, 5),
-('d104gd4d-577d-76dc-1888-767c7aaai446g', 'ana@gohabit.com', 'ana_dev', '$2a$10$X7sKz.QZ1Z5Z5Z5Z5Z5Z5eZZ5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z', 'USER', 'Ana', 'Sánchez', 0, 25, 3, 0),
+('d104gd4d-577d-76dc-1888-767c7aaa446g', 'ana@gohabit.com', 'ana_dev', '$2a$10$X7sKz.QZ1Z5Z5Z5Z5Z5Z5eZZ5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z', 'USER', 'Ana', 'Sánchez', 0, 25, 3, 0),
 ('e205he5e-688e-87ed-2999-878d8bbj557h', 'miguel@gohabit.com', 'miguel_dev', '$2a$10$X7sKz.QZ1Z5Z5Z5Z5Z5Z5eZZ5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z', 'USER', 'Miguel', 'Fernández', 320, 200, 10, 8);
 
 -- Insertar usuarios LEGACY en 'Usuarios' para compatibilidad

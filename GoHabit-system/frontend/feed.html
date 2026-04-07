@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Feed Amigos - GoHabit</title>
+  <style>
+    body { font-family: system-ui; background: #f0f2f5; margin: 0; padding: 20px; }
+    .dark body { background: #121212; color: #fff; }
+    .feed-container { max-width: 600px; margin: auto; }
+    .post { background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .dark .post { background: #1e1e1e; }
+    .post-header { display: flex; align-items: center; margin-bottom: 15px; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: #ccc; margin-right: 12px; }
+    .username { font-weight: bold; }
+    .time { color: #888; font-size: 0.9em; margin-left: auto; }
+    .habit-title { font-size: 1.1em; margin-bottom: 10px; }
+    .post-image { width: 100%; border-radius: 8px; max-height: 400px; object-fit: contain; background: #eee; }
+    .dark .post-image { background: #000; }
+  </style>
+</head>
+<body class="light">
+  <div class="feed-container">
+    <h1>Feed de Amigos</h1>
+    <p>Mira los hábitos completados (verificados con IA) por tus amigos.</p>
+    <div id="feed-list">Cargando...</div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const feedList = document.getElementById('feed-list');
+      try {
+        // En un entorno de producción, esto iría con Auth. Para local, si hay token:
+        const response = await fetch('/api/feed', {
+            headers: window.GoHabitAPI && window.GoHabitAPI.getToken() ? { 'Authorization': 'Bearer ' + window.GoHabitAPI.getToken() } : {}
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch');
+        const { data } = await response.json();
+        
+        if (!data || data.length === 0) {
+            feedList.innerHTML = '<p>Aún no hay actividad de tus amigos, o necesitas Iniciar Sesión en el servidor completo.</p>';
+            return;
+        }
+
+        feedList.innerHTML = data.map(post => `
+            <div class="post">
+                <div class="post-header">
+                    <div class="avatar" style="background-image: url('${post.friendAvatar || ''}'); background-size: cover;"></div>
+                    <div class="username">${post.friendUsername}</div>
+                    <div class="time">${new Date(post.completedAt).toLocaleString()}</div>
+                </div>
+                <div class="habit-title">Completó: <strong>${post.habitTitle}</strong></div>
+                ${post.note ? `<p style="font-style:italic">"${post.note}"</p>` : ''}
+                ${post.imageUrl ? `<img class="post-image" src="${post.imageUrl}" />` : ''}
+            </div>
+        `).join('');
+
+      } catch (err) {
+        feedList.innerHTML = '<p>Error cargando feed. Quizás el servidor no está encendido o no has iniciado sesión.</p>';
+      }
+    });
+  </script>
+</body>
+</html>

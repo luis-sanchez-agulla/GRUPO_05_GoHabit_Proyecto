@@ -64,9 +64,9 @@ export const habitRepository = {
         return result.insertId;
     },
 
-    async createCompletion(habitId: string, userId: string, note?: string, connection?: any): Promise<number> {
-        const sql = 'INSERT INTO habit_completions (habitId, userId, note) VALUES (?, ?, ?)';
-        const params = [habitId, userId, note || null];
+    async createCompletion(habitId: string, userId: string, note?: string, imageUrl?: string, connection?: any): Promise<number> {
+        const sql = 'INSERT INTO habit_completions (habitId, userId, note, imageUrl) VALUES (?, ?, ?, ?)';
+        const params = [habitId, userId, note || null, imageUrl || null];
 
         if (connection) {
             const [result]: any = await connection.execute(sql, params);

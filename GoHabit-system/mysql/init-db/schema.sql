@@ -150,6 +150,7 @@ CREATE TABLE IF NOT EXISTS habit_completions (
     habitId INT NOT NULL,
     userId VARCHAR(36) NOT NULL,
     note TEXT NULL,
+    imageUrl LONGTEXT NULL,
     completedAt TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     INDEX idx_habit_completions_habitId (habitId),
     INDEX idx_habit_completions_userId (userId)

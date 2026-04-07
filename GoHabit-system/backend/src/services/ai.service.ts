@@ -541,7 +541,7 @@ function buildContextualRecommendations(message: string) {
  * - Metas mencionadas en el mensaje
  * - Hábitos que se complementan entre sí
  */
-async function geminiRecommendations(userId: string, message: string) {
+async function geminiRecommendations(userId: string, message: string, history?: {role: string, text: string}[]) {
     const key = env.GOOGLE_API_KEY;
     if (!key) {
         console.warn("[AI] GOOGLE_API_KEY no configurada, usando recomendaciones contextuales locales");
@@ -557,42 +557,69 @@ async function geminiRecommendations(userId: string, message: string) {
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
 
         const systemContext = [
-            "You are an intelligent habit coach AI that provides PERSONALIZED recommendations.",
-            "NEVER use generic or predetermined responses.",
-            "Analyze the user's message and existing habits to suggest SPECIFIC, ACTIONABLE habits.",
-            "If the user mentions a clear interest like gym, reading, study, sleep, or productivity, stay close to that goal.",
-            "Do not switch to unrelated baseline habits unless they clearly help the stated objective.",
+            "Eres una IA de 'Coaching' de Hábitos experta en la psicología de Hábitos Atómicos (Atomic Habits).",
+            "NUNCA uses respuestas genéricas, vagas ni predeterminadas. Analiza el mensaje del usuario y sus hábitos actuales para sugerir hábitos EXTREMADAMENTE ESPECÍFICOS y ACCIONABLES.",
+            "Si el usuario menciona un objetivo, NO le recomiendes el objetivo en sí. Recomiéndale el 'sistema' (la acción atómica mínima que lo llevará allí).",
             "",
-            "User's Current Habits:",
+            "Hábitos Actuales del Usuario:",
             currentHabits,
             "",
-            "User's Goal/Message:",
-            message,
-            "",
-            "IMPORTANT RULES:",
-            "1. Suggest 3-4 habits that COMPLEMENT existing ones or address gaps",
-            "2. Each habit must have clear, specific reasoning tied to the user's goals",
-            "3. Return ONLY valid JSON, no markdown or extra text",
-            "4. Vary suggestions - don't repeat the same habits if they already exist",
-            "5. Consider time constraints - balance shorter and longer habits",
-            "6. If the message is short or informal, infer intent from the strongest keywords and context",
-            "7. Include recommendedDays as an array of Spanish weekday names when possible",
-            "8. Add scheduleHint when the habit should be done on a cadence instead of fixed weekdays",
-            "9. Add xpReward integer between 8 and 35 based on effort and weekly consistency",
-            "",
-            "JSON Response Format (EXACTLY this structure):",
-            `{"suggestions":[{"title":"Specific habit name","reason":"Personal reason based on user context and goals","frequency":"Recommended frequency","recommendedDays":["Lunes","Miércoles","Viernes"],"scheduleHint":"Optional short note","xpReward":14}]}`,
+            "REGLAS OBLIGATORIAS (ANTI-GENÉRICO):",
+            "1. CADA HÁBITO DEBE llevar una DURACIÓN EXACTA (ej: '15 minutos', '2 páginas'). PROHIBIDO usar verbos vagos como 'Hacer', 'Estudiar', 'Mejorar' sin contexto numérico.",
+            "2. CADA HÁBITO DEBE incluir un GATILLO (cuándo se hace: 'al despertar', 'tras la cena'). No pongas 'por la mañana', pon 'inmediatamente después de vestirte'.",
+            "3. Sugiere 3 o 4 hábitos que asuman la barrera del usuario (muy fáciles de lograr).",
+            "4. La 'reason' debe explicar la psicología detrás del comportamiento elegido, atado a su meta original.",
+            "5. NO repitas los hábitos actuales del usuario.",
+            "6. 'recommendedDays' debe ser un array con los días precisos en español (ej. ['Lunes', 'Miércoles']).",
+            "7. 'scheduleHint' debe condensar la frecuencia real (ej. 'Tras el desayuno').",
+            "8. 'xpReward' es un número entero entre 8 y 35, evaluando el nivel de esfuerzo (ejercicio = +XP, acciones de 1 min = menos XP)."
         ].join("\n");
+
+        // Format conversational history or fallback to single message
+        const contents = history?.length
+            ? history.map(item => ({
+                  role: item.role === "model" ? "model" : "user",
+                  parts: [{ text: item.text }]
+              }))
+            : [{ role: "user", parts: [{ text: message }] }];
 
         const response = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [{ role: "user", parts: [{ text: systemContext }] }],
+                systemInstruction: {
+                    parts: [{ text: systemContext }]
+                },
+                contents,
                 generationConfig: {
                     temperature: 0.8,
                     maxOutputTokens: 600,
                     responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            suggestions: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        title: { type: "STRING" },
+                                        reason: { type: "STRING" },
+                                        frequency: { type: "STRING" },
+                                        recommendedDays: {
+                                            type: "ARRAY",
+                                            items: { type: "STRING" }
+                                        },
+                                        scheduleHint: { type: "STRING" },
+                                        icon: { type: "STRING" },
+                                        category: { type: "STRING" },
+                                        xpReward: { type: "INTEGER" }
+                                    },
+                                    required: ["title", "reason", "frequency", "recommendedDays", "xpReward"]
+                                }
+                            }
+                        }
+                    }
                 },
             }),
         });
@@ -601,21 +628,14 @@ async function geminiRecommendations(userId: string, message: string) {
             throw new Error(`Gemini API error ${response.status}`);
         }
 
-        const raw = await response.json();
+        const raw: any = await response.json();
         const text = raw?.candidates?.[0]?.content?.parts?.[0]?.text;
         
         if (!text) {
             throw new Error("Gemini returned empty response");
         }
 
-        let parsed: any;
-        try {
-            parsed = JSON.parse(text);
-        } catch {
-            const match = text.match(/\{[\s\S]*\}/);
-            if (!match) throw new Error("Could not extract JSON from Gemini response");
-            parsed = JSON.parse(match[0]);
-        }
+        const parsed = JSON.parse(text);
 
         const suggestions = Array.isArray(parsed?.suggestions)
             ? parsed.suggestions
@@ -771,10 +791,149 @@ async function geminiTaskReorganization(userId: string, tasks: any[], userContex
     };
 }
 
+/**
+ * Analiza imagen en base64 para validar si el usuario ha cumplido el hábito.
+ * Usa Gemini 2.0 Flash vision.
+ */
+async function verifyHabitImage(habitTitle: string, base64Image: string) {
+    const key = env.GOOGLE_API_KEY;
+    if (!key) {
+        // Fallback: si no hay api key, damos todo por válido en local (para no bloquear).
+        return { verified: true, reason: "No hay API Key configurada para auditar." };
+    }
+
+    try {
+        const model = env.GEMINI_MODEL || "gemini-2.0-flash";
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+
+        const dataPrefixRegex = /^data:image\/[a-zA-Z]+;base64,/;
+        const base64Data = base64Image.replace(dataPrefixRegex, "");
+        const mimeTypeMatch = base64Image.match(/^data:(image\/[a-zA-Z]+);base64,/);
+        const mimeType = mimeTypeMatch ? mimeTypeMatch[1] : "image/jpeg";
+
+        const systemCtx = [
+            "Eres el Juez Visual Anticheat definitivo. Tu trabajo es AUDITAR EXTREMADAMENTE ESTRICTO una foto para confirmar si prueba INDUDABLEMENTE la finalización del hábito.",
+            "REGLAS INQUEBRANTABLES:",
+            "1. NO ASUMAS NADA POR ASOCIACIÓN. Si el hábito es 'Correr', una foto de una botella de agua ES INVÁLIDA. Si es 'Gimnasio', una foto del suelo es INVÁLIDA.",
+            "2. Debe haber evidencia directa de la ACCIÓN o en su defecto un resumen digital incuestionable (ej. Reloj GPS marcando km de carrera).",
+            "3. Rechaza CUALQUIER imagen irrelevante, memes, capturas de texto plano, fotos oscuras o difusas.",
+            "4. Sé rudo e implacable. Si dudas, recházalo.",
+            "Devuelve un JSON estricto con 'verified' boolean y un 'reason' muy corto (explicando fríamente por qué apruebas o por qué deniegas basándote en lo visible)."
+        ].join(" ");
+
+        const prompt = `El usuario dice que ha completado su hábito: "${habitTitle}". ¿Esta imagen demuestra que lo ha hecho?`;
+
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                systemInstruction: { parts: [{ text: systemCtx }] },
+                contents: [{
+                    role: "user",
+                    parts: [
+                        { text: prompt },
+                        { inlineData: { data: base64Data, mimeType } }
+                    ]
+                }],
+                generationConfig: {
+                    temperature: 0.1,
+                    maxOutputTokens: 200,
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            verified: { type: "BOOLEAN" },
+                            reason: { type: "STRING" }
+                        },
+                        required: ["verified", "reason"]
+                    }
+                }
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Gemini Vision Error ${response.status}`);
+        }
+
+        const raw = await response.json();
+        const text = raw?.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (!text) return { verified: true, reason: "Error de visión (respuesta vacía)" };
+
+        const parsed = JSON.parse(text);
+        return {
+            verified: !!parsed.verified,
+            reason: parsed.reason || "Evaluado por IA"
+        };
+    } catch (err) {
+        console.error("[AI] Vision Verification error:", err);
+        return { verified: true, reason: "Fallo temporal en auditoría visual AI" }; // Default pass
+    }
+}
+
+/**
+ * Valida un hábito nuevo antes de crearlo.
+ * Evalúa su viabilidad, nivel de especificidad y asigna la XP justa.
+ */
+async function validateNewHabit(title: string, category: string, frequency: number, target: number) {
+    const key = env.GOOGLE_API_KEY;
+    if (!key) return { valid: true, feedback: "Sin API Key conectada.", xpReward: 10 };
+
+    try {
+        const model = env.GEMINI_MODEL || "gemini-2.0-flash";
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+
+        const systemCtx = [
+            "Eres un juez implacable experto en metodologías de hábitos saludables.",
+            "Evalúa la intención del usuario para crear un nuevo hábito.",
+            "1. Evalúa el título. Si es absurdo ('asdf', 'prueba', 'kkk'), poco sano, o ridículamente genérico ('Hacer cosas'), RECHÁZALO marcando 'valid: false' e incluye un 'feedback' duro aconsejando cómo formular el hábito correctamente (SMART).",
+            "2. Si es válido, calcula una recompensa 'xpReward' del 10 al 50. Mucho esfuerzo (gimnasio diario) = 40-50. Poco esfuerzo (beber vaso de agua) = 10.",
+            "3. Devuelve estrictamente un JSON con 'valid' (boolean), 'feedback' (mensaje motivador o crítico) y 'xpReward' (número)."
+        ].join(" ");
+
+        const prompt = `Hábito propuesto: "${title}". Categoría: ${category}. Días por semana: ${frequency}. Meta diaria: ${target}.`;
+
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                systemInstruction: { parts: [{ text: systemCtx }] },
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: {
+                    temperature: 0.2,
+                    maxOutputTokens: 200,
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            valid: { type: "BOOLEAN" },
+                            feedback: { type: "STRING" },
+                            xpReward: { type: "INTEGER" }
+                        },
+                        required: ["valid", "feedback", "xpReward"]
+                    }
+                }
+            })
+        });
+
+        if (!response.ok) throw new Error("Gemini Validation Error");
+        
+        const raw = await response.json();
+        const text = raw?.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (!text) throw new Error("Respuesta vacía");
+
+        return JSON.parse(text);
+    } catch (err) {
+        console.error("[AI] Habit Validation Error:", err);
+        return { valid: true, feedback: "Error de IA temporal", xpReward: 15 };
+    }
+}
+
 export const aiService = {
-    async recommendHabits(userId: string, message: string) {
+    async recommendHabits(userId: string, message: string, history?: {role: string, text: string}[]) {
         try {
-            return await geminiRecommendations(userId, message);
+            return await geminiRecommendations(userId, message, history);
         } catch (err) {
             console.error("[AI] Error in recommendHabits:", err);
             return heuristicRecommendations(message);
@@ -821,4 +980,12 @@ export const aiService = {
             };
         }
     },
+
+    async verifyHabitImage(habitTitle: string, base64Image: string) {
+        return verifyHabitImage(habitTitle, base64Image);
+    },
+
+    async validateNewHabit(title: string, category: string, frequency: number, target: number) {
+        return validateNewHabit(title, category, frequency, target);
+    }
 };

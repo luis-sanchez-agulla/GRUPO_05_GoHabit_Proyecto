@@ -8,7 +8,8 @@ export const aiController = {
      */
     async recommendHabits(req: any, { data, user }: any) {
         try {
-            const result = await aiService.recommendHabits(user.id, data.message);
+            const history = data.history || [{ role: "user", text: data.message }];
+            const result = await aiService.recommendHabits(user.id, data.message, history);
             return success(result);
         } catch (err) {
             return error(err);

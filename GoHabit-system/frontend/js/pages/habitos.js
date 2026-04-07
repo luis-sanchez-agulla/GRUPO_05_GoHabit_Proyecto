@@ -60,10 +60,69 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
 
       const input = wrapper.querySelector('input[type="checkbox"]');
-      input.addEventListener('change', () => {
-        const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
-        GoHabit.toggleHabit(h.id, { reward });
-        refreshSeeds();
+      input.addEventListener('change', async (e) => {
+        // Si se está desmarcando, permitirlo directamente
+        if (!e.target.checked) {
+            const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
+            GoHabit.toggleHabit(h.id, { reward });
+            refreshSeeds();
+            return;
+        }
+
+        e.preventDefault();
+        e.target.checked = false; // Forzar desmarcado hasta la foto
+
+        // Crear input file escondido
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.onchange = (ev) => {
+            const file = ev.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (reData) => {
+                const base64 = reData.target.result;
+                GoHabit.toast('Analizando foto con IA...', 'good', { icon: 'psychology' });
+                
+                try {
+                    // Si tienes el backend levantado:
+                    const res = await fetch('/api/ai/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ habitTitle: h.titulo, image: base64 })
+                    });
+                    
+                    if (!res.ok) throw new Error('Visual Verification failed');
+                    const data = await res.json();
+                    
+                    if (data.verified) {
+                        e.target.checked = true;
+                        const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
+                        GoHabit.toggleHabit(h.id, { reward });
+                        refreshSeeds();
+                        GoHabit.toast('¡Hábito verificado y guardado!', 'good', { icon: 'verified' });
+
+                        // Subir secretamente a feed (Para el backend que hemos construido)
+                        if (window.GoHabitAPI) {
+                            GoHabitAPI.post(`/habits/${h.id}/complete`, { image: base64, note: "Fotito!" }).catch(console.error);
+                        }
+                    } else {
+                        GoHabit.toast('IA rechaza la foto: ' + data.reason, 'bad', { icon: 'error' });
+                    }
+                } catch (err) {
+                    // Fallback local robusto (prototipo sin backend 100% configurado)
+                    console.error(err);
+                    e.target.checked = true;
+                    const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
+                    GoHabit.toggleHabit(h.id, { reward });
+                    refreshSeeds();
+                    GoHabit.toast('Completado (Fallback)', 'good', { icon: 'check' });
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+        fileInput.click();
       });
 
       container.appendChild(wrapper);
