@@ -1,54 +1,67 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Onboarding IA - GoHabit</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onboarding IA - GoHabit</title>
 
-  <link rel="stylesheet" href="../css/app.css" />
-  <link rel="stylesheet" href="../css/onboarding-ia.css" />
-  <link rel="stylesheet" href="../css/chatbot.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
-</head>
-<body class="ai-onboarding-page">
-  <main class="ai-shell">
-    <section class="ai-card">
-      <p class="ai-kicker">Asistente GoHabit</p>
-      <h1 class="ai-title">Vamos a personalizar tus habitos</h1>
-      <p class="ai-text">
-        Cuentame tus habitos comunes o en que te cuesta mantener constancia. Con eso te sugerire habitos concretos para empezar.
-      </p>
+    <link rel="stylesheet" href="../css/app.css" />
+    <link rel="stylesheet" href="../css/onboarding-ia.css" />
+    <link rel="stylesheet" href="../css/chatbot.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="ai-onboarding-page">
+    <main class="ai-shell">
+      <section class="ai-card">
+        <p class="ai-kicker">Asistente GoHabit</p>
+        <h1 class="ai-title">Vamos a personalizar tus habitos</h1>
+        <p class="ai-text">
+          Cuentame tus habitos comunes o en que te cuesta mantener constancia.
+          Con eso te sugerire habitos concretos para empezar.
+        </p>
 
-      <form id="ai-onboarding-form" class="ai-form">
-        <label class="ai-label" for="ai-message">Tu contexto</label>
-        <textarea
-          id="ai-message"
-          rows="5"
-          placeholder="Ejemplo: Trabajo sentado muchas horas, duermo poco y quiero tener una rutina de estudio estable."
-          required
-        ></textarea>
-        <small id="ai-message-error" class="ai-error"></small>
+        <form id="ai-onboarding-form" class="ai-form">
+          <label class="ai-label" for="ai-message">Tu contexto</label>
+          <textarea
+            id="ai-message"
+            rows="5"
+            placeholder="Ejemplo: Trabajo sentado muchas horas, duermo poco y quiero tener una rutina de estudio estable."
+            required
+          ></textarea>
+          <small id="ai-message-error" class="ai-error"></small>
 
-        <div class="ai-actions">
-          <button type="submit" class="ai-btn ai-btn--primary">Pedir sugerencias</button>
-          <button type="button" id="ai-skip" class="ai-btn ai-btn--ghost">Saltar por ahora</button>
-        </div>
-      </form>
+          <div class="ai-actions">
+            <button type="submit" class="ai-btn ai-btn--primary">
+              Pedir sugerencias
+            </button>
+            <button type="button" id="ai-skip" class="ai-btn ai-btn--ghost">
+              Saltar por ahora
+            </button>
+          </div>
+        </form>
 
-      <section id="ai-results" class="ai-results" hidden>
-        <h2 class="ai-results__title">Sugerencias para ti</h2>
-        <div id="ai-suggestions-list" class="ai-suggestions"></div>
-        <button id="ai-continue" class="ai-btn ai-btn--primary" type="button">Continuar a inicio</button>
+        <section id="ai-results" class="ai-results" hidden>
+          <h2 class="ai-results__title">Sugerencias para ti</h2>
+          <div id="ai-suggestions-list" class="ai-suggestions"></div>
+          <button id="ai-continue" class="ai-btn ai-btn--primary" type="button">
+            Continuar a inicio
+          </button>
+        </section>
       </section>
-    </section>
-  </main>
+    </main>
 
-  <script src="../js/api.js" defer></script>
-  <script src="../js/router.js" defer></script>
-  <script src="../js/app.js" defer></script>
-  <script src="../js/session-user.js" defer></script>
-  <script src="../js/pages/onboarding-ia.js" defer></script>
-  <script src="../js/chatbot.js" defer></script>
-</body>
+    <script src="../js/api.js" defer></script>
+    <script src="../js/router.js" defer></script>
+    <script src="../js/app.js" defer></script>
+    <script src="../js/session-user.js" defer></script>
+    <script src="../js/pages/onboarding-ia.js" defer></script>
+    <script src="../js/chatbot.js" defer></script>
+  </body>
 </html>

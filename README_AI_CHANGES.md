@@ -5,6 +5,7 @@
 Se ha reemplazado completamente el sistema de IA hardcodeado por un **sistema de IA real y funcional** usando Google Gemini.
 
 ### Lo Importante:
+
 ✅ La IA ahora es REAL - No más respuestas preestablecidas
 ✅ Recomendaciones PERSONALIZADAS - Considera hábitos del usuario
 ✅ Reorganización INTELIGENTE - Analiza productividad y urgencia
@@ -16,28 +17,30 @@ Se ha reemplazado completamente el sistema de IA hardcodeado por un **sistema de
 ## ¿Qué Cambió?
 
 ### Antes (Hardcodeado ❌)
+
 ```javascript
 // chatbot.js tenía:
 const MOTIVATIONAL = [
-  '¡Cada pequeño paso cuenta! Sigue adelante 💪',
-  'Los grandes hábitos empiezan...',
+  "¡Cada pequeño paso cuenta! Sigue adelante 💪",
+  "Los grandes hábitos empiezan...",
   // ... 6 frases más genéricas
-]
+];
 
 // Recomendación: Solo buscar keywords en una lista de 8 hábitos
 // Reorganización: Solo ordenar por prioridad + fecha
 ```
 
 ### Ahora (Con IA ✅)
+
 ```
 Usuario: "Quiero dormir mejor"
            ↓
 IA Analiza: "Ya medita y camina, necesita..."
            ↓
-Respuesta: "Te recomiendo regular la temperatura de tu 
-           habitación, ya que ya haces ejercicio y meditación 
+Respuesta: "Te recomiendo regular la temperatura de tu
+           habitación, ya que ya haces ejercicio y meditación
            que mejoran el sueño"
-           
+
 NO: "Duerme 8 horas al día" (genérico)
 ```
 
@@ -91,6 +94,7 @@ Frontend muestra:
 ## Tests Rápidos
 
 ### Test 1: Abre el chatbot
+
 1. Ve a la aplicación GoHabit
 2. Haz click en el botón IA (abajo derecha)
 3. Escribe: "Me cuesta concentrarme"
@@ -99,6 +103,7 @@ Frontend muestra:
 **Esperas:** Recomendaciones específicas, NO frases genéricas
 
 ### Test 2: Prueba reorganización
+
 ```bash
 POST /api/ai/reorganize
 (sin parámetros, usa tu userId)
@@ -110,45 +115,46 @@ POST /api/ai/reorganize
 
 ## Lo Que Falta (Próximas Fases)
 
-| Tarea | Estado | Tiempo Est. |
-|-------|--------|-------------|
-| Guardar historial conversaciones | Preparado | 30 min |
-| Incluir historial en prompts | No iniciado | 20 min |
-| Aprendizaje de preferencias | Diseñado | 1 hora |
-| Multi-turno conversación | Diseñado | 2 horas |
+| Tarea                            | Estado      | Tiempo Est. |
+| -------------------------------- | ----------- | ----------- |
+| Guardar historial conversaciones | Preparado   | 30 min      |
+| Incluir historial en prompts     | No iniciado | 20 min      |
+| Aprendizaje de preferencias      | Diseñado    | 1 hora      |
+| Multi-turno conversación         | Diseñado    | 2 horas     |
 
 ---
 
 ## Ejemplo Real
 
 ### Usuario: Daniel
+
 - Hábitos: Meditar (5 veces/semana), Correr (3 veces/semana)
 - Mensaje: "Tengo mucho café, necesito dormir mejor"
 
 #### Respuesta Antigua (Hardcodeada):
+
 > "Aquí tienes 4 hábitos que podrían ayudarte:
+>
 > 1. Dormir 7-8 horas
 > 2. Meditar 10 minutos
 > 3. Preparar comida casera
 > 4. Beber 2L de agua
-> 
+>
 > ¡Cada pequeño paso cuenta! 💪"
 
 #### Respuesta Nueva (IA Real):
+
 > "He analizado tu entrada y tengo 4 hábitos personalizados para ti (Gemini AI):
-> 
+>
 > 1. **Reducir cafeína después de las 2pm**
 >    - Ya haces ejercicio (bueno), pero la cafeína contrarresta
 >    - Frecuencia: Diario
-> 
 > 2. **Rutina de enfriamiento 30 min antes de dormir**
 >    - Tu meditación es buena, esto la complementa
 >    - Frecuencia: Diario
-> 
 > 3. **Baño tibio 1 hora antes de dormir**
 >    - Científicamente reduce 20-30 min para conciliar sueño
 >    - Frecuencia: 5 veces por semana
-> 
 > 4. **Vaso de leche tibia con miel antes de dormir**
 >    - Combina bien con tu estilo de vida (natural, sencillo)
 >    - Frecuencia: Diario"
@@ -160,6 +166,7 @@ POST /api/ai/reorganize
 ## Configuración Necesaria
 
 ### Verificar `.env`:
+
 ```env
 GOOGLE_API_KEY=sk-proj-xxxxxxxxxxxxx  # ✅ Ya debe estar
 GEMINI_MODEL=gemini-2.0-flash         # (opcional)
@@ -167,6 +174,7 @@ DATABASE_URL=mysql://...              # ✅ Ya debe estar
 ```
 
 ### Primera vez:
+
 1. Los cambios están listos para funcionar
 2. Si tienes GOOGLE_API_KEY, usará IA
 3. Si no la tienes, usará búsqueda inteligente
@@ -176,11 +184,13 @@ DATABASE_URL=mysql://...              # ✅ Ya debe estar
 ## Próximos Pasos
 
 ### Opción 1: Usar ahora (Listo)
+
 - Los cambios ya están implementados
 - El sistema funciona completo
 - Prueba y verás la diferencia
 
 ### Opción 2: Agregar Historial (30 min)
+
 - Ver: `IMPLEMENTATION_GUIDE.ts`
 - Hacer IA aún más inteligente
 - Recordará conversaciones previas
@@ -190,15 +200,18 @@ DATABASE_URL=mysql://...              # ✅ Ya debe estar
 ## Soporte Técnico
 
 **¿Dónde está el código?**
+
 - Lógica: `GoHabit-system/backend/src/services/ai.service.ts`
 - Datos: `GoHabit-system/backend/src/repositories/ai.repository.ts`
 - Frontend: `GoHabit-system/frontend/js/chatbot.js`
 
 **¿Qué es el fallback?**
+
 - Si Gemini API falla → Usa búsqueda por keywords
 - Funciona siempre, solo menos personalizado
 
 **¿Cuánto cuesta?**
+
 - Gemini Flash es muy barato (~$0.01 por 1000 chars)
 - El tráfico típico: ~$0.0001 por recomendación
 
