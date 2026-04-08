@@ -60,9 +60,12 @@ export const habitController = {
             const { user, params, data } = context;
             const { habitId } = await params;
             // Note: withValidation already parsed the body into context.data
-            const completion = await habitService.complete(habitId, user.id, data?.note);
+            const completion = await habitService.complete(habitId, user.id, data?.note, data?.image);
             return success(completion);
-        } catch (err) {
+        } catch (err: any) {
+            if (err.message?.includes('Verificación de imagen fallida')) {
+                return { status: 400, body: { success: false, error: { message: err.message } } };
+            }
             return error(err);
         }
     },

@@ -64,9 +64,9 @@ export const habitRepository = {
         return result.insertId;
     },
 
-    async createCompletion(habitId: string, userId: string, note?: string, connection?: any): Promise<number> {
-        const sql = 'INSERT INTO habit_completions (habitId, userId, note) VALUES (?, ?, ?)';
-        const params = [habitId, userId, note || null];
+    async createCompletion(habitId: string, userId: string, note?: string, imageUrl?: string, connection?: any): Promise<number> {
+        const sql = 'INSERT INTO habit_completions (habitId, userId, note, imageUrl) VALUES (?, ?, ?, ?)';
+        const params = [habitId, userId, note || null, imageUrl || null];
 
         if (connection) {
             const [result]: any = await connection.execute(sql, params);
@@ -92,11 +92,17 @@ export const habitRepository = {
     },
 
     async update(id: string, userId: string, data: any): Promise<void> {
-        const keys = Object.keys(data);
-        if (keys.length === 0) return;
 
-        const setClause = keys.map(key => `${key} = ?`).join(', ');
-        const values = Object.values(data);
+        const ALLOWED_COLUMNS = new Set([
+            'title', 'description', 'frequency',
+            'targetCount', 'color', 'icon', 'isActive',
+        ]);
+
+        const allowed = Object.keys(data).filter(key => ALLOWED_COLUMNS.has(key));
+        if (allowed.length === 0) return;
+
+        const setClause = allowed.map(key => `${key} = ?`).join(', ');
+        const values    = allowed.map(key => data[key]);
 
         await execute(
             `UPDATE habits SET ${setClause} WHERE id = ? AND userId = ?`,

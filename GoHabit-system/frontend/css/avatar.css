@@ -151,13 +151,59 @@ body.dark .avatar-header__title {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  max-width: 28rem;
+  max-width: 42rem;
   margin: 0 auto;
-  background: linear-gradient(to bottom, #e0f2fe, rgba(114, 135, 100, 0.1));
-  border-radius: 0.75rem;
+  background-image: url('../assets/avatar/fondo.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 1rem;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(114, 135, 100, 0.2);
+  box-shadow: 0 18px 36px rgba(45, 72, 52, 0.16);
+  border: 1px solid rgba(108, 146, 117, 0.32);
+}
+
+.avatar-tree-display::before {
+  content: none;
+  position: absolute;
+  left: -12%;
+  right: -12%;
+  bottom: -33%;
+  height: 66%;
+  border-radius: 56% 56% 0 0;
+  background:
+    radial-gradient(68% 38% at 14% 14%, rgba(159, 214, 117, 0.95) 0 40%, rgba(159, 214, 117, 0) 41%),
+    radial-gradient(72% 44% at 48% 11%, rgba(133, 196, 95, 0.96) 0 39%, rgba(133, 196, 95, 0) 40%),
+    radial-gradient(65% 38% at 85% 16%, rgba(112, 176, 82, 0.96) 0 41%, rgba(112, 176, 82, 0) 42%),
+    repeating-linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.07) 0 5px,
+      rgba(255, 255, 255, 0) 5px 12px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(40, 84, 42, 0.09) 0 1px,
+      rgba(40, 84, 42, 0) 1px 8px
+    ),
+    linear-gradient(180deg, #83c864 0%, #5f9e4a 56%, #3e6f35 100%);
+  box-shadow: inset 0 10px 16px rgba(255, 255, 255, 0.14), inset 0 -22px 28px rgba(20, 46, 26, 0.30);
+  z-index: 1;
+}
+
+.avatar-tree-display::after {
+  content: none;
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  top: 24%;
+  height: 40%;
+  background:
+    linear-gradient(166deg, transparent 42%, rgba(154, 198, 186, 0.90) 42.2% 58.8%, transparent 59%),
+    linear-gradient(198deg, transparent 39%, rgba(121, 166, 154, 0.88) 39.2% 55.8%, transparent 56%),
+    linear-gradient(148deg, transparent 50%, rgba(173, 210, 199, 0.86) 50.2% 66.8%, transparent 67%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0 2px, rgba(255, 255, 255, 0) 2px 100%);
+  opacity: 0.92;
+  z-index: 0;
 }
 
 .avatar-tree-container {
@@ -166,15 +212,30 @@ body.dark .avatar-header__title {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: .8rem;
+  z-index: 2;
+  isolation: isolate;
 }
 
 .avatar-tree-image {
-  width: 100%;
-  height: 100%;
+  width: 114%;
+  height: 114%;
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
+  transform-origin: center bottom;
+  filter: drop-shadow(0 14px 20px rgba(32, 64, 37, 0.30));
+}
+
+.avatar-tree-image.gh-avatar-live {
+  animation: ghAvatarFloat 3.4s ease-in-out infinite;
+  mix-blend-mode: normal;
+  opacity: 1;
+}
+
+@keyframes ghAvatarFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.02); }
 }
 
 .avatar-tree-badge {
@@ -187,6 +248,7 @@ body.dark .avatar-header__title {
   border-radius: 9999px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(114, 135, 100, 0.2);
+  z-index: 3;
 }
 
 .avatar-tree-badge__text {
@@ -296,6 +358,139 @@ body.dark .avatar-stat-card__value--streak {
   height: 100%;
   width: 75%;
   border-radius: 9999px;
+}
+
+/* ================================================
+   COSMETICS OVERLAY + INVENTORY
+   ================================================ */
+
+.avatar-cosmetic {
+  position: absolute;
+  z-index: 4;
+  text-shadow: 0 6px 12px rgba(0, 0, 0, 0.22);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.avatar-cosmetic--common {
+  color: #475569;
+}
+
+.avatar-cosmetic--rare {
+  color: #4f46e5;
+}
+
+.avatar-cosmetic--epic {
+  color: #d97706;
+}
+
+.avatar-cosmetic--head {
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.3rem;
+}
+
+.avatar-cosmetic--face {
+  top: 42%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+}
+
+.avatar-cosmetic--aura {
+  top: 16%;
+  right: 18%;
+  font-size: 2.1rem;
+}
+
+.avatar-cosmetic--companion {
+  bottom: 20%;
+  left: 22%;
+  font-size: 2rem;
+}
+
+.avatar-inventory {
+  margin: 1rem;
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(114, 135, 100, 0.2);
+  padding: 1rem;
+}
+
+body.dark .avatar-inventory {
+  background: rgba(17, 24, 39, 0.82);
+}
+
+.avatar-inventory__title {
+  margin: 0 0 0.85rem;
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+body.dark .avatar-inventory__title {
+  color: #e2e8f0;
+}
+
+.avatar-inventory__list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.avatar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 0.55rem;
+  background: rgba(248, 250, 252, 0.8);
+}
+
+.avatar-item--rare {
+  border-color: rgba(79, 70, 229, 0.45);
+}
+
+.avatar-item--epic {
+  border-color: rgba(217, 119, 6, 0.45);
+}
+
+.avatar-item__icon {
+  font-size: 1.3rem;
+  color: var(--primary-dark);
+}
+
+.avatar-item__meta {
+  flex: 1;
+}
+
+.avatar-item__name {
+  margin: 0;
+  font-weight: 600;
+}
+
+.avatar-item__rarity {
+  margin: 0.15rem 0 0;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.avatar-item__btn {
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+}
+
+.avatar-item__btn:hover {
+  background: var(--primary-dark);
+}
+
+.avatar-inventory__empty {
+  margin: 0;
+  color: #64748b;
 }
 
 .avatar-stat-card__subtitle {

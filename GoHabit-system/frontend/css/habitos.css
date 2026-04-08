@@ -303,7 +303,7 @@ body.dark .habitos-xp-bar {
 .habitos-xp-fill {
   height: 100%;
   background-color: var(--primary);
-  width: 75%;
+  width: 0%;
   border-radius: 9999px;
   box-shadow: 0 0 10px rgba(114, 135, 100, 0.4);
 }
@@ -359,6 +359,12 @@ body.dark .habitos-section-title {
 
 .habitos-view-all-link:hover {
   color: #4a5d3f;
+}
+
+.habitos-manage-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
 
 /* ================================================
@@ -418,6 +424,104 @@ body.dark .habit-card--completed .habit-card__title {
 .habit-card__icon-container--primary {
   background-color: rgba(46, 79, 50, 0.1);
   color: var(--primary);
+}
+
+/* ================================================
+   HABIT MANAGE MODAL
+   ================================================ */
+
+.habit-manage-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.46);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 12000;
+  padding: 1rem;
+}
+
+.habit-manage-modal__panel {
+  width: min(520px, 100%);
+  max-height: 80vh;
+  overflow: auto;
+  border-radius: 0.85rem;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.22);
+  padding: 1rem;
+}
+
+body.dark .habit-manage-modal__panel {
+  background: #17202d;
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.habit-manage-modal__title {
+  margin: 0 0 0.7rem;
+  font-size: 1.1rem;
+}
+
+.habit-manage-modal__list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.habit-manage-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.65rem;
+  padding: 0.55rem;
+  background: rgba(248, 250, 252, 0.88);
+}
+
+body.dark .habit-manage-item {
+  background: rgba(30, 41, 59, 0.55);
+}
+
+.habit-manage-item__title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.habit-manage-item__sub {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.habit-manage-item__delete {
+  border: none;
+  border-radius: 0.5rem;
+  background: #dc2626;
+  color: #fff;
+  padding: 0.35rem 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.habit-manage-modal__footer {
+  margin-top: 0.85rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.habit-manage-modal__close {
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: #fff;
+  padding: 0.45rem 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.habit-manage-empty {
+  margin: 0;
+  color: #64748b;
 }
 
 body.dark .habit-card__icon-container--primary {

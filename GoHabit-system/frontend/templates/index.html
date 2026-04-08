@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../css/app.css">
     <!-- Stylesheets -->
     <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/chatbot.css">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -21,12 +22,12 @@
         <header class="index-header gh-fullbleed">
             <div>
                 <p class="index-header__greeting">Buenos días,</p>
-                <h1 class="index-header__title">¡Hola, Alex!</h1>
+                <h1 class="index-header__title">Hola, <span data-user-first-name>Usuario</span></h1>
             </div>
             <div style="display:flex;align-items:center;gap:10px;">
                 <div class="index-header__balance" aria-label="Semillas disponibles">
                     <span class="material-symbols-outlined index-header__balance-icon">eco</span>
-                    <span class="index-header__balance-text" data-seeds>1,250</span>
+                    <span class="index-header__balance-text" data-seeds>0</span>
                 </div>
                 <button class="gh-icon-btn" type="button" data-theme-toggle aria-label="Cambiar a modo oscuro">
                     <span class="material-symbols-outlined">dark_mode</span>
@@ -40,11 +41,11 @@
             <div class="index-tree-glow"></div>
             <div class="index-tree-container">
                 <!-- Tree Image Placeholder -->
-                <div class="index-tree-image" data-avatar-image data-alt="Árbol avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVjO9jGOV1NPgGHkRpiszfA7j4bNqwVW2Tg76Hw1fgn_0w4gLNeXnGx-mCNh9_xY4VvLeT1IIh-orEBsrvjrlCHnxEhAUMFVwxpCYG7TpW6GtcXmLxBy2gtGgiRE4UofK7HCUMdGr4NpWVyB1IggbR76dsyHhpe-mA0O3gIYXWPFDYsxtDfDpfgIl-Euax_gp26WKVNUBr9yYf1AjStg0IrAG_bBGua3eGeAr6VDgRHX7H5NNFyNu0XGkqYj5NIisBbRv8livaJWY');">
+                <div class="index-tree-image"  data-avatar-image data-alt="Árbol avatar">
                 </div>
                 <!-- Floating Level Badge -->
                 <div class="index-tree-badge">
-                    <span class="index-tree-badge__level" data-avatar-level>Nivel 5</span>
+                    <span class="index-tree-badge__level">Nivel <span data-user-level>1</span></span>
                     <span class="index-tree-badge__name" data-avatar-name>Roble Joven</span>
                 </div>
             </div>
@@ -70,7 +71,7 @@
                             <div class="index-task-card__progress-bar">
                                 <div class="index-task-card__progress-fill"></div>
                             </div>
-                            <span class="index-task-card__progress-text">1.5 / 2L</span>
+                            <span class="index-task-card__progress-text">0 / 2L</span>
                         </div>
                     </div>
                     <button class="index-task-card__button" type="button" data-habit-toggle="1" aria-label="Marcar hábito como completado">
@@ -87,7 +88,7 @@
                     <div class="index-progress-card index-progress-card--health">
                         <div class="index-progress-card__header">
                             <span class="material-symbols-outlined index-progress-card__icon">spa</span>
-                            <span class="index-progress-card__percentage">85%</span>
+                            <span class="index-progress-card__percentage">0%</span>
                         </div>
                         <div>
                             <p class="index-progress-card__label">Salud</p>
@@ -101,7 +102,7 @@
                     <div class="index-progress-card index-progress-card--mind">
                         <div class="index-progress-card__header">
                             <span class="material-symbols-outlined index-progress-card__icon">mindfulness</span>
-                            <span class="index-progress-card__percentage">40%</span>
+                            <span class="index-progress-card__percentage">0%</span>
                         </div>
                         <div>
                             <p class="index-progress-card__label">Mente</p>
@@ -144,8 +145,12 @@
   </div>
 </nav>
 
+    <script src="../js/api.js" defer></script>
+    <script src="../js/router.js" defer></script>
+    <script src="../js/session-user.js" defer></script>
     <script src="../js/app.js" defer></script>
     <script src="../js/pages/avatarImage.js" defer></script>
     <script src="../js/pages/index.js" defer></script>
+    <script src="../js/chatbot.js" defer></script>
 </body>
 </html>

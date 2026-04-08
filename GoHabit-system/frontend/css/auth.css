@@ -79,12 +79,36 @@ body.auth-page{
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  isolation: isolate;
+}
+
+.auth-hero__mock::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(28% 28% at 20% 24%, rgba(114,135,100,.16) 0%, rgba(114,135,100,0) 100%),
+    radial-gradient(32% 32% at 78% 74%, rgba(217,140,113,.16) 0%, rgba(217,140,113,0) 100%);
+  z-index: 0;
+}
+
+.auth-hero__mock::after{
+  content: "";
+  position: absolute;
+  width: min(86%, 380px);
+  aspect-ratio: 1 / 1;
+  border-radius: 22px;
+  border: 1px solid rgba(114,135,100,.14);
+  background: #ffffff url('../assets/logo.png') center / 100% no-repeat;
+  box-shadow: 0 14px 30px rgba(20,23,17,.12);
+  z-index: 1;
 }
 
 .auth-hero__circle{
   position: absolute;
   border-radius: 999px;
   filter: blur(8px);
+  display: none;
 }
 
 .auth-hero__circle--one{
@@ -114,6 +138,7 @@ body.auth-page{
   display: grid;
   place-items: center;
   box-shadow: 0 12px 32px rgba(20,23,17,.08);
+  display: none;
 }
 
 .auth-hero__tree .material-symbols-outlined{
@@ -193,6 +218,13 @@ body.auth-page{
   font-size: 14px;
   font-weight: 600;
   color: #334155;
+}
+
+.auth-field__error{
+  display: none;
+  color: #b42318;
+  font-size: 13px;
+  margin-top: 4px;
 }
 
 .auth-input-wrap{
@@ -346,6 +378,11 @@ body.auth-page{
     aspect-ratio: 16 / 10;
   }
 
+  .auth-hero__mock::after{
+    width: min(74%, 320px);
+    border-radius: 18px;
+  }
+
   .auth-card-wrap{
     padding: 20px 16px 32px;
   }
@@ -362,6 +399,11 @@ body.auth-page{
 }
 
 @media (max-width: 560px){
+  .auth-hero__mock::after{
+    width: min(84%, 320px);
+    background-size: 100%;
+  }
+
   .auth-row{
     flex-direction: column;
     align-items: flex-start;

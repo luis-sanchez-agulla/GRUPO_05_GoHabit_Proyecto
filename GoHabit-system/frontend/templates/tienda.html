@@ -1,145 +1,194 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tienda - Habit Tracker</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tienda - Habit Tracker</title>
 
-  <link rel="stylesheet" href="../css/app.css">
-  <link rel="stylesheet" href="../css/tienda.css">
-  <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="../css/app.css" />
+    <link rel="stylesheet" href="../css/tienda.css" />
+    <link rel="stylesheet" href="../css/chatbot.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-</head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<body class="tienda-page">
+  <body class="tienda-page">
+    <!-- ✅ HEADER FULL WIDTH -->
+    <header class="gh-header">
+      <div class="gh-header__inner gh-header__inner--home">
+        <div class="gh-header__left">
+          <a href="index.html" class="gh-icon-btn" aria-label="Volver">
+            <span class="material-symbols-outlined">arrow_back</span>
+          </a>
 
-  <!-- ✅ HEADER FULL WIDTH -->
-  <header class="gh-header">
-    <div class="gh-header__inner gh-header__inner--home">
+          <div class="gh-header__titles">
+            <p class="gh-header__kicker">Personaliza tu árbol</p>
+            <h1 class="gh-header__headline">Tienda</h1>
+          </div>
+        </div>
 
-      <div class="gh-header__left">
-        <a href="index.html" class="gh-icon-btn" aria-label="Volver">
-          <span class="material-symbols-outlined">arrow_back</span>
-        </a>
+        <div class="gh-header__right">
+          <div class="gh-chip" aria-label="Semillas disponibles">
+            <span class="material-symbols-outlined">eco</span>
+            <span data-seeds>550</span>
+          </div>
 
-        <div class="gh-header__titles">
-          <p class="gh-header__kicker">Personaliza tu árbol</p>
-          <h1 class="gh-header__headline">Tienda</h1>
+          <button
+            type="button"
+            class="gh-icon-btn"
+            data-theme-toggle
+            aria-label="Cambiar tema"
+          >
+            <span class="material-symbols-outlined">dark_mode</span>
+          </button>
         </div>
       </div>
+    </header>
 
-      <div class="gh-header__right">
-        <div class="gh-chip" aria-label="Semillas disponibles">
-          <span class="material-symbols-outlined">eco</span>
-          <span data-seeds>550</span>
+    <!-- ✅ CONTENIDO centrado -->
+    <div class="tienda-container">
+      <main class="tienda-main">
+        <div class="tienda-hero-section">
+          <div class="tienda-hero">
+            <div class="tienda-hero__content">
+              <h2 class="tienda-hero__title">Cofres de la Semana</h2>
+              <p class="tienda-hero__subtitle">
+                Abre cofres y consigue objetos aleatorios para tu muñeco
+              </p>
+            </div>
+            <span class="material-symbols-outlined tienda-hero__icon"
+              >deployed_code_history</span
+            >
+          </div>
         </div>
 
-        <button type="button" class="gh-icon-btn" data-theme-toggle aria-label="Cambiar tema">
-          <span class="material-symbols-outlined">dark_mode</span>
-        </button>
-      </div>
+        <h2 class="tienda-products-title">Elige un Cofre</h2>
 
+        <div class="tienda-products-grid">
+          <div class="product-card chest-card chest-card--wood">
+            <div class="product-card__image">
+              <span class="material-symbols-outlined product-card__icon"
+                >deployed_code</span
+              >
+              <div class="product-card__image-overlay"></div>
+            </div>
+            <div class="product-card__info">
+              <p class="product-card__name">Cofre de Madera</p>
+              <div class="product-card__price-container">
+                <span class="material-symbols-outlined product-card__price-icon"
+                  >eco</span
+                >
+                <p class="product-card__price">80 Semillas</p>
+              </div>
+              <p class="chest-card__hint">Mayormente objetos comunes</p>
+            </div>
+            <button class="product-card__button" data-open-chest="madera">
+              <span class="material-symbols-outlined product-card__button-icon"
+                >lock_open</span
+              >
+              Abrir
+            </button>
+          </div>
+
+          <div class="product-card chest-card chest-card--silver">
+            <div class="product-card__image">
+              <span class="material-symbols-outlined product-card__icon"
+                >deployed_code_alert</span
+              >
+              <div class="product-card__image-overlay"></div>
+            </div>
+            <div class="product-card__info">
+              <p class="product-card__name">Cofre de Plata</p>
+              <div class="product-card__price-container">
+                <span class="material-symbols-outlined product-card__price-icon"
+                  >eco</span
+                >
+                <p class="product-card__price">180 Semillas</p>
+              </div>
+              <p class="chest-card__hint">Buen balance de raros</p>
+            </div>
+            <button class="product-card__button" data-open-chest="plata">
+              <span class="material-symbols-outlined product-card__button-icon"
+                >lock_open</span
+              >
+              Abrir
+            </button>
+          </div>
+
+          <div class="product-card chest-card chest-card--gold">
+            <div class="product-card__image">
+              <span class="material-symbols-outlined product-card__icon"
+                >deployed_code_update</span
+              >
+              <div class="product-card__image-overlay"></div>
+            </div>
+            <div class="product-card__info">
+              <p class="product-card__name">Cofre de Oro</p>
+              <div class="product-card__price-container">
+                <span class="material-symbols-outlined product-card__price-icon"
+                  >eco</span
+                >
+                <p class="product-card__price">320 Semillas</p>
+              </div>
+              <p class="chest-card__hint">Alta probabilidad de épicos</p>
+            </div>
+            <button class="product-card__button" data-open-chest="oro">
+              <span class="material-symbols-outlined product-card__button-icon"
+                >lock_open</span
+              >
+              Abrir
+            </button>
+          </div>
+        </div>
+
+        <section class="loot-result" data-loot-result>
+          <p class="loot-result__placeholder">
+            Tu próximo objeto aparecerá aquí al abrir un cofre.
+          </p>
+        </section>
+      </main>
+
+      <!-- ✅ Bottom Navigation -->
+      <nav class="index-nav">
+        <div class="index-nav__container">
+          <a href="index.html" class="index-nav__link"
+            ><span class="index-nav__icon">🏠</span
+            ><span class="index-nav__text">Inicio</span></a
+          >
+          <a href="habitos.html" class="index-nav__link"
+            ><span class="index-nav__icon">✔️</span
+            ><span class="index-nav__text">Hábitos</span></a
+          >
+          <a href="avatar.html" class="index-nav__link"
+            ><span class="index-nav__icon">🌳</span
+            ><span class="index-nav__text">Avatar</span></a
+          >
+          <a href="tienda.html" class="index-nav__link index-nav__link--active"
+            ><span class="index-nav__icon">🛒</span
+            ><span class="index-nav__text">Tienda</span></a
+          >
+          <a href="perfil.html" class="index-nav__link"
+            ><span class="index-nav__icon">👤</span
+            ><span class="index-nav__text">Perfil</span></a
+          >
+        </div>
+      </nav>
     </div>
-  </header>
 
-  <!-- ✅ CONTENIDO centrado -->
-  <div class="tienda-container">
-
-    <main class="tienda-main">
-      <div class="tienda-hero-section">
-        <div class="tienda-hero">
-          <div class="tienda-hero__content">
-            <h2 class="tienda-hero__title">Colección de Primavera</h2>
-            <p class="tienda-hero__subtitle">Personaliza tu árbol con objetos únicos</p>
-          </div>
-          <span class="material-symbols-outlined tienda-hero__icon">park</span>
-        </div>
-      </div>
-
-      <h2 class="tienda-products-title">Accesorios para tu Árbol</h2>
-
-      <div class="tienda-products-grid">
-        <div class="product-card">
-          <div class="product-card__image">
-            <span class="material-symbols-outlined product-card__icon">nest_eco</span>
-            <div class="product-card__image-overlay"></div>
-          </div>
-          <div class="product-card__info">
-            <p class="product-card__name">Nido de Pájaros</p>
-            <div class="product-card__price-container">
-              <span class="material-symbols-outlined product-card__price-icon">eco</span>
-              <p class="product-card__price">120 Semillas</p>
-            </div>
-          </div>
-          <a href="objeto.html" class="product-card__button">
-            <span class="material-symbols-outlined product-card__button-icon">shopping_cart</span>
-            Comprar
-          </a>
-        </div>
-
-        <div class="product-card">
-          <div class="product-card__image">
-            <span class="material-symbols-outlined product-card__icon">local_florist</span>
-            <div class="product-card__image-overlay"></div>
-          </div>
-          <div class="product-card__info">
-            <p class="product-card__name">Flores de Cerezo</p>
-            <div class="product-card__price-container">
-              <span class="material-symbols-outlined product-card__price-icon">eco</span>
-              <p class="product-card__price">200 Semillas</p>
-            </div>
-          </div>
-          <a href="objeto.html" class="product-card__button">
-            <span class="material-symbols-outlined product-card__button-icon">shopping_cart</span>
-            Comprar
-          </a>
-        </div>
-
-        <div class="product-card">
-          <div class="product-card__image">
-            <span class="material-symbols-outlined product-card__icon">fence</span>
-            <div class="product-card__image-overlay"></div>
-          </div>
-          <div class="product-card__info">
-            <p class="product-card__name">Valla de Madera</p>
-            <div class="product-card__price-container">
-              <span class="material-symbols-outlined product-card__price-icon">eco</span>
-              <p class="product-card__price">150 Semillas</p>
-            </div>
-          </div>
-          <a href="objeto.html" class="product-card__button">
-            <span class="material-symbols-outlined product-card__button-icon">shopping_cart</span>
-            Comprar
-          </a>
-        </div>
-
-        <div class="product-card product-card--coming-soon">
-          <div class="product-card__image">
-            <span class="material-symbols-outlined product-card__icon">lock</span>
-          </div>
-          <div class="product-card__info">
-            <p class="product-card__coming-soon-text">Más objetos pronto...</p>
-          </div>
-        </div>
-      </div>
-    </main>
-
-    <!-- ✅ Bottom Navigation -->
-    <nav class="index-nav">
-      <div class="index-nav__container">
-        <a href="index.html" class="index-nav__link"><span class="index-nav__icon">🏠</span><span class="index-nav__text">Inicio</span></a>
-        <a href="habitos.html" class="index-nav__link"><span class="index-nav__icon">✔️</span><span class="index-nav__text">Hábitos</span></a>
-        <a href="avatar.html" class="index-nav__link"><span class="index-nav__icon">🌳</span><span class="index-nav__text">Avatar</span></a>
-        <a href="tienda.html" class="index-nav__link index-nav__link--active"><span class="index-nav__icon">🛒</span><span class="index-nav__text">Tienda</span></a>
-        <a href="perfil.html" class="index-nav__link"><span class="index-nav__icon">👤</span><span class="index-nav__text">Perfil</span></a>
-      </div>
-    </nav>
-
-  </div>
-
-  <script src="../js/app.js" defer></script>
-  <script src="../js/pages/bindSeeds.js" defer></script>
-</body>
+    <script src="../js/api.js" defer></script>
+    <script src="../js/router.js" defer></script>
+    <script src="../js/session-user.js" defer></script>
+    <script src="../js/app.js" defer></script>
+    <script src="../js/pages/bindSeeds.js" defer></script>
+    <script src="../js/pages/tienda-cofres.js" defer></script>
+    <script src="../js/chatbot.js" defer></script>
+  </body>
 </html>

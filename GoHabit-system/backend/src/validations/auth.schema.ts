@@ -26,8 +26,15 @@ import { LIMITS } from "@/lib/constants";  // Límites definidos centralmente
  *   → Error: { email: ["Email inválido"], password: ["Contraseña requerida"] }
  */
 export const loginSchema = z.object({
-    email: z.string().email("Email inválido"),       // Debe ser un email válido (con @)
-    password: z.string().min(1, "Contraseña requerida"),  // No puede estar vacío
+    email: z
+        .string()
+        .email("Email inválido")
+        .toLowerCase()  // Normalizar a minúsculas para evitar case-sensitivity
+        .trim(),  // Eliminar espacios
+    password: z
+        .string()
+        .min(1, "Contraseña requerida")
+        .max(128, "Contraseña muy larga"),  // Límite sensato
 });
 
 /**
@@ -42,18 +49,24 @@ export const loginSchema = z.object({
  *   }
  */
 export const registerSchema = z.object({
-    email: z.string().email("Email inválido"),
+    email: z
+        .string()
+        .email("Email inválido")
+        .toLowerCase()
+        .trim(),
     username: z
         .string()
         .min(LIMITS.USERNAME_MIN_LENGTH, `Mínimo ${LIMITS.USERNAME_MIN_LENGTH} caracteres`)
         .max(LIMITS.USERNAME_MAX_LENGTH, `Máximo ${LIMITS.USERNAME_MAX_LENGTH} caracteres`)
-        .regex(/^[a-zA-Z0-9_]+$/, "Solo letras, números y guiones bajos"),  // Sin espacios ni caracteres raros
+        .regex(/^[a-zA-Z0-9_]+$/, "Solo letras, números y guiones bajos")  // Sin espacios ni caracteres raros
+        .trim(),
     password: z
         .string()
-        .min(LIMITS.PASSWORD_MIN_LENGTH, `Mínimo ${LIMITS.PASSWORD_MIN_LENGTH} caracteres`),
-    firstName: z.string().optional(),  // Opcional: el usuario puede rellenarlo después
-    lastName: z.string().optional(),
-});
+        .min(LIMITS.PASSWORD_MIN_LENGTH, `Mínimo ${LIMITS.PASSWORD_MIN_LENGTH} caracteres`)
+        .max(128, "Contraseña muy larga"),
+    firstName: z.string().max(50, "Nombre muy largo").optional().nullable(),
+    lastName: z.string().max(50, "Apellido muy largo").optional().nullable(),
+}).strict();  // Rechaza campos adicionales inesperados
 
 // Exportamos los tipos inferidos de los schemas
 // z.infer<typeof schema> genera el tipo TypeScript equivalente automáticamente

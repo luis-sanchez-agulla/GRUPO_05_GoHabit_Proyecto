@@ -36,7 +36,7 @@
 
     <section class="auth-card-wrap">
       <div class="auth-card">
-        <a href="index.html" class="auth-back">
+        <a href="registro.html" class="auth-back">
           <span class="material-symbols-outlined">arrow_back</span>
         </a>
 
@@ -46,21 +46,23 @@
           <p class="auth-card__subtitle">Accede a tu cuenta y sigue con tu progreso.</p>
         </div>
 
-        <form class="auth-form" action="index.html">
+        <form class="auth-form" id="login-form">
           <label class="auth-field">
             <span class="auth-field__label">Correo electrónico</span>
             <div class="auth-input-wrap">
               <span class="material-symbols-outlined auth-input__icon">mail</span>
-              <input type="email" placeholder="tuemail@email.com" required />
+              <input id="login-email" type="email" placeholder="tuemail@email.com" required />
             </div>
+            <small id="login-email-error" class="auth-field__error"></small>
           </label>
 
           <label class="auth-field">
             <span class="auth-field__label">Contraseña</span>
             <div class="auth-input-wrap">
               <span class="material-symbols-outlined auth-input__icon">lock</span>
-              <input type="password" placeholder="••••••••" required />
+              <input id="login-password" type="password" placeholder="••••••••" required />
             </div>
+            <small id="login-password-error" class="auth-field__error"></small>
           </label>
 
           <div class="auth-row">
@@ -86,6 +88,10 @@
       </div>
     </section>
   </main>
+
+  <script src="../js/api.js" defer></script>
+  <script src="../js/router.js" defer></script>
+  <script src="../js/login_register.js" defer></script>
 
 </body>
 </html>

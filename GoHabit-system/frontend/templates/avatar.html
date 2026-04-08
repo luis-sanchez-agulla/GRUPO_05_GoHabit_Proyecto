@@ -1,133 +1,110 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Tu Avatar - Habit Tracker</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tu Avatar - Habit Tracker</title>
 
-<link rel="stylesheet" href="../css/app.css">
-<link rel="stylesheet" href="../css/avatar.css">
-<link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="../css/app.css" />
+    <link rel="stylesheet" href="../css/chatbot.css" />
+    <link rel="stylesheet" href="../css/avatar.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1"
+      rel="stylesheet"
+    />
+  </head>
 
-</head>
+  <body class="avatar-page">
+    <!-- HEADER FULL WIDTH -->
+    <header class="gh-header">
+      <div class="gh-header__inner gh-header__inner--home">
+        <div class="gh-header__left">
+          <a href="index.html" class="gh-icon-btn">
+            <span class="material-symbols-outlined">arrow_back</span>
+          </a>
 
+          <div class="gh-header__titles">
+            <p class="gh-header__kicker">Tu progreso</p>
+            <h1 class="gh-header__headline">Avatar</h1>
+          </div>
+        </div>
 
-<body class="avatar-page">
+        <div class="gh-header__right">
+          <div class="gh-chip">
+            <span class="material-symbols-outlined">eco</span>
+            <span data-seeds>500</span>
+          </div>
 
+          <button class="gh-icon-btn" data-theme-toggle>
+            <span class="material-symbols-outlined">dark_mode</span>
+          </button>
+        </div>
+      </div>
+    </header>
 
-<!-- HEADER FULL WIDTH -->
-<header class="gh-header">
+    <!-- CONTENIDO -->
+    <div class="avatar-container">
+      <main class="avatar-main">
+        <div class="avatar-tree-section">
+          <div class="avatar-tree-display">
+            <div class="avatar-tree-container">
+              <div class="avatar-tree-image" data-avatar-image></div>
+            </div>
 
-<div class="gh-header__inner gh-header__inner--home">
+            <div class="avatar-tree-badge">
+              <span class="avatar-tree-badge__text">
+                <span class="material-symbols-outlined avatar-tree-badge__icon"
+                  >auto_awesome</span
+                >
+                <span data-avatar-name>Brote</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </main>
 
-<div class="gh-header__left">
+      <nav class="index-nav">
+        <div class="index-nav__container">
+          <a href="index.html" class="index-nav__link">
+            <span class="index-nav__icon">🏠</span>
+            <span class="index-nav__text">Inicio</span>
+          </a>
 
-<a href="index.html" class="gh-icon-btn">
-<span class="material-symbols-outlined">arrow_back</span>
-</a>
+          <a href="habitos.html" class="index-nav__link">
+            <span class="index-nav__icon">✔️</span>
+            <span class="index-nav__text">Hábitos</span>
+          </a>
 
-<div class="gh-header__titles">
-<p class="gh-header__kicker">Tu progreso</p>
-<h1 class="gh-header__headline">Avatar</h1>
-</div>
+          <a href="avatar.html" class="index-nav__link index-nav__link--active">
+            <span class="index-nav__icon">🌳</span>
+            <span class="index-nav__text">Avatar</span>
+          </a>
 
-</div>
+          <a href="tienda.html" class="index-nav__link">
+            <span class="index-nav__icon">🛒</span>
+            <span class="index-nav__text">Tienda</span>
+          </a>
 
+          <a href="perfil.html" class="index-nav__link">
+            <span class="index-nav__icon">👤</span>
+            <span class="index-nav__text">Perfil</span>
+          </a>
+        </div>
+      </nav>
+    </div>
 
-<div class="gh-header__right">
-
-<div class="gh-chip">
-<span class="material-symbols-outlined">eco</span>
-<span data-seeds>500</span>
-</div>
-
-<button class="gh-icon-btn" data-theme-toggle>
-<span class="material-symbols-outlined">dark_mode</span>
-</button>
-
-</div>
-
-</div>
-
-</header>
-
-
-
-<!-- CONTENIDO -->
-<div class="avatar-container">
-
-<main class="avatar-main">
-
-<div class="avatar-tree-section">
-
-<div class="avatar-tree-display">
-
-<div class="avatar-tree-container">
-
-<div class="avatar-tree-image"
-data-avatar-image
-style='background-image:url("https://lh3.googleusercontent.com/aida-public/AB6AXuCphDlqrvBia8ebxYuaw7h7KrkJONBB-hyxlIZYZRjnKxCTSJpxTjiojUuFQ4g8bJwXSriK5mi-WUMsa_sWJ6UOG3xQkJIM2ffw4upFx-uDgRlZeNYVtnYqnhH1Of_IuJz-x8K0BYU5-eD0a4klQejtR49PYlrE3Q-cqp5RnMOMUACU3GHZ3Agss0Ntu_qdhDaxtzxbqyzhThT6mcK78zutpL4DWhdK7HKdtOkQS5Xj7nixK6YURxzQmAiuqUoISfE6gONkxIIIsoU");'>
-</div>
-
-</div>
-
-<div class="avatar-tree-badge">
-<span class="avatar-tree-badge__text">
-<span class="material-symbols-outlined avatar-tree-badge__icon">auto_awesome</span>
-Renaciendo
-</span>
-</div>
-
-</div>
-
-</div>
-
-
-</main>
-
-
-
-<nav class="index-nav">
-
-<div class="index-nav__container">
-
-<a href="index.html" class="index-nav__link">
-<span class="index-nav__icon">🏠</span>
-<span class="index-nav__text">Inicio</span>
-</a>
-
-<a href="habitos.html" class="index-nav__link">
-<span class="index-nav__icon">✔️</span>
-<span class="index-nav__text">Hábitos</span>
-</a>
-
-<a href="avatar.html" class="index-nav__link index-nav__link--active">
-<span class="index-nav__icon">🌳</span>
-<span class="index-nav__text">Avatar</span>
-</a>
-
-<a href="tienda.html" class="index-nav__link">
-<span class="index-nav__icon">🛒</span>
-<span class="index-nav__text">Tienda</span>
-</a>
-
-<a href="perfil.html" class="index-nav__link">
-<span class="index-nav__icon">👤</span>
-<span class="index-nav__text">Perfil</span>
-</a>
-
-</div>
-
-</nav>
-
-</div>
-
-
-<script src="../js/app.js" defer></script>
-<script src="../js/pages/avatarImage.js" defer></script>
-
-</body>
+    <script src="../js/api.js" defer></script>
+    <script src="../js/router.js" defer></script>
+    <script src="../js/session-user.js" defer></script>
+    <script src="../js/app.js" defer></script>
+    <script src="../js/pages/avatarImage.js" defer></script>
+    <script src="../js/pages/avatar-cosmetics.js" defer></script>
+    <script src="../js/chatbot.js" defer></script>
+  </body>
 </html>

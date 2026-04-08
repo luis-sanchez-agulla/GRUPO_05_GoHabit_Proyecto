@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-  GoHabit.bindSeeds('[data-seeds]');
+  const refreshSeeds = GoHabit.bindSeeds('[data-seeds]');
 
   const container = document.querySelector('.habitos-cards-container');
+  const manageBtn = document.querySelector('[data-manage-habits]');
   if(!container) return;
 
   const colorClass = (c) => {
@@ -15,8 +16,24 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   function render(){
-    const habits = GoHabit.ensureDefaultHabits();
+    const habits = GoHabit.getDueHabitsForDate(new Date());
     container.innerHTML = '';
+
+    if(!habits.length){
+      const empty = document.createElement('div');
+      empty.className = 'habit-card';
+      empty.innerHTML = `
+        <div class="habit-card__icon-container habit-card__icon-container--primary">
+          <span class="material-symbols-outlined">task_alt</span>
+        </div>
+        <div class="habit-card__content">
+          <h3 class="habit-card__title">No tienes objetivos para hoy</h3>
+          <p class="habit-card__category">Tus hábitos de otros días no se muestran en esta lista diaria.</p>
+        </div>
+      `;
+      container.appendChild(empty);
+      return;
+    }
 
     habits.forEach(h => {
       const wrapper = document.createElement('div');
@@ -43,13 +60,144 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
 
       const input = wrapper.querySelector('input[type="checkbox"]');
-      input.addEventListener('change', () => {
-        const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
-        GoHabit.toggleHabit(h.id, { reward });
-        GoHabit.bindSeeds('[data-seeds]')();
+      input.addEventListener('change', async (e) => {
+        // Si se está desmarcando, permitirlo directamente
+        if (!e.target.checked) {
+            const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
+            GoHabit.toggleHabit(h.id, { reward });
+            refreshSeeds();
+            return;
+        }
+
+        e.preventDefault();
+        e.target.checked = false; // Forzar desmarcado hasta la foto
+
+        // Crear input file escondido
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.onchange = (ev) => {
+            const file = ev.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (reData) => {
+                const base64 = reData.target.result;
+                GoHabit.toast('Analizando foto con IA...', 'good', { icon: 'psychology' });
+                
+                try {
+                    // Si tienes el backend levantado:
+                    const res = await fetch('/api/ai/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ habitTitle: h.titulo, image: base64 })
+                    });
+                    
+                    if (!res.ok) throw new Error('Visual Verification failed');
+                    const data = await res.json();
+                    
+                    if (data.verified) {
+                        e.target.checked = true;
+                        const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
+                        GoHabit.toggleHabit(h.id, { reward });
+                        refreshSeeds();
+                        GoHabit.toast('¡Hábito verificado y guardado!', 'good', { icon: 'verified' });
+
+                        // Subir secretamente a feed (Para el backend que hemos construido)
+                        if (window.GoHabitAPI) {
+                            GoHabitAPI.post(`/habits/${h.id}/complete`, { image: base64, note: "Fotito!" }).catch(console.error);
+                        }
+                    } else {
+                        GoHabit.toast('IA rechaza la foto: ' + data.reason, 'bad', { icon: 'error' });
+                    }
+                } catch (err) {
+                    // Fallback local robusto (prototipo sin backend 100% configurado)
+                    console.error(err);
+                    e.target.checked = true;
+                    const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
+                    GoHabit.toggleHabit(h.id, { reward });
+                    refreshSeeds();
+                    GoHabit.toast('Completado (Fallback)', 'good', { icon: 'check' });
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+        fileInput.click();
       });
 
       container.appendChild(wrapper);
+    });
+  }
+
+  function openManageModal(){
+    const allHabits = GoHabit.ensureDefaultHabits();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'habit-manage-modal';
+
+    const listHtml = allHabits.length
+      ? allHabits.map((habit) => `
+          <article class="habit-manage-item" data-manage-item="${String(habit.id)}">
+            <div class="habit-manage-item__meta">
+              <p class="habit-manage-item__title">${escapeHTML(habit.titulo)}</p>
+              <p class="habit-manage-item__sub">${escapeHTML((habit.etiqueta || habit.categoria || '').toString())}</p>
+            </div>
+            <button class="habit-manage-item__delete" data-delete-habit="${String(habit.id)}">Eliminar</button>
+          </article>
+        `).join('')
+      : '<p class="habit-manage-empty">No tienes hábitos creados.</p>';
+
+    overlay.innerHTML = `
+      <div class="habit-manage-modal__panel" role="dialog" aria-modal="true" aria-label="Gestionar hábitos">
+        <h3 class="habit-manage-modal__title">Gestionar hábitos</h3>
+        <div class="habit-manage-modal__list">${listHtml}</div>
+        <div class="habit-manage-modal__footer">
+          <button class="habit-manage-modal__close" data-close-manage>Cerrar</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    function close(){
+      overlay.remove();
+    }
+
+    overlay.addEventListener('click', (event) => {
+      if(event.target === overlay){
+        close();
+      }
+    });
+
+    const closeBtn = overlay.querySelector('[data-close-manage]');
+    if(closeBtn){
+      closeBtn.addEventListener('click', close);
+    }
+
+    overlay.querySelectorAll('[data-delete-habit]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const habitId = btn.getAttribute('data-delete-habit');
+        if(!habitId) return;
+
+        const ok = window.confirm('¿Seguro que quieres eliminar este hábito?');
+        if(!ok) return;
+
+        const removed = GoHabit.removeHabit(habitId);
+        if(removed){
+          const item = overlay.querySelector(`[data-manage-item="${CSS.escape(String(habitId))}"]`);
+          if(item) item.remove();
+          GoHabit.toast('Hábito eliminado', 'good', { icon: 'delete' });
+          render();
+        } else {
+          GoHabit.toast('No se pudo eliminar el hábito', 'bad', { icon: 'warning' });
+        }
+
+        const stillItems = overlay.querySelectorAll('[data-manage-item]').length;
+        if(!stillItems){
+          const listNode = overlay.querySelector('.habit-manage-modal__list');
+          if(listNode) listNode.innerHTML = '<p class="habit-manage-empty">No tienes hábitos creados.</p>';
+        }
+      });
     });
   }
 
@@ -63,4 +211,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   render();
+
+  if(manageBtn){
+    manageBtn.addEventListener('click', openManageModal);
+  }
 });

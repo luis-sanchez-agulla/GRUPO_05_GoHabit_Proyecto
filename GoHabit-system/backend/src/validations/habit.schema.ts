@@ -39,6 +39,7 @@ export const updateHabitSchema = createHabitSchema.partial().extend({
  */
 export const completeHabitSchema = z.object({
     note: z.string().max(500).optional(),
+    image: z.string().optional(),
 });
 
 // Tipos TypeScript inferidos automáticamente de los schemas

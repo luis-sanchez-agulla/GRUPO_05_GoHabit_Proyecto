@@ -46,12 +46,21 @@
           <p class="auth-card__subtitle">Crea tu perfil y empieza a crecer día a día.</p>
         </div>
 
-        <form class="auth-form" id="registerForm">
+        <form class="auth-form" id="register-form">
           <label class="auth-field">
             <span class="auth-field__label">Nombre</span>
             <div class="auth-input-wrap">
               <span class="material-symbols-outlined auth-input__icon">person</span>
-              <input type="text" placeholder="Tu nombre" required />
+              <input id="register-firstname" type="text" placeholder="Tu nombre" required />
+            </div>
+            <small id="register-firstname-error" class="auth-field__error"></small>
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-field__label">Apellidos</span>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined auth-input__icon">badge</span>
+              <input id="register-lastname" type="text" placeholder="Tus apellidos" />
             </div>
           </label>
 
@@ -59,24 +68,36 @@
             <span class="auth-field__label">Correo electrónico</span>
             <div class="auth-input-wrap">
               <span class="material-symbols-outlined auth-input__icon">mail</span>
-              <input type="email" placeholder="tuemail@email.com" required />
+              <input id="register-email" type="email" placeholder="tuemail@email.com" required />
             </div>
+            <small id="register-email-error" class="auth-field__error"></small>
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-field__label">Usuario</span>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined auth-input__icon">alternate_email</span>
+              <input id="register-username" type="text" placeholder="nombre_usuario" required />
+            </div>
+            <small id="register-username-error" class="auth-field__error"></small>
           </label>
 
           <label class="auth-field">
             <span class="auth-field__label">Contraseña</span>
             <div class="auth-input-wrap">
               <span class="material-symbols-outlined auth-input__icon">lock</span>
-              <input type="password" id="password" placeholder="Mínimo 8 caracteres" required />
+              <input type="password" id="register-password" placeholder="Mínimo 8 caracteres" required />
             </div>
+            <small id="register-password-error" class="auth-field__error"></small>
           </label>
 
           <label class="auth-field">
             <span class="auth-field__label">Confirmar contraseña</span>
             <div class="auth-input-wrap">
               <span class="material-symbols-outlined auth-input__icon">verified_user</span>
-              <input type="password" id="confirmPassword" placeholder="Repite la contraseña" required />
+              <input type="password" id="register-confirm-password" placeholder="Repite la contraseña" required />
             </div>
+            <small id="register-confirm-password-error" class="auth-field__error"></small>
           </label>
 
           <label class="auth-check auth-check--terms">
@@ -96,22 +117,8 @@
       </div>
     </section>
   </main>
-<script>
-
-document.getElementById("registerForm").addEventListener("submit", function(e){
-
-const password = document.getElementById("password").value;
-const confirm = document.getElementById("confirmPassword").value;
-
-if(password !== confirm){
-
-e.preventDefault();
-alert("Las contraseñas no coinciden");
-
-}
-
-});
-
-</script>
+<script src="../js/api.js" defer></script>
+<script src="../js/router.js" defer></script>
+<script src="../js/login_register.js" defer></script>
 </body>
 </html>
