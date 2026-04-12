@@ -25,6 +25,13 @@ export const friendService = {
     },
 
     /**
+     * getPendingRequests — Lista todas las solicitudes pendientes recibidas.
+     */
+    async getPendingRequests(userId: string) {
+        return friendRepository.findPendingRequests(userId);
+    },
+
+    /**
      * sendRequest — Envía una solicitud de amistad.
      */
     async sendRequest(senderId: string, receiverId: string) {

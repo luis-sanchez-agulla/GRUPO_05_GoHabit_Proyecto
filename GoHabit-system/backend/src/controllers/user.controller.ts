@@ -22,6 +22,18 @@ export const userController = {
         }
     },
 
+    async searchUsers(req: any, context: any) {
+        try {
+            const { user } = context;
+            const { searchParams } = new URL(req.url);
+            const q = searchParams.get("q") || "";
+            const users = await userService.searchUsers(q, user.id);
+            return success(users);
+        } catch (err) {
+            return error(err);
+        }
+    },
+
     async getPublicProfile(req: any, context: any) {
         try {
             const { params } = context;

@@ -104,15 +104,30 @@
   }
 
   function levelFromPoints(points){
-    return 1 + Math.floor(Math.max(0, Number(points) || 0) / 100);
+    let currentLevel = 1;
+    let xpTarget = 50;
+    let p = Math.max(0, Number(points) || 0);
+    while (p >= xpTarget) {
+      p -= xpTarget;
+      currentLevel++;
+      xpTarget += 50;
+    }
+    return currentLevel;
   }
 
   function syncProgressUI(){
     const progress = getProgress();
     const points = Math.max(0, Number(progress?.points || 0));
     const level = levelFromPoints(points);
-    const xpTarget = 1000;
-    const xpPct = Math.max(0, Math.min(100, Math.round((points / xpTarget) * 100)));
+
+    let xpTarget = 50;
+    let p = points;
+    while (p >= xpTarget) {
+      p -= xpTarget;
+      xpTarget += 50;
+    }
+    const xpCurrent = p;
+    const xpPct = Math.max(0, Math.min(100, Math.round((xpCurrent / xpTarget) * 100)));
 
     document.querySelectorAll('[data-user-points]').forEach((el) => {
       el.textContent = String(points);
@@ -123,7 +138,7 @@
     });
 
     const xpValue = document.querySelector('.habitos-xp-value');
-    if(xpValue) xpValue.textContent = `${points} / ${xpTarget} XP`;
+    if(xpValue) xpValue.textContent = `${Math.floor(xpCurrent)} / ${xpTarget} XP`;
 
     const xpFill = document.querySelector('.habitos-xp-fill');
     if(xpFill) xpFill.style.width = `${xpPct}%`;
@@ -219,6 +234,17 @@
     const source = Array.isArray(days) ? days : [];
     const unique = [];
     source.forEach((value) => {
+      // Si recibimos nombres de días por IA (ej: 'Lunes'), los convertimos a números
+      if(typeof value === 'string' && isNaN(Number(value))){
+        const normalized = value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const map = { domingo: 0, lunes: 1, martes: 2, miercoles: 3, jueves: 4, viernes: 5, sabado: 6 };
+        if (map[normalized] !== undefined) {
+          const day = map[normalized];
+          if(!unique.includes(day)) unique.push(day);
+          return;
+        }
+      }
+
       const day = Number(value);
       if(Number.isInteger(day) && day >= 0 && day <= 6 && !unique.includes(day)){
         unique.push(day);
@@ -268,6 +294,7 @@
     const frequency = normalizeFrequencyDays(habit?.frecuencia);
     const safe = {
       id,
+      backendId: habit?.backendId || null,
       titulo: String(habit?.titulo || habit?.nombre || 'Nuevo hábito').trim() || 'Nuevo hábito',
       categoria: String(habit?.categoria || 'salud'),
       etiqueta: String(habit?.etiqueta || habit?.categoria || 'General'),

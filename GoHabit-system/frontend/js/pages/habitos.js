@@ -20,17 +20,31 @@ document.addEventListener('DOMContentLoaded', () => {
     container.innerHTML = '';
 
     if(!habits.length){
+      const allHabits = GoHabit.getHabitsList() || [];
       const empty = document.createElement('div');
-      empty.className = 'habit-card';
-      empty.innerHTML = `
-        <div class="habit-card__icon-container habit-card__icon-container--primary">
-          <span class="material-symbols-outlined">task_alt</span>
-        </div>
-        <div class="habit-card__content">
-          <h3 class="habit-card__title">No tienes objetivos para hoy</h3>
-          <p class="habit-card__category">Tus hábitos de otros días no se muestran en esta lista diaria.</p>
-        </div>
-      `;
+      empty.className = 'habit-card gh-glass';
+      
+      if (allHabits.length > 0) {
+        empty.innerHTML = `
+          <div class="habit-card__icon-container habit-card__icon-container--primary">
+            <span class="material-symbols-outlined">calendar_today</span>
+          </div>
+          <div class="habit-card__content">
+            <h3 class="habit-card__title">Hoy descansas</h3>
+            <p class="habit-card__category">Tienes ${allHabits.length} hábitos guardados, pero ninguno para hoy. ¡Sigue así!</p>
+          </div>
+        `;
+      } else {
+        empty.innerHTML = `
+          <div class="habit-card__icon-container habit-card__icon-container--primary">
+            <span class="material-symbols-outlined">add_task</span>
+          </div>
+          <div class="habit-card__content">
+            <h3 class="habit-card__title">Empieza tu viaje</h3>
+            <p class="habit-card__category">Crea tu primer hábito para empezar a ganar XP y semillas.</p>
+          </div>
+        `;
+      }
       container.appendChild(empty);
       return;
     }
@@ -61,68 +75,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const input = wrapper.querySelector('input[type="checkbox"]');
       input.addEventListener('change', async (e) => {
-        // Si se está desmarcando, permitirlo directamente
-        if (!e.target.checked) {
-            const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
-            GoHabit.toggleHabit(h.id, { reward });
-            refreshSeeds();
-            return;
+        const done = e.target.checked;
+        const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
+        
+        // Marcado local inmediato
+        GoHabit.toggleHabit(h.id, { reward, done });
+        refreshSeeds();
+
+        if (done) {
+            // Sincronización silenciosa con el servidor para puntos/nivel
+            try {
+                const apiId = h.backendId || h.id;
+                await GoHabitAPI.post(`/habits/${apiId}/completions`, { 
+                    note: h.titulo 
+                });
+            } catch (err) {
+                console.error('Error sincronizando XP:', err);
+            }
         }
-
-        e.preventDefault();
-        e.target.checked = false; // Forzar desmarcado hasta la foto
-
-        // Crear input file escondido
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.onchange = (ev) => {
-            const file = ev.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = async (reData) => {
-                const base64 = reData.target.result;
-                GoHabit.toast('Analizando foto con IA...', 'good', { icon: 'psychology' });
-                
-                try {
-                    // Si tienes el backend levantado:
-                    const res = await fetch('/api/ai/verify', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ habitTitle: h.titulo, image: base64 })
-                    });
-                    
-                    if (!res.ok) throw new Error('Visual Verification failed');
-                    const data = await res.json();
-                    
-                    if (data.verified) {
-                        e.target.checked = true;
-                        const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
-                        GoHabit.toggleHabit(h.id, { reward });
-                        refreshSeeds();
-                        GoHabit.toast('¡Hábito verificado y guardado!', 'good', { icon: 'verified' });
-
-                        // Subir secretamente a feed (Para el backend que hemos construido)
-                        if (window.GoHabitAPI) {
-                            GoHabitAPI.post(`/habits/${h.id}/complete`, { image: base64, note: "Fotito!" }).catch(console.error);
-                        }
-                    } else {
-                        GoHabit.toast('IA rechaza la foto: ' + data.reason, 'bad', { icon: 'error' });
-                    }
-                } catch (err) {
-                    // Fallback local robusto (prototipo sin backend 100% configurado)
-                    console.error(err);
-                    e.target.checked = true;
-                    const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
-                    GoHabit.toggleHabit(h.id, { reward });
-                    refreshSeeds();
-                    GoHabit.toast('Completado (Fallback)', 'good', { icon: 'check' });
-                }
-            };
-            reader.readAsDataURL(file);
-        };
-        fileInput.click();
       });
 
       container.appendChild(wrapper);

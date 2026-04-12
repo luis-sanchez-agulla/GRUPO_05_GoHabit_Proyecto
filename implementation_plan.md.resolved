@@ -1,0 +1,46 @@
+# Plan: Aesthetic Overhaul & Social Fix
+
+This plan outlines a complete visual redesign of GoHabit to provide a "Premium" and "Wowed" experience, while ensuring the new Social/Comunidad section is properly integrated and visible.
+
+## User Review Required
+
+> [!IMPORTANT]
+> I will replace the current emoji-based navigation with high-quality Material Symbols and a floating glassmorphism design. This will significantly change the look and feel to be more modern.
+
+## Proposed Changes
+
+### Design System (CSS)
+
+#### [MODIFY] [app.css](file:///c:/Users/Estudio/OneDrive%20-%20UFV/Documentos/3%20CARRERA/PROYECTOS/GRUPO_05_GoHabit_Proyecto/GoHabit-system/frontend/css/app.css)
+- Define a modern, harmonious color palette (HSL-based).
+- Implement global glassmorphism utility classes (`.gh-glass`).
+- redesign the `.index-nav` to be a floating pill bar with better hover/active states.
+- Improve desktop layout: Center the application in a "Mobile-First but Desktop-Friendly" frame.
+
+#### [MODIFY] [social.css](file:///c:/Users/Estudio/OneDrive%20-%20UFV/Documentos/3%20CARRERA/PROYECTOS/GRUPO_05_GoHabit_Proyecto/GoHabit-system/frontend/css/social.css)
+- Update feed cards and friend lists to match the new design system.
+
+### Frontend Templates (HTML)
+
+#### [MODIFY] All Templates (index, habitos, avatar, perfil, tienda, social, anadirHabito, calendario)
+- Standardize the navigation bar structure.
+- **CRITICAL FIX**: Re-add the "Comunidad" link to ensure it's present across all pages.
+- Standardize the Header structure to use the new premium styles.
+
+### Assets & Visuals
+
+#### [NEW] UI Assets
+- Use `generate_image` if needed for background textures or placeholder avatars to make the initial view stunning.
+
+## Open Questions
+
+- **Navigation Style**: Do you prefer the navigation bar fixed at the bottom (mobile-app style) or a floating pill that hides on scroll? (Assuming fixed pill for now).
+- **Icons**: Should I use Material Symbols (Google) or FontAwesome style icons? (Assuming Material for consistency).
+
+## Verification Plan
+
+### Manual Verification
+- I will use the browser tool to:
+    - Verify the "Social" link is visible in the new nav bar.
+    - Check the responsiveness of the new desktop layout.
+    - Confirm the glassmorphism effects are rendering correctly.

@@ -10,6 +10,15 @@ export const userRepository = {
         return rows || [];
     },
 
+    async searchByQuery(q: string, excludeUserId: string): Promise<UserPublicProfile[]> {
+        const pattern = `%${q}%`;
+        const [rows]: any = await query(
+            'SELECT id, username, first_name AS firstName, last_name AS lastName, avatar_url AS avatarUrl, level, points FROM users WHERE (username LIKE ? OR first_name LIKE ? OR last_name LIKE ?) AND id != ? LIMIT 10',
+            [pattern, pattern, pattern, excludeUserId]
+        );
+        return rows || [];
+    },
+
     async findById(id: string): Promise<UserPrivateProfile | null> {
         const [rows]: any = await query(
             'SELECT id, email, username, first_name AS firstName, last_name AS lastName, avatar_url AS avatarUrl, role, points, coins, level, created_at AS createdAt FROM users WHERE id = ?',
@@ -68,6 +77,9 @@ export const userRepository = {
             lastName:   'last_name',
             avatarUrl:  'avatar_url',
             username:   'username',
+            points:     'points',
+            coins:      'coins',
+            level:      'level',
         };
 
         const allowed = Object.keys(data).filter((key) => key in fieldMap);
