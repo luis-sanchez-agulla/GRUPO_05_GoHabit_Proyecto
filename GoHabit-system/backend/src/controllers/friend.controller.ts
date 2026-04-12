@@ -13,12 +13,46 @@ export const friendController = {
         }
     },
 
+    async getPendingRequests(req: any, context: any) {
+        try {
+            const { user } = context;
+            // Explicitly cast to avoid transient IDE type errors
+            const srv = friendService as any;
+            const requests = await srv.getPendingRequests(user.id);
+            return success(requests);
+        } catch (err) {
+            return error(err);
+        }
+    },
+
     async sendRequest(req: any, context: any) {
         try {
             const { user, data } = context;
             const { receiverId } = data;
             const request = await friendService.sendRequest(user.id, receiverId);
             return created(request);
+        } catch (err) {
+            return error(err);
+        }
+    },
+
+    async acceptRequest(req: any, context: any) {
+        try {
+            const { user, params } = context;
+            const { requestId } = await params;
+            const result = await friendService.respondToRequest(requestId, user.id, "ACCEPTED");
+            return success(result);
+        } catch (err) {
+            return error(err);
+        }
+    },
+
+    async rejectRequest(req: any, context: any) {
+        try {
+            const { user, params } = context;
+            const { requestId } = await params;
+            const result = await friendService.respondToRequest(requestId, user.id, "REJECTED");
+            return success(result);
         } catch (err) {
             return error(err);
         }

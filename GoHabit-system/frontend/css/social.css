@@ -1,0 +1,357 @@
+/* social.css - Social 2.0 Luxury Styling */
+
+.social-container {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 80px);
+    padding-bottom: 80px; /* espacio para bottom nav */
+}
+
+.social-main {
+    padding: 1.5rem;
+    padding-bottom: 2rem;
+    max-width: 700px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.social-section-divider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted, var(--muted));
+    margin: 1.5rem 0 1rem;
+    padding: 0 4px;
+}
+
+.social-section-divider .material-symbols-outlined {
+    font-size: 18px;
+    opacity: 0.6;
+}
+
+/* Tabs Navigation */
+.social-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 2rem;
+    background: var(--surface-low);
+    padding: 6px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--surface-border);
+    position: sticky;
+    top: 5rem;
+    z-index: 900;
+    backdrop-filter: blur(10px);
+}
+
+.social-tab {
+    flex: 1;
+    padding: 10px 4px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    position: relative;
+}
+
+.social-tab.active {
+    background: var(--surface);
+    color: var(--primary);
+    box-shadow: var(--shadow-soft);
+}
+
+.social-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transform: translate(25%, -25%);
+    font-weight: 800;
+    border: 2px solid var(--surface);
+}
+
+.social-tab-content {
+    display: none;
+    animation: ghSlideIn 0.4s ease-out;
+}
+
+.social-tab-content.active {
+    display: block;
+}
+
+/* --- Premium Activity Cards (Instagram-lite) --- */
+.social-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.activity-card {
+    overflow: hidden;
+}
+
+.activity-card__header {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.activity-card__user-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.activity-card__avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--surface-low);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--primary-glow);
+    overflow: hidden;
+}
+
+.activity-card__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.activity-card__username {
+    font-weight: 800;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.activity-card__time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.activity-card__badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 6px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+}
+
+.activity-card__content {
+    padding: 0;
+}
+
+.activity-card__description {
+    padding: 0 1rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.activity-card__habit-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+}
+
+.activity-card__habit-icon .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.activity-card__description p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+.activity-card__visual {
+    width: 100%;
+    background: #000;
+    line-height: 0;
+    position: relative;
+    overflow: hidden;
+    cursor: zoom-in;
+}
+
+.activity-card__img {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    display: block;
+}
+
+.activity-card:hover .activity-card__img {
+    transform: scale(1.02);
+}
+
+.activity-card__img-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.activity-card__img-overlay .material-symbols-outlined {
+    color: white;
+    font-size: 2.5rem;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    text-shadow: 0 2px 8px rgba(0,0,0,.5);
+}
+
+.activity-card__visual:hover .activity-card__img-overlay {
+    background: rgba(0,0,0,.15);
+}
+
+.activity-card__visual:hover .activity-card__img-overlay .material-symbols-outlined {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.activity-card__no-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 2rem;
+    background: var(--surface-low, #f7f8f6);
+    color: var(--text-muted, var(--muted));
+}
+
+.activity-card__caption {
+    padding: 1rem;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    background: var(--surface-low);
+    border-top: 1px solid var(--surface-border);
+}
+
+/* --- Friends & Requests --- */
+.friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.friend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.friend-item__profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.friend-item__name {
+    font-weight: 700;
+    margin: 0;
+}
+
+.friend-item__level {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.friend-item__actions {
+    display: flex;
+    gap: 8px;
+}
+
+.friend-item__action {
+    color: var(--text-muted);
+    padding: 8px;
+}
+
+.friend-item__action:hover {
+    color: var(--accent);
+}
+
+/* Search Bar */
+.social-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--surface-border);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-soft);
+}
+
+.social-search-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* States */
+.social-loader {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-style: italic;
+    opacity: 0.7;
+}
+
+.social-empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+}
+
+.social-empty-state .material-symbols-outlined {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+    opacity: 0.15;
+}
+
+.social-empty-state p {
+    font-weight: 500;
+    max-width: 280px;
+    margin: 0 auto;
+}

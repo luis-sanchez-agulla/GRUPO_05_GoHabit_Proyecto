@@ -45,6 +45,17 @@ export const friendRepository = {
         return rows && rows.length > 0 ? rows[0] : null;
     },
 
+    async findPendingRequests(userId: string): Promise<any[]> {
+        const [rows]: any = await query(
+            `SELECT f.id, f.senderId, f.createdAt, u.username as sender_username, u.avatarUrl as avatar_url
+             FROM friendships f
+             JOIN users u ON f.senderId = u.id
+             WHERE f.receiverId = ? AND f.status = 'PENDING'`,
+            [userId]
+        );
+        return rows;
+    },
+
     async updateStatus(id: string, status: string): Promise<void> {
         await execute(
             "UPDATE friendships SET status = ? WHERE id = ?",

@@ -63,25 +63,50 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if(submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Guardando...';
+    }
+
     const metaTxt = `${metaValor} ${metaUnidad}`;
     const metaLabel = (metaUnidad === 'litros') ? 'Hidratación' : (metaUnidad === 'paginas' ? 'Lectura' : (metaUnidad === 'minutos' ? 'Tiempo' : 'Objetivo'));
 
     const map = iconForCategory(state.categoria);
 
-    let aiReward = 10;
+    let aiReward = Math.max(8, Math.min(20, 8 + Math.ceil(state.frecuencia.length * 1.5)));
+    let backendId = null;
+
     try {
       if (window.GoHabitAPI?.post) {
+        // 1. Obtener recompensa AI si es posible
         const aiMessage = `Quiero crear este hábito: ${titulo}. Categoría: ${state.categoria}. Meta: ${metaValor} ${metaUnidad}. Frecuencia semanal: ${state.frecuencia.length} días.`;
-        const aiResponse = await window.GoHabitAPI.post('/ai/recommend', { message: aiMessage });
-        const firstSuggestion = aiResponse?.data?.suggestions?.[0];
-        const maybeReward = Number(firstSuggestion?.xpReward || 0);
-        if (Number.isFinite(maybeReward) && maybeReward > 0) {
-          aiReward = maybeReward;
+        const aiResponse = await window.GoHabitAPI.post('/ai/recommend', { message: aiMessage }).catch(() => null);
+        
+        if (aiResponse?.data?.suggestions?.[0]) {
+            const maybeReward = Number(aiResponse.data.suggestions[0].xpReward || 0);
+            if (maybeReward > 0) aiReward = maybeReward;
+        }
+
+        // 2. Sincronizar con el backend para tener un ID real en el muro social
+        const backendRes = await window.GoHabitAPI.post('/habits', {
+            title: `${titulo} (${metaTxt})`,
+            description: `Meta: ${metaTxt}`,
+            frequency: state.frecuencia.join(','), // Guardamos los días como string
+            targetCount: metaValor,
+            color: map.color,
+            icon: map.icono
+        }).catch(err => {
+            console.warn('Backend habit creation failed, falling back to local only:', err);
+            return null;
+        });
+
+        if (backendRes?.data?.id) {
+            backendId = backendRes.data.id;
         }
       }
-    } catch {
-      // Fallback local si IA no está disponible.
-      aiReward = Math.max(8, Math.min(20, 8 + Math.ceil(state.frecuencia.length * 1.5)));
+    } catch (err) {
+      console.error("Error during habit synchronization:", err);
     }
 
     const created = GoHabit.addHabit({
@@ -95,14 +120,26 @@ document.addEventListener('DOMContentLoaded', () => {
       metaValor,
       metaUnidad,
       recordatorio,
+      backendId: backendId, // Guardamos el ID del servidor
     });
 
     if(!created || created.error){
       GoHabit.toast(created?.message || `Máximo ${GoHabit.getHabitLimitPerDay()} hábitos por día.`, 'bad');
+      if(submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Guardar Hábito';
+      }
       return;
     }
 
-    GoHabit.toast('Hábito guardado ✅', 'good');
-    window.location.href = 'habitos.html';
+    // Mejora del feedback: informar en qué días aparecerá
+    const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const diasTxt = state.frecuencia.map(d => dias[d]).join(', ');
+    
+    GoHabit.toast(`¡Hábito guardado! Programado para: ${diasTxt}`, 'good', { duration: 4000 });
+    
+    setTimeout(() => {
+        window.location.href = 'habitos.html';
+    }, 1200);
   });
 });

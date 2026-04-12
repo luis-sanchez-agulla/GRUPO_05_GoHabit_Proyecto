@@ -43,6 +43,11 @@ const envSchema = z.object({
     // API key opcional para IA real (Gemini). Si no existe, se usa fallback heuristico.
     GOOGLE_API_KEY: z.string().optional(),
     GEMINI_MODEL: z.string().default("gemini-2.0-flash"),
+    // Variables para Ollama (IA local, gratuita, privada)
+    USE_OLLAMA: z.string().default("false"),  // "true" o "false"
+    OLLAMA_API_URL: z.string().default("http://localhost:11434"),
+    OLLAMA_MODEL: z.string().default("qwen2.5:3b-instruct"),
+    OLLAMA_VISION_MODEL: z.string().default("llava"),
 });
 
 /**

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Social – GoHabit</title>
+
+  <link rel="stylesheet" href="../css/app.css"/>
+  <link rel="stylesheet" href="../css/social.css"/>
+  <link rel="stylesheet" href="../css/chatbot.css"/>
+  <link rel="stylesheet" href="../css/responsive.css"/>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+</head>
+
+<body class="social-page">
+
+  <!-- ✅ HEADER FULL WIDTH -->
+  <header class="gh-header">
+    <div class="gh-header__inner gh-header__inner--home">
+      <div class="gh-header__left">
+        <a href="index.html" class="gh-icon-btn" aria-label="Volver">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div class="gh-header__titles">
+          <p class="gh-header__kicker">Comunidad</p>
+          <h1 class="gh-header__headline">Social</h1>
+        </div>
+      </div>
+
+      <div class="gh-header__right">
+        <button type="button" class="gh-icon-btn" data-theme-toggle aria-label="Cambiar tema">
+          <span class="material-symbols-outlined">dark_mode</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ✅ CONTENIDO PRINCIPAL -->
+  <div class="social-container">
+    <main class="social-main">
+
+      <!-- Tabs de navegación -->
+      <nav class="social-tabs" role="tablist" aria-label="Secciones sociales">
+        <button class="social-tab active" data-tab="friends" role="tab" aria-selected="true" aria-controls="tab-friends" id="tab-btn-friends">
+          <span class="material-symbols-outlined" style="font-size:18px">group</span>
+          Amigos
+        </button>
+        <button class="social-tab" data-tab="requests" role="tab" aria-selected="false" aria-controls="tab-requests" id="tab-btn-requests">
+          <span class="material-symbols-outlined" style="font-size:18px">mail</span>
+          Solicitudes
+          <span class="social-badge" id="requests-badge" style="display:none">0</span>
+        </button>
+      </nav>
+
+      <!-- ══════════════════════════════════════
+           TAB 1: AMIGOS (Predeterminado)
+      ══════════════════════════════════════ -->
+      <div class="social-tab-content active" id="tab-friends" role="tabpanel" aria-labelledby="tab-btn-friends">
+
+        <!-- Buscador -->
+        <div class="social-search-bar">
+          <span class="material-symbols-outlined" style="color:var(--primary); font-size:20px">search</span>
+          <input
+            type="text"
+            id="friend-search-input"
+            placeholder="Buscar usuario por nombre..."
+            autocomplete="off"
+            aria-label="Buscar amigos"
+          />
+          <button class="gh-primary-btn" id="friend-search-btn" style="padding:8px 16px; font-size:0.85rem;" aria-label="Buscar">
+            Buscar
+          </button>
+        </div>
+
+        <!-- Resultados de búsqueda -->
+        <div class="friends-list" id="search-results-container"></div>
+
+        <!-- Divider -->
+        <div class="social-section-divider">
+          <span class="material-symbols-outlined">group</span>
+          Mis amigos
+        </div>
+
+        <!-- Lista de amigos actuales -->
+        <div class="friends-list" id="friends-list-container">
+          <div class="social-loader">Cargando amigos...</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           TAB 3: SOLICITUDES PENDIENTES
+      ══════════════════════════════════════ -->
+      <div class="social-tab-content" id="tab-requests" role="tabpanel" aria-labelledby="tab-btn-requests">
+        <div class="friends-list" id="requests-list-container">
+          <div class="social-loader">Buscando solicitudes pendientes...</div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ✅ BOTTOM NAV -->
+    <nav class="index-nav">
+      <div class="index-nav__container">
+        <a href="index.html" class="index-nav__link">
+          <span class="index-nav__icon">🏠</span>
+          <span class="index-nav__text">Inicio</span>
+        </a>
+        <a href="habitos.html" class="index-nav__link">
+          <span class="index-nav__icon">✔️</span>
+          <span class="index-nav__text">Hábitos</span>
+        </a>
+        <a href="avatar.html" class="index-nav__link">
+          <span class="index-nav__icon">🌳</span>
+          <span class="index-nav__text">Avatar</span>
+        </a>
+        <a href="tienda.html" class="index-nav__link">
+          <span class="index-nav__icon">🛒</span>
+          <span class="index-nav__text">Tienda</span>
+        </a>
+        <a href="social.html" class="index-nav__link index-nav__link--active">
+          <span class="index-nav__icon">👥</span>
+          <span class="index-nav__text">Social</span>
+        </a>
+        <a href="perfil.html" class="index-nav__link">
+          <span class="index-nav__icon">👤</span>
+          <span class="index-nav__text">Perfil</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <script src="../js/api.js" defer></script>
+  <script src="../js/router.js" defer></script>
+  <script src="../js/session-user.js" defer></script>
+  <script src="../js/app.js" defer></script>
+  <script src="../js/pages/social.js" defer></script>
+  <script src="../js/chatbot.js" defer></script>
+</body>
+</html>

@@ -63,9 +63,6 @@ export const habitController = {
             const completion = await habitService.complete(habitId, user.id, data?.note, data?.image);
             return success(completion);
         } catch (err: any) {
-            if (err.message?.includes('Verificación de imagen fallida')) {
-                return { status: 400, body: { success: false, error: { message: err.message } } };
-            }
             return error(err);
         }
     },

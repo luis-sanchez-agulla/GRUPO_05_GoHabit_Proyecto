@@ -175,9 +175,18 @@
           return;
         }
 
-        btn.textContent = 'Anadido';
+        btn.textContent = 'Añadido';
         btn.disabled = true;
         btn.style.background = '#728764';
+
+        // Recargar para que aparezca en la lista de objetivos
+        setTimeout(() => {
+          if (window.location.pathname.includes('habitos.html')) {
+            window.location.reload();
+          } else {
+            GoHabit.toast('Hábito añadido. Ve a la sección de Hábitos para verlo.', 'good');
+          }
+        }, 800);
       });
 
       box.appendChild(div);
@@ -210,20 +219,34 @@
             history: conversationHistory
         });
         const suggestions = response?.data?.suggestions || [];
+        const textResponse = response?.data?.textResponse;
         const provider = response?.data?.provider || 'unknown';
 
         typingEl.remove();
 
-        if (!suggestions.length) {
+        if (textResponse) {
+          appendMsg(textResponse, 'bot');
+          conversationHistory.push({ role: 'model', text: textResponse });
+        } else if (!suggestions.length) {
           appendMsg('No pude generar sugerencias ahora mismo. Intenta describir más detalladamente tus metas.', 'bot');
           conversationHistory.push({ role: 'model', text: 'No pude generar sugerencias.' });
-        } else {
-          const providerLabel = provider === 'gemini' ? '(Gemini AI)' : '(Contexto local)';
-          appendMsg(`He analizado tu entrada y tengo ${suggestions.length} hábito(s) personalizados para ti ${providerLabel}:`, 'bot');
+        }
+
+        if (suggestions.length) {
+          const providerLabel = provider === 'ollama'
+            ? '(Ollama local)'
+            : provider === 'gemini'
+              ? '(Gemini AI)'
+              : '(Contexto local)';
+          if (!textResponse) {
+            appendMsg(`He analizado tu entrada y tengo ${suggestions.length} hábito(s) personalizados para ti ${providerLabel}:`, 'bot');
+          }
           suggestions.forEach(s => appendSuggestion(s));
           
           const suggestionsText = suggestions.map(s => s.title).join(', ');
-          conversationHistory.push({ role: 'model', text: `Te sugerí los siguientes hábitos: ${suggestionsText}` });
+          if (!textResponse) {
+            conversationHistory.push({ role: 'model', text: `Te sugerí los siguientes hábitos: ${suggestionsText}` });
+          }
         }
       } catch (err) {
         typingEl.remove();

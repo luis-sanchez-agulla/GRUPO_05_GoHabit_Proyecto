@@ -17,7 +17,7 @@ export const aiRepository = {
         const [habits]: any = await query(
             `SELECT h.id, h.title, h.frequency, h.targetCount, 
                     COUNT(hc.id) as completionCount,
-                    DATE(hc.completedAt) as lastCompleted
+                    MAX(hc.completedAt) as lastCompleted
              FROM habits h
              LEFT JOIN habit_completions hc ON h.id = hc.habitId
              WHERE h.userId = ?

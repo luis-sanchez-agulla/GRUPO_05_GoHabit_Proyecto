@@ -18,7 +18,7 @@ import { z } from "zod";
 export const createHabitSchema = z.object({
     title: z.string().min(1, "Título requerido").max(100),
     description: z.string().max(500).optional(),
-    frequency: z.enum(["DAILY", "WEEKLY", "MONTHLY"]).default("DAILY"),  // Diario por defecto
+    frequency: z.string().default("DAILY"),  // Acepta DAILY o formatos de días como "1,2,3"
     targetCount: z.number().int().min(1).max(100).default(1),            // Veces por período
     color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Color hexadecimal inválido").optional(),
     icon: z.string().max(30).optional(),

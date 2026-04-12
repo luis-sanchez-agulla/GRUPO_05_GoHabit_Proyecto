@@ -16,11 +16,9 @@
 /* ==================== Base Styles ==================== */
 body {
   font-family: 'Inter', sans-serif;
-  min-height: max(884px, 100dvh);
+  min-height: 100vh;
   background-color: var(--cream);
   color: var(--text-main);
-  display: flex;
-  justify-content: center;
 }
 
 body.dark {
@@ -594,18 +592,8 @@ body.dark .index-progress-card__bar {
   width: 0%;
 }
 
-/* Barra full width */
-.index-nav{
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(255,255,255,.92);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(114,135,100,.12);
-  padding: .75rem 1rem 1rem;
-  z-index: 50;
-}
+
+/* Navbar styles moved to app.css */
 
 .index-nav__container{
   max-width: 650px;

@@ -16,8 +16,15 @@
     const coins = hasLocalProgress
       ? Math.max(0, Number(localProgress.coins || 0))
       : Math.max(Number(baseUser?.coins || 0), Number(localProgress.coins || 0));
-    const levelFromPoints = 1 + Math.floor(points / 100);
-    const level = Math.max(Number(baseUser?.level || 1), levelFromPoints);
+    let levFromPts = 1;
+    let xpTarg = 50;
+    let currentP = points;
+    while (currentP >= xpTarg) {
+      currentP -= xpTarg;
+      levFromPts++;
+      xpTarg += 50;
+    }
+    const level = Math.max(Number(baseUser?.level || 1), levFromPts);
 
     return {
       ...baseUser,
@@ -66,12 +73,19 @@
       el.style.width = `${overallPct}%`;
     });
 
-    const xpTarget = 1000;
-    const xpCurrent = Number(user?.points || 0);
+    let curLevel = 1;
+    let xpTarget = 50;
+    let xpRemaining = Number(user?.points || 0);
+    while (xpRemaining >= xpTarget) {
+      xpRemaining -= xpTarget;
+      curLevel++;
+      xpTarget += 50;
+    }
+    const xpCurrent = xpRemaining;
     const xpPct = pct(xpCurrent, xpTarget);
 
     const xpValue = document.querySelector('.habitos-xp-value');
-    if (xpValue) xpValue.textContent = `${xpCurrent} / ${xpTarget} XP`;
+    if (xpValue) xpValue.textContent = `${Math.floor(xpCurrent)} / ${xpTarget} XP`;
 
     const xpFill = document.querySelector('.habitos-xp-fill');
     if (xpFill) xpFill.style.width = `${xpPct}%`;
@@ -186,6 +200,22 @@
       if (!profile) return;
 
       const merged = getMergedUser(profile);
+
+      // Sincronización PROFUNDA: si los puntos localmente son mayores que en el servidor, 
+      // actualizamos el servidor para que el resto de usuarios (y el muro social) vean el nivel real.
+      if (merged.points > Number(profile.points || 0) || merged.coins > Number(profile.coins || 0)) {
+          console.log("[Sync] Empujando progreso local al servidor...", merged);
+          try {
+              await window.GoHabitAPI.put('/users/profile', {
+                  points: merged.points,
+                  coins: merged.coins,
+                  level: merged.level
+              });
+          } catch (syncErr) {
+              console.warn("[Sync] Error al sincronizar stats con el servidor:", syncErr);
+          }
+      }
+
       window.GoHabitAPI.setSession(token, merged);
       bindUser(merged);
     } catch (err) {

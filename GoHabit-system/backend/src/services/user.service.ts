@@ -20,6 +20,11 @@ export const userService = {
         return userRepository.findAll();
     },
 
+    async searchUsers(q: string, excludeUserId: string) {
+        if (!q || q.length < 2) return [];
+        return userRepository.searchByQuery(q, excludeUserId);
+    },
+
     /**
      * getProfile — Perfil PRIVADO (todos los datos excepto password).
      * Solo accesible por el propio usuario (GET /api/users, GET /api/auth/me).
@@ -71,8 +76,15 @@ export const userService = {
         const updatedPoints = user.points + points;
         const updatedCoins = user.coins + coins;
 
-        // El nivel es la raíz cuadrada de (puntos / 100)
-        const newLevel = Math.floor(Math.sqrt(updatedPoints / 100));
+        let currentLevel = 1;
+        let xpTarget = 50;
+        let remainingXp = updatedPoints;
+        while (remainingXp >= xpTarget) {
+            remainingXp -= xpTarget;
+            currentLevel++;
+            xpTarget += 50;
+        }
+        const newLevel = currentLevel;
 
         // Determinar la etapa del árbol basada en los puntos
         const newStage = TREE_STAGE_LEVELS.find(

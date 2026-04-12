@@ -13,6 +13,9 @@ services:
       NODE_ENV: "production"
       GOOGLE_API_KEY: "${GOOGLE_API_KEY:-}"
       GEMINI_MODEL: "${GEMINI_MODEL:-gemini-2.0-flash}"
+      USE_OLLAMA: "${USE_OLLAMA:-false}"
+      OLLAMA_API_URL: "${OLLAMA_API_URL:-http://ollama:11434}"
+      OLLAMA_MODEL: "${OLLAMA_MODEL:-qwen2.5:3b-instruct}"
     depends_on:
       mysql:
         condition: service_healthy
@@ -136,5 +139,47 @@ services:
     volumes:
       - ./GoHabit-system/mysql/init-db/schema.sql:/bootstrap/01-schema.sql:ro
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: gohabit-ollama
+    restart: unless-stopped
+    profiles: ["ollama"]
+    ports:
+      - "11434:11434"
+    environment:
+      OLLAMA_HOST: "0.0.0.0:11434"
+    volumes:
+      - ollama_data:/root/.ollama  # Persistencia del modelo descargado
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    entrypoint: ["/bin/sh", "-lc"]
+    # Script para descargar el modelo automáticamente
+    command: >
+      ollama serve &
+      OLLAMA_PID=$$!;
+      sleep 10;
+      echo "Verificando modelo ${OLLAMA_MODEL:-qwen2.5:3b-instruct}...";
+      ollama pull ${OLLAMA_MODEL:-qwen2.5:3b-instruct};
+      wait $$OLLAMA_PID
+    # Límites para Raspberry Pi
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'      # Usa 2 núcleos (importante para Ollama)
+          memory: 3G       # Modelo ligero por defecto para mejor compatibilidad
+        reservations:
+          cpus: '1.0'
+          memory: 1.5G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
+
 volumes:
   mysql_data:
+  ollama_data:

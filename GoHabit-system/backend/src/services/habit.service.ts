@@ -75,11 +75,22 @@ export const habitService = {
         const habit = await habitRepository.findById(habitId);
         if (!habit || habit.userId !== userId) throw new NotFoundError("Habit");
 
-        if (image) {
-            const audit = await aiService.verifyHabitImage(habit.title, image);
-            if (!audit.verified) {
-                // Return an error object instead of throwing avoiding generic 500
-                throw new Error(`Verificación de imagen fallida: ${audit.reason}`);
+        // La IA ya no bloquea el completado. Si hay imagen, intentamos verificarla en segundo plano 
+        // o simplemente la guardamos. Para simplificar y evitar errores 429 de Gemini, 
+        // lo hacemos opcional y no bloqueante.
+        let aiVerified = true;
+        let aiReason = "";
+
+        if (image && image.startsWith('data:')) {
+            try {
+                // Intentamos verificar pero no lanzamos error si falla la IA (rate limits, etc)
+                const audit = await aiService.verifyHabitImage(habit.title, image);
+                aiVerified = audit.verified;
+                aiReason = audit.reason;
+            } catch (err) {
+                console.warn("[AI] Error durante la verificación (no bloqueante):", err);
+                aiVerified = false;
+                aiReason = "Error de servicio AI";
             }
         }
 

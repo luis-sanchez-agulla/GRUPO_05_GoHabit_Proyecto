@@ -665,7 +665,161 @@ async function geminiRecommendations(userId: string, message: string, history?: 
         };
     } catch (err) {
         console.warn("[AI] Gemini recommendations failed:", (err as Error)?.message);
+        throw err;
+    }
+}
+
+/**
+ * Genera recomendaciones usando Ollama (IA local, gratuita, privada)
+ * Funciona sin API keys, ideal para Raspberry Pi
+ */
+async function ollamaRecommendations(userId: string, message: string, history?: {role: string, text: string}[]) {
+    const apiUrl = env.OLLAMA_API_URL || "http://localhost:11434";
+    const modelName = env.OLLAMA_MODEL || "qwen2.5:7b-instruct";
+    
+    if (!apiUrl) {
+        console.warn("[AI] OLLAMA_API_URL no configurada, usando heurísticas");
         return heuristicRecommendations(message);
+    }
+
+    try {
+        // Obtener contexto del usuario
+        const userContext = await aiRepository.getUserHabitPatterns(userId);
+        const currentHabits = userContext.habits?.map((h: any) => `- ${h.title} (${h.frequency})`).join("\n") || "None";
+        
+        const systemPrompt = [
+            "Eres el asistente IA de GoHabit, un experto Coach en Hábitos Atómicos (Atomic Habits).",
+            "Tu objetivo es transformar los deseos del usuario en acciones concretas, atómicas y medibles.",
+            "",
+            "Hábitos Actuales (si los hay):",
+            currentHabits,
+            "",
+            "REGLAS EBLIGATORIAS (Responde solo en JSON):",
+            "1. CADA HÁBITO debe ser específico (ej: 'Leer 5 páginas' en vez de 'Leer').",
+            "2. CADA HÁBITO debe tener un disparador claro (ej: 'Después de lavarme los dientes').",
+            "3. Sugiere de 2 a 4 hábitos.",
+            "4. 'recommendedDays' debe ser un array de días en español (ej: ['Lunes', 'Miércoles', 'Viernes']).",
+            "5. 'xpReward' debe ser entre 8 y 35.",
+            "6. 'category' puede ser: 'salud', 'productividad', 'mente', 'social', 'finanzas'.",
+            "7. 'icon' debe ser un nombre de icono de Material Symbols (ej: 'fitness_center', 'menu_book', 'meditation').",
+            "",
+            "DEBES RESPONDER ÚNICAMENTE CON UN JSON VÁLIDO siguiendo este formato:",
+            "{",
+            "  \"textResponse\": \"Un breve mensaje de ánimo y contexto (máximo 2 líneas)\",",
+            "  \"suggestions\": [",
+            "    {",
+            "      \"title\": \"Título del hábito\",",
+            "      \"reason\": \"Por qué este hábito le ayudará\",",
+            "      \"frequency\": \"Frecuencia (ej: Diario)\",",
+            "      \"recommendedDays\": [\"Lunes\", \"Martes\"],",
+            "      \"scheduleHint\": \"Momento del día\",",
+            "      \"icon\": \"nombre_icono\",",
+            "      \"category\": \"categoria\",",
+            "      \"xpReward\": 20",
+            "    }",
+            "  ]",
+            "}"
+        ].join("\n");
+
+        const userMessage = `Mensaje del usuario: "${message}"\n\nGenera las recomendaciones de hábitos en formato JSON.`;
+
+        let response = await fetch(`${apiUrl}/api/generate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                model: modelName,
+                prompt: `${systemPrompt}\n\nUser: ${userMessage}`,
+                stream: false,
+                temperature: 0.7,
+                num_predict: 500
+            }),
+            signal: AbortSignal.timeout(60000), // 60s timeout para Ollama
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+
+            // Si el modelo configurado no existe, intenta con el primer modelo disponible.
+            if (response.status === 404 && /model|not found|does not exist/i.test(errorBody)) {
+                const tagsResponse = await fetch(`${apiUrl}/api/tags`, {
+                    method: "GET",
+                    signal: AbortSignal.timeout(10000),
+                });
+
+                if (tagsResponse.ok) {
+                    const tagsRaw: any = await tagsResponse.json();
+                    const fallbackModel = Array.isArray(tagsRaw?.models) ? tagsRaw.models[0]?.name : undefined;
+
+                    if (fallbackModel) {
+                        console.warn(`[AI] Modelo Ollama '${modelName}' no existe. Reintentando con '${fallbackModel}'.`);
+                        response = await fetch(`${apiUrl}/api/generate`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                model: fallbackModel,
+                                prompt: `${systemPrompt}\n\nUser: ${userMessage}`,
+                                stream: false,
+                                temperature: 0.7,
+                                num_predict: 500,
+                            }),
+                            signal: AbortSignal.timeout(60000),
+                        });
+                    }
+                }
+            }
+
+            if (!response.ok) {
+                throw new Error(`Ollama API error ${response.status}`);
+            }
+        }
+
+        const raw: any = await response.json();
+        const text = raw?.response?.trim();
+        
+        if (!text) {
+            throw new Error("Ollama returned empty response");
+        }
+
+        let parsed: any = { suggestions: [], textResponse: text };
+        try {
+            // Intentar extraer JSON si Ollama incluye texto adicional
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            const jsonText = jsonMatch ? jsonMatch[0] : text;
+            parsed = JSON.parse(jsonText);
+        } catch (parseErr) {
+            console.warn("[AI] Fallo al parsear JSON de Ollama, usando respuesta como texto");
+            return {
+                provider: "ollama",
+                input: message,
+                textResponse: text,
+                suggestions: [],
+                contextUsed: true,
+            };
+        }
+
+        const suggestions = Array.isArray(parsed?.suggestions)
+            ? parsed.suggestions.map((s: any) => decorateSuggestion({
+                title: String(s?.title || "Hábito sugerido").slice(0, 80),
+                reason: String(s?.reason || "Te ayudará a progresar.").slice(0, 180),
+                frequency: String(s?.frequency || "Diario").slice(0, 40),
+                recommendedDays: Array.isArray(s?.recommendedDays) ? s.recommendedDays.map(String) : [],
+                scheduleHint: String(s?.scheduleHint || "").slice(0, 80),
+                icon: String(s?.icon || "task_alt"),
+                category: String(s?.category || "salud"),
+                xpReward: Number(s?.xpReward || 15)
+            }))
+            : [];
+
+        return {
+            provider: "ollama",
+            input: message,
+            textResponse: parsed.textResponse || (suggestions.length ? "" : text),
+            suggestions,
+            contextUsed: true,
+        };
+    } catch (err) {
+        console.warn("[AI] Ollama recommendations failed:", (err as Error)?.message);
+        throw err;
     }
 }
 
@@ -792,14 +946,85 @@ async function geminiTaskReorganization(userId: string, tasks: any[], userContex
 }
 
 /**
+ * Analiza imagen en base64 para validar si el usuario ha cumplido el hábito usando Ollama (local).
+ */
+async function ollamaVerifyHabitImage(habitTitle: string, base64Image: string) {
+    const apiUrl = env.OLLAMA_API_URL || "http://localhost:11434";
+    const modelName = env.OLLAMA_VISION_MODEL || "llava";
+
+    try {
+        const dataPrefixRegex = /^data:image\/[a-zA-Z]+;base64,/;
+        const base64Data = base64Image.replace(dataPrefixRegex, "");
+
+        const prompt = [
+            "Eres el Juez Visual de GoHabit. Tu trabajo es AUDITAR si esta foto prueba que se ha cumplido el hábito.",
+            `Hábito a validar: "${habitTitle}"`,
+            "",
+            "REGLAS:",
+            "1. Responde ÚNICAMENTE en JSON.",
+            "2. 'verified': true si la imagen muestra el hábito cumplido, false si no.",
+            "3. 'reason': Explicación muy breve (máximo 10 palabras).",
+            "",
+            "Formato de respuesta:",
+            "{\"verified\": boolean, \"reason\": \"string\"}"
+        ].join("\n");
+
+        const response = await fetch(`${apiUrl}/api/generate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                model: modelName,
+                prompt,
+                images: [base64Data],
+                stream: false,
+                options: {
+                    temperature: 0.1,
+                }
+            }),
+            signal: AbortSignal.timeout(60000),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ollama Vision API error ${response.status}`);
+        }
+
+        const raw: any = await response.json();
+        const text = raw?.response?.trim();
+
+        if (!text) throw new Error("Ollama vision returned empty response");
+
+        // Intentar extraer JSON
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        const jsonText = jsonMatch ? jsonMatch[0] : text;
+        const parsed = JSON.parse(jsonText);
+
+        return {
+            verified: !!parsed.verified,
+            reason: parsed.reason || "Validado por Ollama"
+        };
+    } catch (err) {
+        console.warn("[AI] Ollama vision verification failed:", (err as Error)?.message);
+        return null; // Fallback to Gemini or default
+    }
+}
+
+/**
  * Analiza imagen en base64 para validar si el usuario ha cumplido el hábito.
- * Usa Gemini 2.0 Flash vision.
+ * Usa Ollama (si está habilitado) o Gemini como fallback.
  */
 async function verifyHabitImage(habitTitle: string, base64Image: string) {
+    // 1. Intentar con Ollama si está habilitado
+    if (env.USE_OLLAMA === "true") {
+        console.log("[AI] Intentando verificación visual con Ollama...");
+        const result = await ollamaVerifyHabitImage(habitTitle, base64Image);
+        if (result) return result;
+    }
+
+    // 2. Fallback a Gemini
     const key = env.GOOGLE_API_KEY;
     if (!key) {
-        // Fallback: si no hay api key, damos todo por válido en local (para no bloquear).
-        return { verified: true, reason: "No hay API Key configurada para auditar." };
+        console.warn("[AI] No hay API Key para Gemini Vision, dando por válido.");
+        return { verified: true, reason: "Auditoría visual no disponible (local mode)." };
     }
 
     try {
@@ -933,10 +1158,30 @@ async function validateNewHabit(title: string, category: string, frequency: numb
 export const aiService = {
     async recommendHabits(userId: string, message: string, history?: {role: string, text: string}[]) {
         try {
-            return await geminiRecommendations(userId, message, history);
+            // Intentar Ollama primero si está habilitado (mejor privacidad + sin API key)
+            const useOllama = env.USE_OLLAMA === "true";
+            if (useOllama) {
+                console.log("[AI] Usando Ollama para recomendaciones...");
+                const result = await ollamaRecommendations(userId, message, history);
+                console.log(`[AI] Provider final recommendHabits: ${result.provider}`);
+                if (result.provider !== "heuristic") {
+                    return result; // Éxito con Ollama
+                }
+            }
+
+            // Fallback a Gemini si Ollama no está disponible o falló
+            console.log("[AI] Intentando Gemini...");
+            const result = await geminiRecommendations(userId, message, history);
+            console.log(`[AI] Provider final recommendHabits: ${result.provider}`);
+            return result;
         } catch (err) {
             console.error("[AI] Error in recommendHabits:", err);
-            return heuristicRecommendations(message);
+            return {
+                provider: "error",
+                input: message,
+                textResponse: "⚠️ Error conectando con la IA: " + (err as Error)?.message,
+                suggestions: []
+            };
         }
     },
 

@@ -20,16 +20,17 @@ export const feedRepository = {
             FROM habit_completions hc
             JOIN habits h ON hc.habitId = h.id
             JOIN users u ON hc.userId = u.id
-            JOIN friendships f ON (
+            LEFT JOIN friendships f ON (
                 (f.senderId = ? AND f.receiverId = u.id) OR 
                 (f.receiverId = ? AND f.senderId = u.id)
             )
-            WHERE f.status = 'ACCEPTED' AND hc.imageUrl IS NOT NULL
+            WHERE (f.status = 'ACCEPTED' OR u.id = ?)
+              AND hc.imageUrl IS NOT NULL
             ORDER BY hc.completedAt DESC
             LIMIT ?
         `;
         
-        const [rows]: any = await query(sql, [userId, userId, limit]);
+        const [rows]: any = await query(sql, [userId, userId, userId, limit]);
         return rows || [];
     }
 };
