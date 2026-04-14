@@ -75,27 +75,27 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem(WATER_KEY, JSON.stringify({ date: getTodayKey(), glasses }));
   }
 
-  const waterFill   = document.getElementById('waterFill');
-  const waterLabel  = document.getElementById('waterLabel');
-  const waterSub    = document.getElementById('waterSub');
-  const waterAdd    = document.getElementById('waterAdd');
-  const waterRemove = document.getElementById('waterRemove');
-  const waterBucket = document.getElementById('waterBucket');
+  const waterFill    = document.getElementById('waterFill');
+  const waterLabel   = document.getElementById('waterLabel');
+  const waterSub     = document.getElementById('waterSub');
+  const waterAdd     = document.getElementById('waterAdd');
+  const waterRemove  = document.getElementById('waterRemove');
+  const waterWidget  = document.getElementById('waterWidget');  // the whole tank widget
 
   if (waterFill && waterAdd) {
     let glasses = loadWater();
 
     function renderWater() {
       const pct = Math.min((glasses / WATER_MAX) * 100, 100);
-      waterFill.style.height = pct + '%';
+      waterFill.style.height  = pct + '%';
       waterLabel.textContent  = `${glasses}/${WATER_MAX}`;
-      waterSub.textContent    = `${glasses} de ${WATER_MAX} vasos`;
+      waterSub.textContent    = `${glasses} vaso${glasses !== 1 ? 's' : ''}`;
       waterAdd.disabled    = glasses >= WATER_MAX;
       waterRemove.disabled = glasses <= 0;
       if (glasses >= WATER_MAX) {
-        waterBucket.classList.add('full');
+        waterWidget?.classList.add('full');
       } else {
-        waterBucket.classList.remove('full');
+        waterWidget?.classList.remove('full');
       }
     }
 
@@ -104,11 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
         glasses++;
         saveWater(glasses);
         renderWater();
-        waterBucket.animate([
-          { transform: 'scale(1)' },
-          { transform: 'scale(1.08)' },
-          { transform: 'scale(1)' }
-        ], { duration: 300, easing: 'ease-out' });
+        // Subtle pulse on the fill
+        waterFill.animate([
+          { opacity: 0.7 },
+          { opacity: 1 }
+        ], { duration: 400, easing: 'ease-out' });
       }
     });
 
