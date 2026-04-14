@@ -363,3 +363,23 @@ function initSearch() {
         if (e.key === 'Enter') performSearch();
     });
 }
+
+/**
+ * Carga el conteo de solicitudes pendientes y actualiza el badge en la UI
+ */
+async function updateRequestsBadge() {
+    const badge = document.getElementById('requests-badge');
+    if (!badge) return;
+    try {
+        const response = await GoHabitAPI.get('/friends/requests');
+        const count = response?.data?.length || 0;
+        if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = 'inline-flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    } catch (err) {
+        console.warn("Could not fetch requests badge", err);
+    }
+}

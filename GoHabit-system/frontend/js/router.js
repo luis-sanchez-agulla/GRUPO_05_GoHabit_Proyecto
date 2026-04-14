@@ -9,7 +9,9 @@
   const ONBOARDING_PAGE = "onboarding-ia.html";
   const HOME_PAGE = "index.html";
 
-  const page = (window.location.pathname.split("/").pop() || "").toLowerCase();
+  const pageRaw = window.location.pathname.split("/").pop();
+  const page = (pageRaw || "login.html").toLowerCase();
+  
   const token = localStorage.getItem(TOKEN_KEY);
   const onboardingPending = localStorage.getItem(ONBOARDING_KEY) === "1";
 
