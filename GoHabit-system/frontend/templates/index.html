@@ -53,34 +53,61 @@
 
         <!-- Content Area -->
         <div class="index-content">
-            <!-- Quick Task Card -->
-            <div>
-                <div class="index-task-header">
-                    <h3 class="index-task-header__title">Siguiente Hábito</h3>
-                    <a href="habitos.html" class="index-task-header__link">Ver todo</a>
-                </div>
-                <div class="index-task-card">
-                    <!-- Progress Fill Indicator -->
-                    <div class="index-task-card__indicator"></div>
-                    <div class="index-task-card__icon">
-                        <span class="material-symbols-outlined">water_drop</span>
+
+            <!-- Water + Habit row -->
+            <div class="index-widgets-row">
+
+                <!-- 💧 WATER BUCKET WIDGET -->
+                <div class="water-widget" id="waterWidget" aria-label="Seguimiento de agua">
+                    <h3 class="water-widget__title">💧 Agua</h3>
+
+                    <!-- Bucket visual -->
+                    <div class="water-bucket" id="waterBucket" aria-hidden="true">
+                        <div class="water-bucket__fill" id="waterFill"></div>
+                        <div class="water-bucket__waves" id="waterWaves"></div>
+                        <span class="water-bucket__label" id="waterLabel">0/8</span>
                     </div>
-                    <div class="index-task-card__content">
-                        <h4 class="index-task-card__title">Beber agua</h4>
-                        <div class="index-task-card__progress">
-                            <div class="index-task-card__progress-bar">
-                                <div class="index-task-card__progress-fill"></div>
-                            </div>
-                            <span class="index-task-card__progress-text">0 / 2L</span>
+
+                    <p class="water-widget__sub" id="waterSub">0 de 8 vasos</p>
+
+                    <div class="water-widget__controls">
+                        <button class="water-widget__btn water-widget__btn--remove" id="waterRemove" aria-label="Quitar vaso">
+                            <span class="material-symbols-outlined">remove</span>
+                        </button>
+                        <button class="water-widget__btn water-widget__btn--add" id="waterAdd" aria-label="Añadir vaso">
+                            <span class="material-symbols-outlined">add</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Task Card -->
+                <div class="index-habit-quick">
+                    <div class="index-task-header">
+                        <h3 class="index-task-header__title">Siguiente Hábito</h3>
+                        <a href="habitos.html" class="index-task-header__link">Ver todo</a>
+                    </div>
+                    <div class="index-task-card">
+                        <!-- Progress Fill Indicator -->
+                        <div class="index-task-card__indicator"></div>
+                        <div class="index-task-card__icon">
+                            <span class="material-symbols-outlined">task_alt</span>
                         </div>
+                        <div class="index-task-card__content">
+                            <h4 class="index-task-card__title">Cargando...</h4>
+                            <div class="index-task-card__progress">
+                                <div class="index-task-card__progress-bar">
+                                    <div class="index-task-card__progress-fill"></div>
+                                </div>
+                                <span class="index-task-card__progress-text">0 / 1</span>
+                            </div>
+                        </div>
+                        <button class="index-task-card__button" type="button" data-habit-toggle="1" aria-label="Marcar hábito como completado">
+                            <span class="material-symbols-outlined">radio_button_unchecked</span>
+                        </button>
                     </div>
-                    <button class="index-task-card__button" type="button" data-habit-toggle="1" aria-label="Marcar hábito como completado">
-                        <span class="material-symbols-outlined">radio_button_unchecked</span>
-                    </button>
                 </div>
+
             </div>
-
-
         </div>
 
         <!-- Navigation Bar -->

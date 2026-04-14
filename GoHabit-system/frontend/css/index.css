@@ -631,3 +631,194 @@ body.dark .index-progress-card__bar {
   color: var(--primary);
   background: rgba(114,135,100,.12);
 }
+
+/* ==================== Widgets Row ==================== */
+.index-widgets-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 380px) {
+  .index-widgets-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.index-habit-quick {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ==================== Water Bucket Widget ==================== */
+.water-widget {
+  background: linear-gradient(145deg, #e0f4ff, #c8e8ff);
+  border-radius: 20px;
+  padding: 0.9rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  box-shadow: 0 4px 16px rgba(56, 152, 220, 0.15);
+  border: 1px solid rgba(56, 152, 220, 0.2);
+}
+
+body.dark .water-widget {
+  background: linear-gradient(145deg, #1a3a5c, #0f2a45);
+  border-color: rgba(56, 152, 220, 0.3);
+}
+
+.water-widget__title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1a6fa0;
+  text-align: center;
+  margin: 0;
+}
+
+body.dark .water-widget__title {
+  color: #7dd3fc;
+}
+
+/* The bucket container */
+.water-bucket {
+  position: relative;
+  width: 72px;
+  height: 90px;
+  background: rgba(255, 255, 255, 0.45);
+  border: 2.5px solid rgba(56, 152, 220, 0.5);
+  border-top: none;
+  border-radius: 0 0 20px 20px;
+  overflow: hidden;
+  /* Trapezoid-ish effect using clip-path */
+  clip-path: polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%);
+}
+
+body.dark .water-bucket {
+  background: rgba(15, 42, 69, 0.6);
+  border-color: rgba(125, 211, 252, 0.4);
+}
+
+/* The water fill */
+.water-bucket__fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 0%;
+  background: linear-gradient(180deg, #60c9f8 0%, #2196F3 100%);
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0 0 18px 18px;
+}
+
+/* Animated wave on top of fill */
+.water-bucket__waves {
+  position: absolute;
+  bottom: 0;
+  left: -50%;
+  right: -50%;
+  height: 0%;
+  overflow: hidden;
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.water-bucket__waves::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.6) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: waterWave 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes waterWave {
+  0%, 100% { transform: scaleX(1) translateX(0); }
+  50% { transform: scaleX(1.1) translateX(-5%); }
+}
+
+.water-bucket__label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.water-widget__sub {
+  font-size: 0.65rem;
+  color: #3b82c4;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+}
+
+body.dark .water-widget__sub {
+  color: #93c5fd;
+}
+
+.water-widget__controls {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.water-widget__btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-size: 16px;
+}
+
+.water-widget__btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.water-widget__btn--add {
+  background: #2196F3;
+  color: white;
+  box-shadow: 0 3px 10px rgba(33, 150, 243, 0.4);
+}
+
+.water-widget__btn--add:hover {
+  background: #1976D2;
+  transform: scale(1.1);
+}
+
+.water-widget__btn--remove {
+  background: rgba(56, 152, 220, 0.15);
+  color: #2196F3;
+}
+
+.water-widget__btn--remove:hover {
+  background: rgba(56, 152, 220, 0.3);
+  transform: scale(1.1);
+}
+
+.water-widget__btn--add:disabled,
+.water-widget__btn--remove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Full celebration state */
+.water-bucket.full .water-bucket__fill {
+  background: linear-gradient(180deg, #34d399 0%, #059669 100%);
+}

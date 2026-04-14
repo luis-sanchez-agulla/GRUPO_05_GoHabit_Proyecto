@@ -174,9 +174,14 @@
       el.textContent = Number(user?.coins ?? 0).toLocaleString("es-ES");
     });
 
-    if (user?.avatarUrl) {
-      document.querySelectorAll("[data-user-avatar]").forEach((el) => {
-        el.style.backgroundImage = `url('${user.avatarUrl}')`;
+    const avatarSrc = user?.avatarUrl || localStorage.getItem('gohabit_avatar_url') || null;
+    if (avatarSrc) {
+      document.querySelectorAll('[data-user-avatar]').forEach((el) => {
+        el.style.backgroundImage = `url('${avatarSrc}')`;
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = 'center';
+        const placeholder = el.querySelector('.perfil-avatar__placeholder');
+        if (placeholder) placeholder.style.display = 'none';
       });
     }
 
