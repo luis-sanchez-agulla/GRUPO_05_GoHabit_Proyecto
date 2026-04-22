@@ -142,7 +142,7 @@
 
     // Fallback for any old static heading markup still cached in some templates.
     const indexTitle = document.querySelector('.index-header__title');
-    if(indexTitle){
+    if (indexTitle) {
       indexTitle.textContent = `Hola, ${firstName}`;
     }
 
@@ -209,16 +209,16 @@
       // Sincronización PROFUNDA: si los puntos localmente son mayores que en el servidor, 
       // actualizamos el servidor para que el resto de usuarios (y el muro social) vean el nivel real.
       if (merged.points > Number(profile.points || 0) || merged.coins > Number(profile.coins || 0)) {
-          console.log("[Sync] Empujando progreso local al servidor...", merged);
-          try {
-              await window.GoHabitAPI.put('/users/profile', {
-                  points: merged.points,
-                  coins: merged.coins,
-                  level: merged.level
-              });
-          } catch (syncErr) {
-              console.warn("[Sync] Error al sincronizar stats con el servidor:", syncErr);
-          }
+        console.log("[Sync] Empujando progreso local al servidor...", merged);
+        try {
+          await window.GoHabitAPI.put('/users/profile', {
+            points: merged.points,
+            coins: merged.coins,
+            level: merged.level
+          });
+        } catch (syncErr) {
+          console.warn("[Sync] Error al sincronizar stats con el servidor:", syncErr);
+        }
       }
 
       window.GoHabitAPI.setSession(token, merged);
@@ -226,48 +226,76 @@
 
       // Sincronizar hábitos desde el servidor para compartir entre dispositivos
       try {
+        if (window.GoHabit) {
+          const localHabits = window.GoHabit.getHabitsList() || [];
+          const mergedHabits = [...localHabits];
+          let hasNewUploads = false;
+
+          // 1. Upload any old local habits that don't have a backendId yet
+          for (let i = 0; i < mergedHabits.length; i++) {
+            if (!mergedHabits[i].backendId) {
+              try {
+                console.log("[Sync] Pushing viejo hábito local al servidor...", mergedHabits[i].titulo);
+                const res = await window.GoHabitAPI.post('/habits', {
+                  title: mergedHabits[i].titulo,
+                  frequency: (mergedHabits[i].frecuencia || []).join(','),
+                  targetCount: mergedHabits[i].metaValor || 1,
+                  color: mergedHabits[i].color || 'primary',
+                  icon: mergedHabits[i].icono || 'star'
+                });
+                if (res?.data?.id) {
+                  mergedHabits[i].backendId = res.data.id;
+                  hasNewUploads = true;
+                }
+              } catch (e) {
+                console.warn('Failed to push old habit:', e);
+              }
+            }
+          }
+
+          if (hasNewUploads) {
+            window.GoHabit.setHabitsList(mergedHabits);
+          }
+
+          // 2. Fetch server habits and merge as normal
           const habitsRes = await window.GoHabitAPI.get('/habits');
           const serverHabits = habitsRes?.data || [];
-          
-          if (serverHabits.length > 0 && window.GoHabit) {
-              const localHabits = window.GoHabit.getHabitsList() || [];
-              const mergedHabits = [...localHabits];
-              
-              for (const sh of serverHabits) {
-                  let frequency = [];
-                  if (sh.frequency && sh.frequency !== 'DAILY' && sh.frequency !== 'WEEKLY' && sh.frequency !== 'MONTHLY') {
-                      frequency = sh.frequency.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
-                  }
-                  if (frequency.length === 0) frequency = [1,2,3,4,5];
-                  
-                  const existingIdx = mergedHabits.findIndex(lh => lh.backendId === sh.id);
-                  if (existingIdx >= 0) {
-                      mergedHabits[existingIdx].titulo = sh.title;
-                      mergedHabits[existingIdx].color = sh.color;
-                      mergedHabits[existingIdx].icono = sh.icon;
-                  } else {
-                      const nextLocalId = mergedHabits.length ? Math.max(...mergedHabits.map(h => Number(h.id)||0)) + 1 : 1;
-                      mergedHabits.push({
-                          id: nextLocalId,
-                          backendId: sh.id,
-                          titulo: sh.title,
-                          categoria: 'salud',
-                          etiqueta: 'Progreso',
-                          icono: sh.icon || 'star',
-                          color: sh.color || 'primary',
-                          reward: 15,
-                          frecuencia: frequency,
-                          metaValor: sh.targetCount || 1,
-                          metaUnidad: 'veces',
-                          recordatorio: false,
-                          creadoEn: Date.now()
-                      });
-                  }
-              }
-              window.GoHabit.setHabitsList(mergedHabits);
+
+          for (const sh of serverHabits) {
+            let frequency = [];
+            if (sh.frequency && sh.frequency !== 'DAILY' && sh.frequency !== 'WEEKLY' && sh.frequency !== 'MONTHLY') {
+              frequency = sh.frequency.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
+            }
+            if (frequency.length === 0) frequency = [1, 2, 3, 4, 5];
+
+            const existingIdx = mergedHabits.findIndex(lh => lh.backendId === sh.id);
+            if (existingIdx >= 0) {
+              mergedHabits[existingIdx].titulo = sh.title;
+              mergedHabits[existingIdx].color = sh.color;
+              mergedHabits[existingIdx].icono = sh.icon;
+            } else {
+              const nextLocalId = mergedHabits.length ? Math.max(...mergedHabits.map(h => Number(h.id) || 0)) + 1 : 1;
+              mergedHabits.push({
+                id: nextLocalId,
+                backendId: sh.id,
+                titulo: sh.title,
+                categoria: 'salud',
+                etiqueta: 'Progreso',
+                icono: sh.icon || 'star',
+                color: sh.color || 'primary',
+                reward: 15,
+                frecuencia: frequency,
+                metaValor: sh.targetCount || 1,
+                metaUnidad: 'veces',
+                recordatorio: false,
+                creadoEn: Date.now()
+              });
+            }
           }
+          window.GoHabit.setHabitsList(mergedHabits);
+        }
       } catch (syncHabitsErr) {
-          console.warn("[Sync] Error sync habits:", syncHabitsErr);
+        console.warn("[Sync] Error sync habits:", syncHabitsErr);
       }
 
     } catch (err) {
