@@ -211,6 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   render();
 
+  // Re-renderizar cuando el sync de session-user.js descargue hábitos del servidor
+  // (el render inicial ocurre antes de que llegue la respuesta async del backend)
+  window.addEventListener('gohabit:habits-synced', () => render());
+
   if(manageBtn){
     manageBtn.addEventListener('click', openManageModal);
   }

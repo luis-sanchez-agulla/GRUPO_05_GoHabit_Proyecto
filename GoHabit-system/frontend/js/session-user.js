@@ -293,6 +293,9 @@
             }
           }
           window.GoHabit.setHabitsList(mergedHabits);
+          // Notificar a las páginas que ya tienen la UI pintada (ej: habitos.js)
+          // para que re-rendericen con los hábitos recién descargados del servidor.
+          window.dispatchEvent(new CustomEvent('gohabit:habits-synced', { detail: { habits: mergedHabits } }));
         }
       } catch (syncHabitsErr) {
         console.warn("[Sync] Error sync habits:", syncHabitsErr);
