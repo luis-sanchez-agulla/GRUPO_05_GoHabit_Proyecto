@@ -13,7 +13,7 @@ export const friendRepository = {
         if (friendIds.length === 0) return [];
 
         const [friendDetails]: any = await query(
-            `SELECT id, username, firstName, lastName, avatarUrl, level, points 
+            `SELECT id, username, first_name AS firstName, last_name AS lastName, avatar_url AS avatarUrl, level, points 
              FROM users WHERE id IN (?)`,
             [friendIds]
         );
