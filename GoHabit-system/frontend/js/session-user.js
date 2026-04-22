@@ -300,6 +300,10 @@
 
     } catch (err) {
       console.warn("No se pudo cargar /auth/me", err?.message || err);
+      if (err?.status === 401 && !window.location.pathname.includes('login.html')) {
+        window.GoHabitAPI.clearSession();
+        window.location.href = "login.html";
+      }
     }
   }
 
