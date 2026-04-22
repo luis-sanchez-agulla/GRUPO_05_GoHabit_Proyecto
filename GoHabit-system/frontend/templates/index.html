@@ -35,14 +35,44 @@
             </div>
         </header>
 
-        <!-- Main Tree Visual (Avatar) -->
+        <!-- Main Tree Visual (Avatar) + Water Tank -->
         <div class="index-tree-section">
             <!-- Background glow effect -->
             <div class="index-tree-glow"></div>
-            <div class="index-tree-container">
-                <!-- Tree Image Placeholder -->
-                <div class="index-tree-image"  data-avatar-image data-alt="Árbol avatar">
+
+            <!-- 💧 WATER TANK — left side inside the avatar section -->
+            <div class="water-tank" id="waterWidget" aria-label="Seguimiento de agua diario">
+                <!-- Tank label + count at top -->
+                <div class="water-tank__header">
+                    <span class="water-tank__icon">💧</span>
+                    <span class="water-tank__count" id="waterLabel">0/8</span>
                 </div>
+
+                <!-- Tall tank body -->
+                <div class="water-tank__body" id="waterBucket">
+                    <div class="water-tank__fill" id="waterFill"></div>
+                    <!-- Animated bubbles -->
+                    <div class="water-tank__bubble water-tank__bubble--1"></div>
+                    <div class="water-tank__bubble water-tank__bubble--2"></div>
+                    <div class="water-tank__bubble water-tank__bubble--3"></div>
+                </div>
+
+                <!-- Controls -->
+                <div class="water-tank__controls">
+                    <button class="water-tank__btn water-tank__btn--remove" id="waterRemove" aria-label="Quitar vaso">
+                        <span class="material-symbols-outlined">remove</span>
+                    </button>
+                    <button class="water-tank__btn water-tank__btn--add" id="waterAdd" aria-label="Añadir vaso">
+                        <span class="material-symbols-outlined">add</span>
+                    </button>
+                </div>
+
+                <p class="water-tank__sub" id="waterSub">0 vasos</p>
+            </div>
+
+            <!-- Avatar -->
+            <div class="index-tree-container">
+                <div class="index-tree-image" data-avatar-image data-alt="Árbol avatar"></div>
                 <!-- Floating Level Badge -->
                 <div class="index-tree-badge">
                     <span class="index-tree-badge__level">Nivel <span data-user-level>1</span></span>
@@ -54,66 +84,57 @@
         <!-- Content Area -->
         <div class="index-content">
             <!-- Quick Task Card -->
-            <div>
-                <div class="index-task-header">
-                    <h3 class="index-task-header__title">Siguiente Hábito</h3>
-                    <a href="habitos.html" class="index-task-header__link">Ver todo</a>
-                </div>
-                <div class="index-task-card">
-                    <!-- Progress Fill Indicator -->
-                    <div class="index-task-card__indicator"></div>
-                    <div class="index-task-card__icon">
-                        <span class="material-symbols-outlined">water_drop</span>
-                    </div>
-                    <div class="index-task-card__content">
-                        <h4 class="index-task-card__title">Beber agua</h4>
-                        <div class="index-task-card__progress">
-                            <div class="index-task-card__progress-bar">
-                                <div class="index-task-card__progress-fill"></div>
-                            </div>
-                            <span class="index-task-card__progress-text">0 / 2L</span>
-                        </div>
-                    </div>
-                    <button class="index-task-card__button" type="button" data-habit-toggle="1" aria-label="Marcar hábito como completado">
-                        <span class="material-symbols-outlined">radio_button_unchecked</span>
-                    </button>
-                </div>
+            <div class="index-task-header">
+                <h3 class="index-task-header__title">Siguiente Hábito</h3>
+                <a href="habitos.html" class="index-task-header__link">Ver todo</a>
             </div>
-
-
+            <div class="index-task-card">
+                <div class="index-task-card__indicator"></div>
+                <div class="index-task-card__icon">
+                    <span class="material-symbols-outlined">task_alt</span>
+                </div>
+                <div class="index-task-card__content">
+                    <h4 class="index-task-card__title">Cargando...</h4>
+                    <div class="index-task-card__progress">
+                        <div class="index-task-card__progress-bar">
+                            <div class="index-task-card__progress-fill"></div>
+                        </div>
+                        <span class="index-task-card__progress-text">0 / 1</span>
+                    </div>
+                </div>
+                <button class="index-task-card__button" type="button" data-habit-toggle="1" aria-label="Marcar hábito como completado">
+                    <span class="material-symbols-outlined">radio_button_unchecked</span>
+                </button>
+            </div>
         </div>
 
         <!-- Navigation Bar -->
- <nav class="index-nav">
-  <div class="index-nav__container">
-    <a href="index.html" class="index-nav__link index-nav__link--active">
-      <span class="index-nav__icon">🏠</span>
-      <span class="index-nav__text">Inicio</span>
-    </a>
-
-    <a href="habitos.html" class="index-nav__link ">
-      <span class="index-nav__icon">✔️</span>
-      <span class="index-nav__text">Hábitos</span>
-    </a>
-
-    <a href="avatar.html" class="index-nav__link">
-      <span class="index-nav__icon">🌳</span>
-      <span class="index-nav__text">Avatar</span>
-    </a>
-
-    <a href="tienda.html" class="index-nav__link">
-      <span class="index-nav__icon">🛒</span>
-      <span class="index-nav__text">Tienda</span>
-    </a>
-
-        <a href="social.html" class="index-nav__link">
-          <span class="index-nav__icon">👥</span><span class="index-nav__text">Social</span>
-        </a>
-        <a href="perfil.html" class="index-nav__link">
-          <span class="index-nav__icon">👤</span><span class="index-nav__text">Perfil</span>
-        </a>
-      </div>
-    </nav>
+        <nav class="index-nav">
+          <div class="index-nav__container">
+            <a href="index.html" class="index-nav__link index-nav__link--active">
+              <span class="index-nav__icon">🏠</span>
+              <span class="index-nav__text">Inicio</span>
+            </a>
+            <a href="habitos.html" class="index-nav__link ">
+              <span class="index-nav__icon">✔️</span>
+              <span class="index-nav__text">Hábitos</span>
+            </a>
+            <a href="avatar.html" class="index-nav__link">
+              <span class="index-nav__icon">🌳</span>
+              <span class="index-nav__text">Avatar</span>
+            </a>
+            <a href="tienda.html" class="index-nav__link">
+              <span class="index-nav__icon">🛒</span>
+              <span class="index-nav__text">Tienda</span>
+            </a>
+            <a href="social.html" class="index-nav__link">
+              <span class="index-nav__icon">👥</span><span class="index-nav__text">Social</span>
+            </a>
+            <a href="perfil.html" class="index-nav__link">
+              <span class="index-nav__icon">👤</span><span class="index-nav__text">Perfil</span>
+            </a>
+          </div>
+        </nav>
 
     <script src="../js/api.js" defer></script>
     <script src="../js/router.js" defer></script>

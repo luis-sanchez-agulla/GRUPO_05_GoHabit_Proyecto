@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(20) NOT NULL DEFAULT 'USER',
     first_name VARCHAR(100) NULL,
     last_name VARCHAR(100) NULL,
-    avatar_url VARCHAR(255) NULL,
+    avatar_url LONGTEXT NULL,
     points INT NOT NULL DEFAULT 0,
     coins INT NOT NULL DEFAULT 0,
     level INT NOT NULL DEFAULT 1,
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS users (
     -- Compatibilidad con consultas legacy en camelCase
     firstName VARCHAR(100) NULL,
     lastName VARCHAR(100) NULL,
-    avatarUrl VARCHAR(255) NULL,
+    avatarUrl LONGTEXT NULL,
     createdAt TIMESTAMP(3) NULL
 );
 
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS habits (
     userId VARCHAR(36) NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT NULL,
-    frequency ENUM('DAILY', 'WEEKLY', 'MONTHLY') NOT NULL DEFAULT 'DAILY',
+    frequency VARCHAR(50) NOT NULL DEFAULT 'DAILY',
     targetCount INT NOT NULL DEFAULT 1,
     color VARCHAR(20) NOT NULL DEFAULT '#6366f1',
     icon VARCHAR(50) NOT NULL DEFAULT 'star',

@@ -970,3 +970,35 @@ body.dark .calendario-modal-habit__time {
 .calendario-modal-habit__status .material-symbols-outlined {
   font-size: 1.75rem;
 }
+
+/* ==================== Traffic-light calendar colours ==================== */
+.calendario-week-day.cal-green,
+.calendario-month-day.cal-green {
+  background-color: rgba(34, 197, 94, 0.18) !important;
+  border: 1.5px solid rgba(34, 197, 94, 0.5);
+}
+.calendario-week-day.cal-yellow,
+.calendario-month-day.cal-yellow {
+  background-color: rgba(234, 179, 8, 0.18) !important;
+  border: 1.5px solid rgba(234, 179, 8, 0.5);
+}
+.calendario-week-day.cal-red,
+.calendario-month-day.cal-red {
+  background-color: rgba(239, 68, 68, 0.13) !important;
+  border: 1.5px solid rgba(239, 68, 68, 0.4);
+}
+/* Don't override today's primary colour */
+.calendario-week-day.today.cal-green,
+.calendario-week-day.today.cal-yellow,
+.calendario-week-day.today.cal-red,
+.calendario-month-day.today.cal-green,
+.calendario-month-day.today.cal-yellow,
+.calendario-month-day.today.cal-red {
+  background-color: var(--primary) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+/* dot colour matching the overall day colour */
+.calendario-week-day.cal-green .calendario-habit-dot.done { background-color: #22c55e; }
+.calendario-week-day.cal-yellow .calendario-habit-dot.done { background-color: #eab308; }
+.calendario-week-day.cal-red .calendario-habit-dot { background-color: rgba(239,68,68,0.4); }
