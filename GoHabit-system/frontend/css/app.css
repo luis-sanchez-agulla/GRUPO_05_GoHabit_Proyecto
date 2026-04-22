@@ -383,7 +383,7 @@ body.dark .gh-chip {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(114, 135, 100, 0.12);
   border-radius: 18px;
@@ -393,6 +393,7 @@ body.dark .gh-chip {
 
 .index-nav__link {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
