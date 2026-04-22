@@ -1,12 +1,18 @@
 /* api.js - Central API utility for GoHabit */
 
 const API_CONFIG = {
+    // Robust detection: if we are on localhost, use localhost. If on IP, use IP.
     BASE_URL: `${window.location.origin}/api`,
     TOKEN_KEY: 'gohabit_token',
     USER_KEY: 'gohabit_user'
 };
 
-console.log('GoHabitAPI: Initialized with BASE_URL', API_CONFIG.BASE_URL);
+// Help debug sync: Log origin and connectivity
+console.log('GoHabitAPI: 🚀 Initializing...', {
+    origin: window.location.origin,
+    api_url: API_CONFIG.BASE_URL,
+    device: navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop'
+});
 
 const api = {
     setToken(token) {
@@ -62,17 +68,28 @@ const api = {
 
         try {
             const response = await fetch(url, config);
+            
+            // Check for CORS or Network issues explicitly
+            if (response.status === 0) {
+                 console.error('API Network Error: Possible CORS or disconnected server.');
+            }
+
             const result = await response.json();
 
             if (!response.ok) {
                 const err = new Error(result?.error?.message || result?.message || 'Something went wrong');
+                err.status = response.status;
                 err.details = result?.error?.details || null;
                 throw err;
             }
 
             return result;
         } catch (error) {
-            console.error('API Request Error:', error);
+            console.group('GoHabitAPI: ❌ Request Failed');
+            console.error('Endpoint:', endpoint);
+            console.error('Error:', error.message);
+            if (error.status === 401) console.warn('Authentication expired or invalid.');
+            console.groupEnd();
             throw error;
         }
     },

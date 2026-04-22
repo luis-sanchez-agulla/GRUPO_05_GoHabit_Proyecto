@@ -76,19 +76,19 @@ function createActivityCard(item) {
                         : '<span class="material-symbols-outlined">account_circle</span>'}
                 </div>
                 <div class="activity-card__user-info">
-                    <p class="activity-card__username">${isOwn ? 'Tú' : item.friendUsername}${isOwn ? ' <span style="font-size:0.75rem;opacity:.6">(ti)</span>' : ''}</p>
+                    <p class="activity-card__username">${isOwn ? 'Tú' : item.friendUsername}</p>
                     <p class="activity-card__time">${fecha}</p>
                 </div>
             </div>
-            <div class="activity-card__badge" style="background:${badgeColor}18; color:${badgeColor}; border:1px solid ${badgeColor}30">
-                <span class="material-symbols-outlined" style="font-size:13px">verified</span>
-                IA VERIFIED
+            <div class="activity-card__badge-ia">
+                <span class="material-symbols-outlined">verified</span>
+                <span>IA VERIFIED</span>
             </div>
         </div>
 
         <div class="activity-card__content">
-            <div class="activity-card__description">
-                <span class="activity-card__habit-icon" style="background:${badgeColor}25; color:${badgeColor}">
+            <div class="activity-card__habit-info">
+                <span class="activity-card__habit-icon" style="background:${badgeColor}20; color:${badgeColor}">
                     <span class="material-symbols-outlined">${item.habitIcon || 'task_alt'}</span>
                 </span>
                 <p>Completó <strong>${item.habitTitle}</strong></p>
@@ -103,8 +103,8 @@ function createActivityCard(item) {
             </div>
             ` : `
             <div class="activity-card__no-image">
-                <span class="material-symbols-outlined" style="font-size:2rem;opacity:.2">image_not_supported</span>
-                <span style="font-size:0.75rem;opacity:.4">Sin imagen</span>
+                <span class="material-symbols-outlined">image_not_supported</span>
+                <span>Sin evidencia visual</span>
             </div>
             `}
 
@@ -326,7 +326,10 @@ function initSearch() {
                         </div>
                         <div class="friend-item__info">
                             <p class="friend-item__name">${user.username}</p>
-                            <p class="friend-item__level">Nivel ${user.level || 1}</p>
+                            <div class="friend-item__stats">
+                                <span class="friend-item__badge">Niv. ${user.level || 1}</span>
+                                <span class="friend-item__xp">${user.points || 0} XP</span>
+                            </div>
                         </div>
                     </div>
                     <button class="gh-primary-btn add-friend-btn" data-id="${user.id}" style="padding: 8px 16px; font-size: 0.85rem;">
