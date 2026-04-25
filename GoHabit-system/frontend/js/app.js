@@ -435,12 +435,12 @@
 
   // Level (very simple for the prototype; later you can compute from XP)
   function getLevel(){
-    const v = localStorage.getItem(storageKey(STORAGE.level));
-    const n = v ? parseInt(v, 10) : 1;
-    return Number.isFinite(n) ? Math.max(1, n) : 1;
+    const progress = getProgress();
+    return levelFromPoints(progress?.points || 0);
   }
   function setLevel(n){
     const val = Math.max(1, Number(n)||1);
+    // Compatibilidad legacy por si alguna vista antigua lo sigue leyendo.
     localStorage.setItem(storageKey(STORAGE.level), String(val|0));
     return getLevel();
   }
