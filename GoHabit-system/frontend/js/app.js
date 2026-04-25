@@ -348,9 +348,23 @@
   }
 
   // Cosmetics (loot/chests)
+  function isPetCosmetic(item){
+    const image = String(item?.image || '');
+    const slot = String(item?.slot || '');
+    return slot === 'companion' && image.includes('/assets/mascotas/');
+  }
+
   function getCosmeticsInventory(){
     const inventory = getJSON(STORAGE.cosmeticsInventory, []);
-    return Array.isArray(inventory) ? inventory : [];
+    const safe = Array.isArray(inventory) ? inventory : [];
+    const petsOnly = safe.filter(isPetCosmetic);
+
+    // Limpieza automática para eliminar objetos legacy que no son mascotas.
+    if(petsOnly.length !== safe.length){
+      setCosmeticsInventory(petsOnly);
+    }
+
+    return petsOnly;
   }
 
   function setCosmeticsInventory(list){
@@ -376,6 +390,7 @@
       id,
       name: String(item?.name || 'Objeto misterioso'),
       icon: String(item?.icon || 'star'),
+      image: item?.image ? String(item.image) : '',
       slot: String(item?.slot || 'aura'),
       rarity: String(item?.rarity || 'common'),
       sourceChest: String(item?.sourceChest || 'madera'),

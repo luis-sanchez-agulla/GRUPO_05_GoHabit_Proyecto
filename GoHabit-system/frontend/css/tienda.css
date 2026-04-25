@@ -554,6 +554,13 @@ body.dark .chest-card__hint {
   color: var(--primary-dark);
 }
 
+.loot-result__pet {
+  width: 3.69rem;
+  height: 3.69rem;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.2));
+}
+
 .loot-result__name {
   margin: 0;
   font-weight: 700;

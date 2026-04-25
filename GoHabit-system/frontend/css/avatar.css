@@ -371,6 +371,12 @@ body.dark .avatar-stat-card__value--streak {
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
 }
 
+.avatar-cosmetic--image {
+  width: clamp(79px, 19.8vw, 119px);
+  height: clamp(79px, 19.8vw, 119px);
+  object-fit: contain;
+}
+
 .avatar-cosmetic--common {
   color: #475569;
 }
@@ -404,8 +410,10 @@ body.dark .avatar-stat-card__value--streak {
 }
 
 .avatar-cosmetic--companion {
-  bottom: 20%;
-  left: 22%;
+  bottom: 10%;
+  right: 8%;
+  left: auto;
+  transform: none;
   font-size: 2rem;
 }
 
@@ -457,6 +465,12 @@ body.dark .avatar-inventory__title {
 .avatar-item__icon {
   font-size: 1.3rem;
   color: var(--primary-dark);
+}
+
+.avatar-item__pet {
+  width: 2.59rem;
+  height: 2.59rem;
+  object-fit: contain;
 }
 
 .avatar-item__meta {

@@ -36,11 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const item = map[String(itemId)];
       if (!item) return;
 
-      const icon = document.createElement('span');
-      icon.className = `material-symbols-outlined avatar-cosmetic ${SLOT_CLASS[item.slot] || ''} avatar-cosmetic--${item.rarity || 'common'}`;
-      icon.textContent = item.icon || 'star';
-      icon.title = item.name || 'Objeto';
-      container.appendChild(icon);
+      const pet = document.createElement('img');
+      pet.className = `avatar-cosmetic avatar-cosmetic--image ${SLOT_CLASS[item.slot] || ''} avatar-cosmetic--${item.rarity || 'common'}`;
+      pet.src = item.image;
+      pet.alt = item.name || 'Mascota';
+      pet.title = item.name || 'Mascota';
+      container.appendChild(pet);
     });
   }
 
@@ -72,10 +73,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const isEquipped = equipped[item.slot] === item.id;
       return `
         <article class="avatar-item avatar-item--${item.rarity || 'common'}">
-          <span class="material-symbols-outlined avatar-item__icon">${item.icon}</span>
+          <img class="avatar-item__pet" src="${item.image}" alt="${item.name}">
           <div class="avatar-item__meta">
             <p class="avatar-item__name">${item.name}</p>
-            <p class="avatar-item__rarity">${rarityLabel[item.rarity] || 'Común'} · ${item.slot}</p>
+            <p class="avatar-item__rarity">${rarityLabel[item.rarity] || 'Común'} · Mascota</p>
           </div>
           <button class="avatar-item__btn" data-equip-item="${item.id}">${isEquipped ? 'Quitar' : 'Equipar'}</button>
         </article>

@@ -23,20 +23,25 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const COSMETICS = [
-    { id: 'wood-cap', name: 'Gorra de Madera', icon: 'forest', slot: 'head', rarity: 'common' },
-    { id: 'leaf-headband', name: 'Diadema de Hojas', icon: 'eco', slot: 'head', rarity: 'common' },
-    { id: 'twig-glasses', name: 'Gafas de Rama', icon: 'visibility', slot: 'face', rarity: 'common' },
-    { id: 'sprout-smile', name: 'Sonrisa Brote', icon: 'mood', slot: 'face', rarity: 'common' },
+    { id: 'pet-agua', name: 'Mascota Agua', icon: 'pets', image: '../assets/mascotas/Agua.png', slot: 'companion', rarity: 'common' },
+    { id: 'pet-arbusto', name: 'Mascota Arbusto', icon: 'pets', image: '../assets/mascotas/Arbusto.png', slot: 'companion', rarity: 'common' },
+    { id: 'pet-bellota', name: 'Mascota Bellota', icon: 'pets', image: '../assets/mascotas/Bellota.png', slot: 'companion', rarity: 'common' },
+    { id: 'pet-nube', name: 'Mascota Nube', icon: 'pets', image: '../assets/mascotas/Nube.png', slot: 'companion', rarity: 'common' },
+    { id: 'pet-riego', name: 'Mascota Riego', icon: 'pets', image: '../assets/mascotas/Riego.png', slot: 'companion', rarity: 'common' },
+    { id: 'pet-roca', name: 'Mascota Roca', icon: 'pets', image: '../assets/mascotas/Roca.png', slot: 'companion', rarity: 'common' },
+    { id: 'pet-saco', name: 'Mascota Saco', icon: 'pets', image: '../assets/mascotas/Saco.png', slot: 'companion', rarity: 'common' },
+    { id: 'pet-seta', name: 'Mascota Seta', icon: 'pets', image: '../assets/mascotas/Seta.png', slot: 'companion', rarity: 'common' },
 
-    { id: 'silver-crown', name: 'Corona de Plata', icon: 'diamond', slot: 'head', rarity: 'rare' },
-    { id: 'moon-monocle', name: 'Monoculo Lunar', icon: 'lens_blur', slot: 'face', rarity: 'rare' },
-    { id: 'wind-aura', name: 'Aura de Viento', icon: 'air', slot: 'aura', rarity: 'rare' },
-    { id: 'butterfly-friend', name: 'Mariposa Compañera', icon: 'flutter_dash', slot: 'companion', rarity: 'rare' },
+    { id: 'pet-arbol', name: 'Mascota Arbol', icon: 'pets', image: '../assets/mascotas/Arbol.png', slot: 'companion', rarity: 'rare' },
+    { id: 'pet-calamar', name: 'Mascota Calamar', icon: 'pets', image: '../assets/mascotas/Calamar.png', slot: 'companion', rarity: 'rare' },
+    { id: 'pet-escudo', name: 'Mascota Escudo', icon: 'pets', image: '../assets/mascotas/Escudo.png', slot: 'companion', rarity: 'rare' },
+    { id: 'pet-hada', name: 'Mascota Hada', icon: 'pets', image: '../assets/mascotas/Hada.png', slot: 'companion', rarity: 'rare' },
+    { id: 'pet-libelula', name: 'Mascota Libelula', icon: 'pets', image: '../assets/mascotas/Libelula.png', slot: 'companion', rarity: 'rare' },
+    { id: 'pet-luciernaga', name: 'Mascota Luciernaga', icon: 'pets', image: '../assets/mascotas/Luciernaga.png', slot: 'companion', rarity: 'rare' },
 
-    { id: 'sun-halo', name: 'Halo Solar', icon: 'wb_sunny', slot: 'aura', rarity: 'epic' },
-    { id: 'royal-crown', name: 'Corona Real', icon: 'workspace_premium', slot: 'head', rarity: 'epic' },
-    { id: 'phoenix-tail', name: 'Cola Fenix', icon: 'local_fire_department', slot: 'companion', rarity: 'epic' },
-    { id: 'star-visor', name: 'Visor Estelar', icon: 'auto_awesome', slot: 'face', rarity: 'epic' },
+    { id: 'pet-dragon', name: 'Mascota Dragon', icon: 'pets', image: '../assets/mascotas/Dragon.png', slot: 'companion', rarity: 'epic' },
+    { id: 'pet-esqueleto', name: 'Mascota Esqueleto', icon: 'pets', image: '../assets/mascotas/Esqueleto.png', slot: 'companion', rarity: 'epic' },
+    { id: 'pet-serpiente', name: 'Mascota Serpiente', icon: 'pets', image: '../assets/mascotas/Serpiente.png', slot: 'companion', rarity: 'epic' },
   ];
 
   const rarityLabel = {
@@ -91,9 +96,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const rarity = result.rarity || 'common';
     const rarityText = rarityLabel[rarity] || 'Común';
 
+    const visual = result.image
+      ? `<img class="loot-result__pet" src="${result.image}" alt="${result.name}">`
+      : `<span class="material-symbols-outlined loot-result__icon">${result.icon}</span>`;
+
     panel.innerHTML = `
       <div class="loot-result__card ${rarityClass(rarity)}">
-        <span class="material-symbols-outlined loot-result__icon">${result.icon}</span>
+        ${visual}
         <div class="loot-result__text">
           <p class="loot-result__name">${result.name}</p>
           <p class="loot-result__meta">Rareza: ${rarityText}</p>
