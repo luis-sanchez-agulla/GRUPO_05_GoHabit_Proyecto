@@ -21,21 +21,13 @@ body {
   color: var(--text-main);
   overflow-x: hidden;
   margin: 0;
+  padding-bottom: 80px; /* Espacio para el navbar inferior */
   -webkit-font-smoothing: antialiased;
 }
 
 body.dark {
   background-color: var(--background-dark);
   color: #f3f4f6;
-}
-
-/* Material Icons Configuration */
-.material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-}
-
-.material-symbols-outlined.fill {
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
 /* ==================== Main Container ==================== */
@@ -45,588 +37,161 @@ body.dark {
   background: transparent;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  position: relative;
-  box-shadow: none;
-  overflow: visible;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-  transition: padding 0.3s ease;
-}
-
-body.dark .index-container {
-  background-color: var(--background-dark);
-}
-
-@media (min-width: 640px) {
-  .index-container { max-width: 44rem; padding-left:1.5rem; padding-right:1.5rem; }
 }
 
 @media (min-width: 1024px) {
-  .index-container { max-width: 64rem; padding-left:3rem; padding-right:3rem; }
+  .index-container { max-width: 64rem; margin: 0 auto; padding: 0 2rem; }
 }
 
-/* ==================== Header Section ==================== */
-.index-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.5rem 0.5rem 1rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(247, 248, 246, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  margin: 0 -1.25rem;
-  padding-left: 1.75rem;
-  padding-right: 1.75rem;
-}
-
-body.dark .index-header {
-  background: rgba(31, 36, 27, 0.8);
-}
-
-.index-header__greeting {
-  color: var(--text-light);
-  font-weight: 600;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  opacity: 0.8;
-}
-
-.index-header__title {
-  font-size: clamp(1.5rem, 5vw, 2.2rem);
-  font-weight: 800;
-  color: var(--text-main);
-  margin-top: 0.1rem;
-  letter-spacing: -0.03em;
-}
-
-.index-header__balance {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 0.6rem 1rem;
-  border-radius: 24px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(114, 135, 100, 0.1);
-  transition: transform 0.2s ease;
-}
-
-.index-header__balance:active {
-  transform: scale(0.95);
-}
-
-/* ==================== Tree Visual Section ==================== */
+/* ==================== Tree Section ==================== */
 .index-tree-section {
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 320px;
-  max-height: 400px;
-  height: 45vh;
-  padding: 1.5rem;
-  margin: 1.5rem 0;
+  width: 100%;
   position: relative;
-  border-radius: 32px;
-  overflow: hidden;
-  background-image: url('../assets/avatar/fondo.png');
-  background-size: cover;
-  background-position: center;
-  border: 1px solid rgba(114, 135, 100, 0.15);
-  box-shadow: 0 20px 40px rgba(114, 135, 100, 0.1);
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  margin-bottom: 1.5rem;
 }
 
 .index-tree-container {
   position: relative;
   width: 100%;
-  height: 100%;
-  max-width: 320px;
+  aspect-ratio: 16 / 10; /* Un poco más alto para que quepa bien el Tallo */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
+  overflow: hidden;
 }
 
 .index-tree-image {
-  width: 100%;
-  height: 100%;
-  max-height: 280px;
-  background-size: contain;
-  background-position: center bottom;
+  position: absolute;
+  inset: 0;
+  background-size: cover; /* Ocupa todo el marco */
+  background-position: center center;
   background-repeat: no-repeat;
-  transform-origin: center bottom;
-  filter: drop-shadow(0 15px 30px rgba(32, 64, 37, 0.25));
-  animation: ghAvatarFloat 4s ease-in-out infinite;
-}
-
-@keyframes ghAvatarFloat {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-8px) scale(1.03); }
+  z-index: 1;
 }
 
 .index-tree-badge {
   position: absolute;
-  bottom: .6rem;
-  background-color: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(4px);
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 20px -2px rgba(114, 135, 100, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  bottom: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 0.5rem 1.25rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 3;
+  z-index: 10;
+  border: 1px solid rgba(114, 135, 100, 0.2);
 }
 
-body.dark .index-tree-badge {
-  background-color: rgba(42, 48, 37, 0.9);
-  border-color: #4b5563;
-}
+.index-tree-badge__level { font-size: 0.75rem; font-weight: 800; color: var(--primary); text-transform: uppercase; }
+.index-tree-badge__name { font-size: 0.9rem; font-weight: 700; color: #1e293b; }
 
-.index-tree-badge__level {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-light);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.index-tree-badge__name {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-body.dark .index-tree-badge__name {
-  color: white;
-}
-
-/* ==================== Content Area ==================== */
+/* ==================== Habit Section ==================== */
 .index-content {
-  padding-bottom: 8rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
+  padding: 0 1.25rem;
 }
 
-/* ==================== Quick Task Section ==================== */
 .index-task-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.75rem;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-.index-task-header__title {
-  font-weight: 700;
-  font-size: 1.125rem;
-  color: var(--text-main);
-}
+.index-task-header__title { font-size: 1.25rem; font-weight: 800; color: #1e293b; margin: 0; }
+.index-task-header__link { font-size: 0.85rem; font-weight: 700; color: var(--primary); text-decoration: none; }
 
-body.dark .index-task-header__title {
-  color: white;
-}
-
-.index-task-header__link {
-  color: var(--primary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: color 0.3s;
-  text-decoration: none;
-}
-
-.index-task-header__link:hover {
-  color: var(--primary-dark);
-}
-
-.index-task-card {
-  background-color: white;
-  padding: 1.25rem;
-  border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(114, 135, 100, 0.08);
-  border: 1px solid rgba(114, 135, 100, 0.05);
+/* Habit Card */
+.habit-card {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 1.25rem;
+  background-color: white;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f1f5f9;
+  transition: transform 0.2s;
 }
 
-.index-task-card:active {
-  transform: scale(0.98);
-}
-
-body.dark .index-task-card {
-  background: var(--surface-dark);
-  border-color: rgba(255, 255, 255, 0.05);
-}
-
-.index-task-card__icon {
+.habit-card__icon-container {
   width: 3.5rem;
   height: 3.5rem;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #3b82f6;
-  flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.1);
-}
-
-.index-task-card__title {
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: var(--text-main);
-  margin-bottom: 0.25rem;
-}
-
-.index-task-card__progress-bar {
-  height: 6px;
-  background-color: #f1f5f9;
-  border-radius: 10px;
-}
-
-.index-task-card__progress-fill {
-  background: linear-gradient(90deg, #60a5fa, #3b82f6);
-  border-radius: 10px;
-}
-
-/* ==================== Daily Progress Section ==================== */
-.index-progress-title {
-  font-weight: 700;
-  font-size: 1.125rem;
-  color: var(--text-main);
-  margin-bottom: 0.75rem;
-}
-
-body.dark .index-progress-title {
-  color: white;
-}
-
-@media (min-width: 1024px) {
-  .index-progress-title {
-    font-size: 1.25rem;
-  }
-}
-
-.index-progress-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem;
-}
-
-.index-progress-card {
-  padding: 1rem;
   border-radius: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.index-progress-card--health {
   background-color: rgba(114, 135, 100, 0.1);
-}
-
-body.dark .index-progress-card--health {
-  background-color: rgba(114, 135, 100, 0.05);
-}
-
-.index-progress-card--mind {
-  background-color: rgba(217, 140, 113, 0.1);
-}
-
-body.dark .index-progress-card--mind {
-  background-color: rgba(217, 140, 113, 0.05);
-}
-
-.index-progress-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.index-progress-card__icon {
-  font-size: 24px;
-}
-
-.index-progress-card--health .index-progress-card__icon {
   color: var(--primary);
-}
-
-.index-progress-card--mind .index-progress-card__icon {
-  color: var(--secondary);
-}
-
-.index-progress-card__percentage {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-body.dark .index-progress-card__percentage {
-  color: white;
-}
-
-.index-progress-card__label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-main);
-}
-
-body.dark .index-progress-card__label {
-  color: #e5e7eb;
-}
-
-.index-progress-card__bar {
-  width: 100%;
-  height: 0.375rem;
-  background-color: white;
-  border-radius: 9999px;
-  margin-top: 0.5rem;
-  overflow: hidden;
-}
-
-body.dark .index-progress-card__bar {
-  background-color: rgba(55, 65, 81, 0.5);
-}
-
-.index-progress-card__bar-fill {
-  height: 100%;
-  border-radius: 9999px;
-}
-
-.index-progress-card--health .index-progress-card__bar-fill {
-  background-color: var(--primary);
-  width: 0%;
-}
-
-.index-progress-card--mind .index-progress-card__bar-fill {
-  background-color: var(--secondary);
-  width: 0%;
-}
-
-
-/* Navbar styles moved to app.css */
-
-.index-nav__container{
-  max-width: 650px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  background: rgba(255,255,255,.7);
-  border: 1px solid rgba(114,135,100,.12);
-  border-radius: 18px;
-  padding: .7rem 1rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,.06);
-}
-
-.index-nav__link{
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .3rem;
-  text-decoration: none;
-  color: #94a3b8;
-  padding: .45rem .4rem;
-  border-radius: 14px;
-  transition: all .2s ease;
-}
-
-.index-nav__link:hover{
-  color: var(--primary);
-  background: rgba(114,135,100,.08);
-}
-
-.index-nav__link--active{
-  color: var(--primary);
-  background: rgba(114,135,100,.12);
-}
-
-/* ==================== Water Tank (left-of-avatar) ==================== */
-.water-tank {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.45rem;
-  z-index: 10;
-  /* Full height of the parent section minus some padding */
-  height: calc(100% - 32px);
-  max-height: 340px;
-}
-
-.water-tank__header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.1rem;
-}
-
-.water-tank__icon {
-  font-size: 1.1rem;
-  filter: drop-shadow(0 1px 2px rgba(0,100,200,0.3));
-}
-
-.water-tank__count {
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: #fff;
-  background: rgba(33, 150, 243, 0.75);
-  padding: 2px 6px;
-  border-radius: 20px;
-  white-space: nowrap;
-  backdrop-filter: blur(4px);
-}
-
-/* The tall tank body */
-.water-tank__body {
-  flex: 1;
-  width: 36px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.25);
-  border: 2px solid rgba(255,255,255,0.55);
-  position: relative;
-  overflow: hidden;
-  box-shadow: inset 0 2px 8px rgba(0,100,200,0.15), 0 4px 20px rgba(0,100,200,0.12);
-  backdrop-filter: blur(4px);
-}
-
-body.dark .water-tank__body {
-  background: rgba(15, 42, 69, 0.5);
-  border-color: rgba(125, 211, 252, 0.4);
-}
-
-/* The water fill that rises from the bottom */
-.water-tank__fill {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 0%;
-  background: linear-gradient(180deg,
-    rgba(96, 201, 248, 0.9) 0%,
-    rgba(33, 150, 243, 0.95) 50%,
-    rgba(21, 101, 192, 1) 100%);
-  transition: height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 0 0 8px 8px;
-}
-
-/* Wave ripple at the top of fill */
-.water-tank__fill::after {
-  content: '';
-  position: absolute;
-  top: -4px;
-  left: -30%;
-  width: 160%;
-  height: 8px;
-  background: radial-gradient(ellipse at 50% 80%, rgba(255,255,255,0.55) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: tankWave 1.8s ease-in-out infinite;
-}
-
-@keyframes tankWave {
-  0%, 100% { transform: translateX(0) scaleY(1); }
-  50%       { transform: translateX(10%) scaleY(1.3); }
-}
-
-/* Animated rising bubbles */
-.water-tank__bubble {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.5);
-  animation: bubbleRise 3s ease-in infinite;
-  opacity: 0;
-}
-.water-tank__bubble--1 { width: 5px; height: 5px; left: 25%; animation-delay: 0s; }
-.water-tank__bubble--2 { width: 3px; height: 3px; left: 60%; animation-delay: 1.1s; }
-.water-tank__bubble--3 { width: 4px; height: 4px; left: 42%; animation-delay: 2.0s; }
-
-@keyframes bubbleRise {
-  0%   { bottom: 4px; opacity: 0; }
-  20%  { opacity: 0.7; }
-  90%  { opacity: 0.4; }
-  100% { bottom: 90%; opacity: 0; }
-}
-
-/* Full state — green water */
-.water-tank.full .water-tank__fill {
-  background: linear-gradient(180deg, #34d399 0%, #059669 100%);
-}
-
-/* Controls */
-.water-tank__controls {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.water-tank__btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 1.25rem;
+  flex-shrink: 0;
+}
+
+.habit-card__icon-container .material-symbols-outlined { font-size: 24px; }
+
+.habit-card__content { flex: 1; }
+.habit-card__title { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin: 0; }
+.habit-card__category { font-size: 0.85rem; color: #64748b; margin-top: 2px; }
+
+/* ==================== Checkbox (FIXED HIDING) ==================== */
+.habit-checkbox {
+  position: relative;
+  width: 1.75rem;
+  height: 1.75rem;
+  cursor: pointer;
+}
+
+.habit-checkbox__input {
+  position: absolute;
+  opacity: 0; /* Totalmente invisible */
+  width: 0;
+  height: 0;
+}
+
+.habit-checkbox__box {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
   transition: all 0.2s;
 }
 
-.water-tank__btn .material-symbols-outlined { font-size: 16px; }
+.habit-checkbox__input:checked ~ .habit-checkbox__box {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
 
-.water-tank__btn--add {
-  background: rgba(33, 150, 243, 0.85);
+.habit-checkbox__icon {
   color: white;
-  box-shadow: 0 2px 8px rgba(33,150,243,0.4);
-  backdrop-filter: blur(4px);
-}
-.water-tank__btn--add:hover { background: #1976D2; transform: scale(1.15); }
-
-.water-tank__btn--remove {
-  background: rgba(255,255,255,0.35);
-  color: rgba(33,150,243,0.9);
-  backdrop-filter: blur(4px);
-}
-.water-tank__btn--remove:hover { background: rgba(255,255,255,0.6); transform: scale(1.1); }
-
-.water-tank__btn--add:disabled,
-.water-tank__btn--remove:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  transform: none;
+  font-size: 18px;
+  opacity: 0;
+  transition: opacity 0.2s;
 }
 
-.water-tank__sub {
-  font-size: 0.55rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.9);
-  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  text-align: center;
-  margin: 0;
-  white-space: nowrap;
+.habit-checkbox__input:checked ~ .habit-checkbox__box .habit-checkbox__icon {
+  opacity: 1;
 }
 
-body.dark .water-tank__sub { color: #93c5fd; }
+/* ==================== Pets ==================== */
+.avatar-cosmetic--companion {
+  position: absolute !important;
+  bottom: 20px;
+  right: 20px;
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  z-index: 5;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+  animation: float 3s ease-in-out infinite;
+}
 
-/* Legacy classes hidden */
-/* Legacy classes – no longer rendered, keep for safety */
-.water-widget { display: none !important; }
-
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}

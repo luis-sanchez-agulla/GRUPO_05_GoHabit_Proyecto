@@ -8,23 +8,58 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1) Pon tus imágenes en: front/assets/avatar/
   // 2) Cambia las rutas en esta lista (img)
   // 3) Ajusta los rangos de nivel si quieres
-  const STAGES = [
-    { min: 1,  name: 'Brote',       img: '../assets/avatar/lv1.png' },
-    { min: 3,  name: 'Arbolito',    img: '../assets/avatar/lv3.png' },
-    { min: 5,  name: 'Roble Joven', img: '../assets/avatar/lv5.png' },
-    { min: 8,  name: 'Roble Fuerte',img: '../assets/avatar/lv8.png' },
-    { min: 12, name: 'Roble Epico', img: '../assets/avatar/lv12.png' },
-  ];
+  const STAGES = {
+    1: { 
+        name: 'Semilla', 
+        img: '../assets/avatar/lvl1.jpeg', 
+        img_night: '../assets/avatar/lvl1_noche.jpeg' 
+    },
+    2: { 
+        name: 'Brote', 
+        img: '../assets/avatar/lv2.png', 
+        img_night: '../assets/avatar/lv2_noche.png' 
+    },
+    3: { 
+        name: 'Tallo', 
+        img: '../assets/avatar/lv3.png', 
+        img_night: '../assets/avatar/lv3_noche.png' 
+    },
+    4: { 
+        name: 'Planta Joven', 
+        img: '../assets/avatar/lv4.png', 
+        img_night: '../assets/avatar/lv4_noche.png' 
+    },
+    5: { 
+        name: 'Árbol Pequeño', 
+        img: '../assets/avatar/lv5.png', 
+        img_night: '../assets/avatar/lv5_noche.png' 
+    },
+    6: { 
+        name: 'Árbol Mediano', 
+        img: '../assets/avatar/lv6.png', 
+        img_night: '../assets/avatar/lv6_noche.png' 
+    },
+    7: { 
+        name: 'Gran Árbol', 
+        img: '../assets/avatar/lv7.png', 
+        img_night: '../assets/avatar/lv7_noche.png' 
+    },
+    8: { 
+        name: 'Árbol Sabio', 
+        img: '../assets/avatar/lv8.png', 
+        img_night: '../assets/avatar/lv8_noche.png' 
+    },
+  };
 
   const FALLBACK_IMG = '../assets/logo.png';
 
   const level = GoHabit.getLevel();
+  const hours = new Date().getHours();
+  const isNight = hours >= 20 || hours < 7;
 
-  // Pick the last stage where min <= level
-  const stage = STAGES
-    .slice()
-    .sort((a,b) => a.min - b.min)
-    .reduce((acc, s) => (level >= s.min ? s : acc), STAGES[0]);
+  // Pick the stage. If level is higher than 8, stay at 8 (Gran Árbol Sabio).
+  const stage = STAGES[level] || (level > 8 ? STAGES[8] : STAGES[1]);
+  let chosenImg = isNight && stage.img_night ? stage.img_night : stage.img;
 
   function preload(src){
     return new Promise((resolve, reject) => {
@@ -37,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Apply image with fallback so avatar is always visible.
   Promise.resolve()
-    .then(() => preload(stage.img))
+    .then(() => preload(chosenImg))
     .then((src) => {
       document.querySelectorAll('[data-avatar-image]').forEach(el => {
         el.style.backgroundImage = `url("${src}")`;
@@ -60,4 +95,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const levelNumber = document.querySelector('[data-avatar-level-number]');
   if(levelNumber) levelNumber.textContent = String(level);
+
+  // Evolución (Popup)
+  const lastLevelKey = 'gohabit_last_level_' + GoHabit.getUser().id;
+  let lastSeenLevel = localStorage.getItem(lastLevelKey);
+  
+  if (lastSeenLevel === null) {
+      localStorage.setItem(lastLevelKey, String(level));
+      lastSeenLevel = level;
+  } else {
+      lastSeenLevel = parseInt(lastSeenLevel, 10);
+  }
+
+  if (level > lastSeenLevel) {
+    localStorage.setItem(lastLevelKey, String(level));
+
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.inset = '0';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = '9999';
+    overlay.style.color = '#fff';
+
+    overlay.innerHTML = `
+      <h2 style="font-size: 2.5rem; margin-bottom: 20px; text-shadow: 0 0 10px rgba(76, 175, 80, 0.8);">¡Tu Árbol ha evolucionado!</h2>
+      <div style="width:200px; height:200px; background-image: url('${chosenImg}'); background-size: contain; background-repeat: no-repeat; background-position: center; filter: drop-shadow(0 0 20px #4caf50);"></div>
+      <p style="margin-top: 20px; font-size: 1.5rem;">Nuevo estado: <strong>${stage.name}</strong></p>
+      <button style="margin-top: 30px; padding: 10px 30px; font-size: 1.2rem; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer;">¡Genial!</button>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('button').addEventListener('click', () => {
+      overlay.remove();
+    });
+  } else {
+    // Si no evoucionó igual guardamos el actual para estar seguros
+    sessionStorage.setItem(lastLevelKey, String(level));
+    localStorage.setItem(lastLevelKey, String(level));
+  }
+
+  // Render pets/cosmetics
+  GoHabit.renderEquippedOnAvatar('.index-tree-container');
 });
