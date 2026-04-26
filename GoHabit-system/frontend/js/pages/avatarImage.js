@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function preload(src){
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.onload = () => resolve(src);
+      img.onload = () => resolve({ src, width: img.naturalWidth || img.width, height: img.naturalHeight || img.height });
       img.onerror = reject;
       img.src = src;
     });
@@ -51,15 +51,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     Promise.resolve()
       .then(() => preload(stageImage))
-      .then((src) => {
+      .then(({ src, width, height }) => {
+        const ratio = height ? (width / height) : 1;
+        const isWide = ratio > 1.3;
         document.querySelectorAll('[data-avatar-image]').forEach(el => {
           el.style.backgroundImage = `url("${src}")`;
+          el.classList.toggle('gh-avatar-wide', isWide);
           el.classList.add('gh-avatar-live');
         });
       })
       .catch(() => {
         document.querySelectorAll('[data-avatar-image]').forEach(el => {
           el.style.backgroundImage = `url("${FALLBACK_IMG}")`;
+          el.classList.remove('gh-avatar-wide');
           el.classList.add('gh-avatar-live');
         });
       });

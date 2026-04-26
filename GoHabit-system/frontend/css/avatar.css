@@ -215,13 +215,17 @@ body.dark .avatar-header__title {
 }
 
 .avatar-tree-image {
-  width: 114%;
-  height: 114%;
-  background-position: center;
+  width: 100%;
+  height: 100%;
+  background-position: center center;
   background-repeat: no-repeat;
   background-size: contain;
   transform-origin: center bottom;
   filter: drop-shadow(0 14px 20px rgba(32, 64, 37, 0.30));
+}
+
+.avatar-tree-image.gh-avatar-wide {
+  background-size: cover;
 }
 
 .avatar-tree-image.gh-avatar-live {
