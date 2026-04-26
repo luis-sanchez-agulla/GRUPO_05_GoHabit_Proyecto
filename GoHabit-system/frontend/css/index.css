@@ -154,10 +154,7 @@ body.dark .index-header__balance-text {
   position: relative;
   border-radius: 22px;
   overflow: hidden;
-  background-image: url('../assets/avatar/fondo.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-color: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(114, 135, 100, 0.18);
 }
 
@@ -251,8 +248,8 @@ body.dark .index-tree-glow {
 
 .index-tree-image.gh-avatar-live {
   animation: ghAvatarFloat 3.4s ease-in-out infinite;
-  mix-blend-mode: multiply;
-  opacity: 0.98;
+  mix-blend-mode: normal;
+  opacity: 1;
 }
 
 @keyframes ghAvatarFloat {

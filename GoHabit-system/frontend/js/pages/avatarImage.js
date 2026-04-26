@@ -5,16 +5,16 @@
 document.addEventListener('DOMContentLoaded', () => {
   if(!window.GoHabit) return;
 
-  // Evoluciones reales disponibles en assets/avatar (lv1...lv8).
+  // Cada evolución tiene su versión normal y su versión de noche.
   const STAGES = [
-    { min: 1, name: 'Brote', img: '../assets/avatar/lv1.png' },
-    { min: 2, name: 'Evolucion II', img: '../assets/avatar/lv2.png' },
-    { min: 3, name: 'Evolucion III', img: '../assets/avatar/lv3.png' },
-    { min: 4, name: 'Evolucion IV', img: '../assets/avatar/lv4.png' },
-    { min: 5, name: 'Evolucion V', img: '../assets/avatar/lv5.png' },
-    { min: 6, name: 'Evolucion VI', img: '../assets/avatar/lv6.png' },
-    { min: 7, name: 'Evolucion VII', img: '../assets/avatar/lv7.png' },
-    { min: 8, name: 'Evolucion VIII', img: '../assets/avatar/lv8.png' },
+    { min: 1, name: 'Brote', img: '../assets/avatar/lv1.png', imgDark: '../assets/avatar/lv1_noche.jpeg' },
+    { min: 2, name: 'Evolucion II', img: '../assets/avatar/lv2.png', imgDark: '../assets/avatar/lv2_noche.png' },
+    { min: 3, name: 'Evolucion III', img: '../assets/avatar/lv3.png', imgDark: '../assets/avatar/lv3_noche.png' },
+    { min: 4, name: 'Evolucion IV', img: '../assets/avatar/lv4.png', imgDark: '../assets/avatar/lv4_noche.png' },
+    { min: 5, name: 'Evolucion V', img: '../assets/avatar/lv5.png', imgDark: '../assets/avatar/lv5_noche.png' },
+    { min: 6, name: 'Evolucion VI', img: '../assets/avatar/lv6.png', imgDark: '../assets/avatar/lv6_noche.png' },
+    { min: 7, name: 'Evolucion VII', img: '../assets/avatar/lv7.png', imgDark: '../assets/avatar/lv7_noche.png' },
+    { min: 8, name: 'Evolucion VIII', img: '../assets/avatar/lv8.png', imgDark: '../assets/avatar/lv8_noche.png' },
   ];
 
   const FALLBACK_IMG = '../assets/logo.png';
@@ -25,6 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
       .slice()
       .sort((a,b) => a.min - b.min)
       .reduce((acc, s) => (level >= s.min ? s : acc), STAGES[0]);
+  }
+
+  function isDarkModeActive(){
+    return document.body.classList.contains('dark') || document.documentElement.classList.contains('dark');
+  }
+
+  function getStageImage(stage){
+    return isDarkModeActive() ? (stage.imgDark || stage.img) : stage.img;
   }
 
   function preload(src){
@@ -39,9 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateAvatarEvolution(){
     const level = GoHabit.getLevel();
     const stage = getStageForLevel(level);
+    const stageImage = getStageImage(stage);
 
     Promise.resolve()
-      .then(() => preload(stage.img))
+      .then(() => preload(stageImage))
       .then((src) => {
         document.querySelectorAll('[data-avatar-image]').forEach(el => {
           el.style.backgroundImage = `url("${src}")`;
@@ -66,6 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   updateAvatarEvolution();
+
+  // Re-renderiza el avatar cuando cambia la clase de tema.
+  const observer = new MutationObserver(updateAvatarEvolution);
+  observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
   window.addEventListener('gohabit:progress-changed', updateAvatarEvolution);
   window.addEventListener('storage', updateAvatarEvolution);
 });
