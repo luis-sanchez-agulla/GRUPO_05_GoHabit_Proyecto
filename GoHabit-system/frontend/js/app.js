@@ -180,9 +180,13 @@
     } = opts;
 
     const done = getHabitDone(habitId, dateKey);
-    const next = !done;
+    if (done) {
+        toast('Este hábito ya ha sido completado hoy', 'good', { icon: 'lock' });
+        return { done: true, total: getSeeds() };
+    }
+    const next = true;
     setHabitDone(habitId, next, dateKey);
-    const total = next ? addSeeds(reward) : subSeeds(reward);
+    const total = addSeeds(reward);
 
     const progress = getProgress();
     const nextPoints = Math.max(0, progress.points + (next ? reward : -reward));
@@ -216,9 +220,8 @@
       },
     }));
 
-    const toastKind = next ? 'good' : 'bad';
-    toast(next ? toastGood : toastBad, toastKind, { icon: 'eco' });
-    toast(`${next ? '+' : '-'}${reward} XP`, toastKind, { icon: 'bolt' });
+    toast(toastGood, 'good', { icon: 'eco' });
+    toast(`+${reward} XP`, 'good', { icon: 'bolt' });
     if (typeof onChange === 'function') onChange(next, total);
     return { done: next, total };
   }
@@ -395,7 +398,36 @@
   // Cosmetics (loot/chests)
   function getCosmeticsInventory() {
     const inventory = getJSON(STORAGE.cosmeticsInventory, []);
-    return Array.isArray(inventory) ? inventory : [];
+    const list = Array.isArray(inventory) ? inventory : [];
+    
+    // Fix for legacy items missing image property
+    const petMap = {
+      'pet-agua': '../assets/mascotas/Agua.png',
+      'pet-arbusto': '../assets/mascotas/Arbusto.png',
+      'pet-bellota': '../assets/mascotas/Bellota.png',
+      'pet-nube': '../assets/mascotas/Nube.png',
+      'pet-riego': '../assets/mascotas/Riego.png',
+      'pet-roca': '../assets/mascotas/Roca.png',
+      'pet-saco': '../assets/mascotas/Saco.png',
+      'pet-seta': '../assets/mascotas/Seta.png',
+      'pet-arbol': '../assets/mascotas/Arbol.png',
+      'pet-escudo': '../assets/mascotas/Escudo.png',
+      'pet-serpiente': '../assets/mascotas/Serpiente.png',
+      'pet-luciernaga': '../assets/mascotas/Luciernaga.png',
+      'pet-calamar': '../assets/mascotas/Calamar.png',
+      'pet-esqueleto': '../assets/mascotas/Esqueleto.png',
+      'pet-hada': '../assets/mascotas/Hada.png',
+      'pet-libelula': '../assets/mascotas/Libelula.png',
+      'pet-dragon': '../assets/mascotas/Dragon.png'
+    };
+
+    list.forEach(item => {
+      if (!item.image && petMap[item.id]) {
+        item.image = petMap[item.id];
+      }
+    });
+
+    return list;
   }
 
   function setCosmeticsInventory(list) {
@@ -421,6 +453,7 @@
       id,
       name: String(item?.name || 'Objeto misterioso'),
       icon: String(item?.icon || 'star'),
+      image: item?.image || null,
       slot: String(item?.slot || 'aura'),
       rarity: String(item?.rarity || 'common'),
       sourceChest: String(item?.sourceChest || 'madera'),
@@ -465,9 +498,8 @@
 
   // Level (very simple for the prototype; later you can compute from XP)
   function getLevel() {
-    const v = localStorage.getItem(storageKey(STORAGE.level));
-    const n = v ? parseInt(v, 10) : 1;
-    return Number.isFinite(n) ? Math.max(1, n) : 1;
+    const progress = getProgress();
+    return levelFromPoints(progress.points || 0);
   }
   function setLevel(n) {
     const val = Math.max(1, Number(n) || 1);
@@ -492,6 +524,48 @@
     host.style.pointerEvents = 'none';
     document.body.appendChild(host);
     return host;
+  }
+  
+  function confirmModal(title, text) {
+      return new Promise((resolve) => {
+          const overlay = document.createElement('div');
+          overlay.style.position = 'fixed';
+          overlay.style.inset = '0';
+          overlay.style.backgroundColor = 'rgba(0,0,0,0.6)';
+          overlay.style.zIndex = '100000';
+          overlay.style.display = 'flex';
+          overlay.style.alignItems = 'center';
+          overlay.style.justifyContent = 'center';
+          
+          const dialog = document.createElement('div');
+          dialog.style.background = 'var(--bg-surface, #fff)';
+          dialog.style.padding = '24px';
+          dialog.style.borderRadius = '12px';
+          dialog.style.maxWidth = '300px';
+          dialog.style.textAlign = 'center';
+          dialog.style.color = 'var(--text-primary, #000)';
+          
+          dialog.innerHTML = `
+            <h3 style="margin-bottom:12px;font-size:1.2rem;">${title}</h3>
+            <p style="margin-bottom:20px;font-size:0.95rem;opacity:0.8;">${text}</p>
+            <div style="display:flex;gap:10px;justify-content:center;">
+              <button id="gh-conf-no" style="padding:8px 16px;border:none;border-radius:6px;cursor:pointer;background:#e2e8f0;color:#334155;font-weight:600;">Cancelar</button>
+              <button id="gh-conf-yes" style="padding:8px 16px;border:none;border-radius:6px;cursor:pointer;background:var(--primary);color:#fff;font-weight:600;">Confirmar</button>
+            </div>
+          `;
+          
+          overlay.appendChild(dialog);
+          document.body.appendChild(overlay);
+          
+          dialog.querySelector('#gh-conf-no').addEventListener('click', () => {
+              document.body.removeChild(overlay);
+              resolve(false);
+          });
+          dialog.querySelector('#gh-conf-yes').addEventListener('click', () => {
+              document.body.removeChild(overlay);
+              resolve(true);
+          });
+      });
   }
 
   function toast(message, kind = 'good', opts = {}) {
@@ -563,6 +637,46 @@
     return update;
   }
 
+  function renderEquippedOnAvatar(containerSelector) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+
+    container.querySelectorAll('.avatar-cosmetic').forEach((el) => el.remove());
+
+    const equipped = getCosmeticsEquipped();
+    const inventory = getCosmeticsInventory();
+    const map = inventory.reduce((acc, item) => {
+      acc[String(item.id)] = item;
+      return acc;
+    }, {});
+
+    Object.keys(equipped).forEach((slot) => {
+      const itemId = equipped[slot];
+      const item = map[String(itemId)];
+      if (!item) return;
+
+      const SLOT_CLASS = {
+        head: 'avatar-cosmetic--head',
+        face: 'avatar-cosmetic--face',
+        aura: 'avatar-cosmetic--aura',
+        companion: 'avatar-cosmetic--companion',
+      };
+
+      if (item.image) {
+        const img = document.createElement('img');
+        img.src = item.image;
+        img.className = `avatar-cosmetic ${SLOT_CLASS[item.slot] || ''}`;
+        img.alt = item.name;
+        container.appendChild(img);
+      } else {
+        const icon = document.createElement('span');
+        icon.className = `material-symbols-outlined avatar-cosmetic ${SLOT_CLASS[item.slot] || ''} avatar-cosmetic--${item.rarity || 'common'}`;
+        icon.textContent = item.icon || 'star';
+        container.appendChild(icon);
+      }
+    });
+  }
+
   function initNav() {
     const path = (location.pathname.split('/').pop() || '').toLowerCase();
     document.querySelectorAll('nav a[href]').forEach(a => {
@@ -604,7 +718,7 @@
     getCosmeticsEquipped, setCosmeticsEquipped,
     equipCosmetic, unequipCosmetic,
     // ui
-    toast,
+    toast, confirmModal, renderEquippedOnAvatar,
     // level
     getLevel, setLevel,
     // progress

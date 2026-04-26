@@ -493,19 +493,31 @@ body.dark .product-card__name {
 }
 
 .chest-card--wood .product-card__image {
-  background: linear-gradient(160deg, #8b5e3c, #6f472a);
+  background-image: url('../assets/cofres/Bronce.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-color: #f8f9fb;
 }
 
 .chest-card--silver .product-card__image {
-  background: linear-gradient(160deg, #c9d1db, #8c98a6);
+  background-image: url('../assets/cofres/Plata.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-color: #f8f9fb;
 }
 
 .chest-card--gold .product-card__image {
-  background: linear-gradient(160deg, #ffd96b, #e8ab00);
+  background-image: url('../assets/cofres/Oro.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-color: #f8f9fb;
 }
 
 .chest-card .product-card__icon {
-  color: rgba(255, 255, 255, 0.9);
+  display: none;
 }
 
 .chest-card__hint {
@@ -540,6 +552,13 @@ body.dark .chest-card__hint {
 .loot-result__icon {
   font-size: 2rem;
   color: var(--primary-dark);
+}
+
+.loot-result__pet {
+  width: 3.69rem;
+  height: 3.69rem;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.2));
 }
 
 .loot-result__name {

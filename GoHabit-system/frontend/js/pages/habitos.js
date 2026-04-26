@@ -74,21 +74,28 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
 
       const input = wrapper.querySelector('input[type="checkbox"]');
-      input.addEventListener('change', async (e) => {
-        const done = e.target.checked;
-        const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
+      input.addEventListener('click', async (e) => {
+        // Prevenir el cambio inmediato para validar
+        e.preventDefault();
         
-        // Marcado local inmediato
-        GoHabit.toggleHabit(h.id, { reward, done });
-        refreshSeeds();
+        const isCurrentlyDone = GoHabit.getHabitDone(h.id);
+        if (isCurrentlyDone) {
+            GoHabit.toast('Hábito ya completado', 'good', { icon: 'lock' });
+            return;
+        }
 
+        const confirmed = await GoHabit.confirmModal('Completar hábito', `¿Has terminado "${h.titulo}" por hoy?`);
+        if (!confirmed) return;
+
+        const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
+        const { done } = GoHabit.toggleHabit(h.id, { reward });
+        
         if (done) {
-            // Sincronización silenciosa con el servidor para puntos/nivel
+            input.checked = true;
+            refreshSeeds();
             try {
                 const apiId = h.backendId || h.id;
-                await GoHabitAPI.post(`/habits/${apiId}/completions`, { 
-                    note: h.titulo 
-                });
+                await GoHabitAPI.post(`/habits/${apiId}/completions`, { note: h.titulo });
             } catch (err) {
                 console.error('Error sincronizando XP:', err);
             }

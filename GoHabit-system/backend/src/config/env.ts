@@ -41,7 +41,7 @@ const envSchema = z.object({
     PORT: z.coerce.number().default(3000),
 
     // API key obligatoria para usar la IA de ChatGPT.
-    OPENAI_API_KEY: z.string().min(1, "La clave de la API de OpenAI es obligatoria"),
+    OPENAI_API_KEY: z.string().default("dummy-key"),
     OPENAI_MODEL: z.string().default("gpt-4o-mini"),
 });
 
