@@ -174,9 +174,14 @@
       el.textContent = Number(user?.coins ?? 0).toLocaleString("es-ES");
     });
 
-    if (user?.avatarUrl) {
-      document.querySelectorAll("[data-user-avatar]").forEach((el) => {
-        el.style.backgroundImage = `url('${user.avatarUrl}')`;
+    const avatarSrc = user?.avatarUrl || localStorage.getItem('gohabit_avatar_url') || null;
+    if (avatarSrc) {
+      document.querySelectorAll('[data-user-avatar]').forEach((el) => {
+        el.style.backgroundImage = `url('${avatarSrc}')`;
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = 'center';
+        const placeholder = el.querySelector('.perfil-avatar__placeholder');
+        if (placeholder) placeholder.style.display = 'none';
       });
     }
 
@@ -218,6 +223,53 @@
 
       window.GoHabitAPI.setSession(token, merged);
       bindUser(merged);
+
+      // Sincronizar hábitos desde el servidor para compartir entre dispositivos
+      try {
+          const habitsRes = await window.GoHabitAPI.get('/habits');
+          const serverHabits = habitsRes?.data || [];
+          
+          if (serverHabits.length > 0 && window.GoHabit) {
+              const localHabits = window.GoHabit.getHabitsList() || [];
+              const mergedHabits = [...localHabits];
+              
+              for (const sh of serverHabits) {
+                  let frequency = [];
+                  if (sh.frequency && sh.frequency !== 'DAILY' && sh.frequency !== 'WEEKLY' && sh.frequency !== 'MONTHLY') {
+                      frequency = sh.frequency.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
+                  }
+                  if (frequency.length === 0) frequency = [1,2,3,4,5];
+                  
+                  const existingIdx = mergedHabits.findIndex(lh => lh.backendId === sh.id);
+                  if (existingIdx >= 0) {
+                      mergedHabits[existingIdx].titulo = sh.title;
+                      mergedHabits[existingIdx].color = sh.color;
+                      mergedHabits[existingIdx].icono = sh.icon;
+                  } else {
+                      const nextLocalId = mergedHabits.length ? Math.max(...mergedHabits.map(h => Number(h.id)||0)) + 1 : 1;
+                      mergedHabits.push({
+                          id: nextLocalId,
+                          backendId: sh.id,
+                          titulo: sh.title,
+                          categoria: 'salud',
+                          etiqueta: 'Progreso',
+                          icono: sh.icon || 'star',
+                          color: sh.color || 'primary',
+                          reward: 15,
+                          frecuencia: frequency,
+                          metaValor: sh.targetCount || 1,
+                          metaUnidad: 'veces',
+                          recordatorio: false,
+                          creadoEn: Date.now()
+                      });
+                  }
+              }
+              window.GoHabit.setHabitsList(mergedHabits);
+          }
+      } catch (syncHabitsErr) {
+          console.warn("[Sync] Error sync habits:", syncHabitsErr);
+      }
+
     } catch (err) {
       console.warn("No se pudo cargar /auth/me", err?.message || err);
     }

@@ -150,26 +150,34 @@
     margin: 0;
 }
 
-.activity-card__badge {
+.activity-card__badge-ia {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     font-size: 0.65rem;
     font-weight: 800;
-    padding: 6px 10px;
+    padding: 6px 14px;
     border-radius: 999px;
+    background: rgba(114, 135, 100, 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(114, 135, 100, 0.2);
     letter-spacing: 0.05em;
+    backdrop-filter: blur(4px);
+}
+
+.activity-card__badge-ia .material-symbols-outlined {
+    font-size: 14px;
 }
 
 .activity-card__content {
     padding: 0;
 }
 
-.activity-card__description {
-    padding: 0 1rem 1rem;
+.activity-card__habit-info {
+    padding: 0 1.25rem 1.25rem;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .activity-card__habit-icon {
@@ -244,10 +252,15 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 2rem;
-    background: var(--surface-low, #f7f8f6);
-    color: var(--text-muted, var(--muted));
+    gap: 8px;
+    padding: 3rem 1.5rem;
+    background: linear-gradient(180deg, var(--surface-low, #f7f8f6) 0%, rgba(0,0,0,0.02) 100%);
+    color: var(--text-muted);
+}
+
+.activity-card__no-image .material-symbols-outlined {
+    font-size: 2.5rem;
+    opacity: 0.2;
 }
 
 .activity-card__caption {
@@ -270,38 +283,90 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem;
+    padding: 1.25rem;
+    margin-bottom: 0.5rem;
+    transition: transform 0.2s ease;
+}
+
+.friend-item:active {
+    transform: scale(0.98);
 }
 
 .friend-item__profile {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.friend-item__info {
+    flex: 1;
+    min-width: 0;
 }
 
 .friend-item__name {
-    font-weight: 700;
+    font-weight: 800;
     margin: 0;
+    font-size: 1rem;
+    color: var(--text-main);
 }
 
-.friend-item__level {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin: 0;
-}
-
-.friend-item__actions {
+.friend-item__stats {
     display: flex;
+    align-items: center;
     gap: 8px;
+    margin-top: 4px;
+}
+
+.friend-item__badge {
+    font-size: 0.7rem;
+    font-weight: 800;
+    background: var(--primary-glow, rgba(114, 135, 100, 0.15));
+    color: var(--primary);
+    padding: 2px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.friend-item__xp {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.friend-item__progress-bar {
+    width: 60%;
+    height: 4px;
+    background: var(--surface-border, rgba(0,0,0,0.05));
+    border-radius: 10px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.friend-item__progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 10px;
+    transition: width 1s ease-out;
 }
 
 .friend-item__action {
+    background: transparent;
+    border: none;
+    cursor: pointer;
     color: var(--text-muted);
     padding: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .friend-item__action:hover {
     color: var(--accent);
+    transform: scale(1.1);
 }
 
 /* Search Bar */

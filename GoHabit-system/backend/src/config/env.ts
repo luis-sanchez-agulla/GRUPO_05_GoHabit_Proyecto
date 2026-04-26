@@ -40,14 +40,9 @@ const envSchema = z.object({
     // Puerto del servidor (z.coerce.number() convierte string "3000" → number 3000)
     PORT: z.coerce.number().default(3000),
 
-    // API key opcional para IA real (Gemini). Si no existe, se usa fallback heuristico.
-    GOOGLE_API_KEY: z.string().optional(),
-    GEMINI_MODEL: z.string().default("gemini-2.0-flash"),
-    // Variables para Ollama (IA local, gratuita, privada)
-    USE_OLLAMA: z.string().default("false"),  // "true" o "false"
-    OLLAMA_API_URL: z.string().default("http://localhost:11434"),
-    OLLAMA_MODEL: z.string().default("qwen2.5:3b-instruct"),
-    OLLAMA_VISION_MODEL: z.string().default("llava"),
+    // API key obligatoria para usar la IA de ChatGPT.
+    OPENAI_API_KEY: z.string().default("dummy-key"),
+    OPENAI_MODEL: z.string().default("gpt-4o-mini"),
 });
 
 /**

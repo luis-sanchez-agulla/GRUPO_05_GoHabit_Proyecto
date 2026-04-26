@@ -74,21 +74,28 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
 
       const input = wrapper.querySelector('input[type="checkbox"]');
-      input.addEventListener('change', async (e) => {
-        const done = e.target.checked;
-        const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
+      input.addEventListener('click', async (e) => {
+        // Prevenir el cambio inmediato para validar
+        e.preventDefault();
         
-        // Marcado local inmediato
-        GoHabit.toggleHabit(h.id, { reward, done });
-        refreshSeeds();
+        const isCurrentlyDone = GoHabit.getHabitDone(h.id);
+        if (isCurrentlyDone) {
+            GoHabit.toast('Hábito ya completado', 'good', { icon: 'lock' });
+            return;
+        }
 
+        const confirmed = await GoHabit.confirmModal('Completar hábito', `¿Has terminado "${h.titulo}" por hoy?`);
+        if (!confirmed) return;
+
+        const reward = parseInt(wrapper.getAttribute('data-reward') || '10', 10);
+        const { done } = GoHabit.toggleHabit(h.id, { reward });
+        
         if (done) {
-            // Sincronización silenciosa con el servidor para puntos/nivel
+            input.checked = true;
+            refreshSeeds();
             try {
                 const apiId = h.backendId || h.id;
-                await GoHabitAPI.post(`/habits/${apiId}/completions`, { 
-                    note: h.titulo 
-                });
+                await GoHabitAPI.post(`/habits/${apiId}/completions`, { note: h.titulo });
             } catch (err) {
                 console.error('Error sincronizando XP:', err);
             }
@@ -103,46 +110,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const allHabits = GoHabit.ensureDefaultHabits();
 
     const overlay = document.createElement('div');
-    overlay.className = 'habit-manage-modal';
+    overlay.className = 'habit-manage-overlay';
 
     const listHtml = allHabits.length
       ? allHabits.map((habit) => `
           <article class="habit-manage-item" data-manage-item="${String(habit.id)}">
+            <div class="habit-manage-item__icon">
+              <span class="material-symbols-outlined">${habit.icono || 'task_alt'}</span>
+            </div>
             <div class="habit-manage-item__meta">
               <p class="habit-manage-item__title">${escapeHTML(habit.titulo)}</p>
               <p class="habit-manage-item__sub">${escapeHTML((habit.etiqueta || habit.categoria || '').toString())}</p>
             </div>
-            <button class="habit-manage-item__delete" data-delete-habit="${String(habit.id)}">Eliminar</button>
+            <button class="habit-manage-item__delete" data-delete-habit="${String(habit.id)}" aria-label="Eliminar hábito">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
           </article>
         `).join('')
-      : '<p class="habit-manage-empty">No tienes hábitos creados.</p>';
+      : '<p class="habit-manage-empty">No tienes hábitos creados todavía.<br>¡Empieza añadiendo uno!</p>';
 
     overlay.innerHTML = `
-      <div class="habit-manage-modal__panel" role="dialog" aria-modal="true" aria-label="Gestionar hábitos">
-        <h3 class="habit-manage-modal__title">Gestionar hábitos</h3>
-        <div class="habit-manage-modal__list">${listHtml}</div>
-        <div class="habit-manage-modal__footer">
-          <button class="habit-manage-modal__close" data-close-manage>Cerrar</button>
+      <div class="habit-manage-panel" role="dialog" aria-modal="true" aria-label="Gestionar hábitos">
+        <div class="habit-manage-panel__header">
+          <div class="habit-manage-panel__header-icon">
+            <span class="material-symbols-outlined">tune</span>
+          </div>
+          <div>
+            <h3 class="habit-manage-panel__title">Gestionar hábitos</h3>
+            <p class="habit-manage-panel__sub">${allHabits.length} hábito${allHabits.length !== 1 ? 's' : ''} en total</p>
+          </div>
+          <button class="habit-manage-panel__close" data-close-manage aria-label="Cerrar">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="habit-manage-panel__list">${listHtml}</div>
+        <div class="habit-manage-panel__footer">
+          <a href="anadirHabito.html" class="habit-manage-panel__add-btn">
+            <span class="material-symbols-outlined">add_circle</span>
+            Añadir hábito
+          </a>
         </div>
       </div>
     `;
 
     document.body.appendChild(overlay);
+    // Trigger animation
+    requestAnimationFrame(() => overlay.classList.add('is-open'));
 
     function close(){
-      overlay.remove();
+      overlay.classList.remove('is-open');
+      overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
     }
 
     overlay.addEventListener('click', (event) => {
-      if(event.target === overlay){
-        close();
-      }
+      if(event.target === overlay) close();
     });
 
     const closeBtn = overlay.querySelector('[data-close-manage]');
-    if(closeBtn){
-      closeBtn.addEventListener('click', close);
-    }
+    if(closeBtn) closeBtn.addEventListener('click', close);
 
     overlay.querySelectorAll('[data-delete-habit]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -155,17 +180,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const removed = GoHabit.removeHabit(habitId);
         if(removed){
           const item = overlay.querySelector(`[data-manage-item="${CSS.escape(String(habitId))}"]`);
-          if(item) item.remove();
+          if(item){
+            item.style.transition = 'all 0.25s ease';
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(30px)';
+            setTimeout(() => item.remove(), 260);
+          }
           GoHabit.toast('Hábito eliminado', 'good', { icon: 'delete' });
           render();
         } else {
           GoHabit.toast('No se pudo eliminar el hábito', 'bad', { icon: 'warning' });
         }
 
+        const countEl = overlay.querySelector('.habit-manage-panel__sub');
+        if(countEl){
+          const remaining = overlay.querySelectorAll('[data-manage-item]').length - 1;
+          countEl.textContent = `${remaining} hábito${remaining !== 1 ? 's' : ''} en total`;
+        }
+
         const stillItems = overlay.querySelectorAll('[data-manage-item]').length;
         if(!stillItems){
-          const listNode = overlay.querySelector('.habit-manage-modal__list');
-          if(listNode) listNode.innerHTML = '<p class="habit-manage-empty">No tienes hábitos creados.</p>';
+          const listNode = overlay.querySelector('.habit-manage-panel__list');
+          if(listNode) listNode.innerHTML = '<p class="habit-manage-empty">No tienes hábitos creados todavía.<br>¡Empieza añadiendo uno!</p>';
         }
       });
     });

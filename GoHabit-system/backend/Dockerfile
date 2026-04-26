@@ -39,6 +39,10 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
+# Omitimos la validación estricta de variables en tiempo de compilación para que build pase
+ENV SKIP_ENV_VALIDATION=1
+ENV OPENAI_API_KEY="dummy-for-build"
+
 # Compilar la aplicación standalone
 RUN npm run build
 

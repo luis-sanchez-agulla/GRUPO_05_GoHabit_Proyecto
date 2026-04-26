@@ -233,11 +233,9 @@
         }
 
         if (suggestions.length) {
-          const providerLabel = provider === 'ollama'
-            ? '(Ollama local)'
-            : provider === 'gemini'
-              ? '(Gemini AI)'
-              : '(Contexto local)';
+          const providerLabel = provider === 'chatgpt'
+            ? '(ChatGPT)'
+            : '(Generador de Hábitos)';
           if (!textResponse) {
             appendMsg(`He analizado tu entrada y tengo ${suggestions.length} hábito(s) personalizados para ti ${providerLabel}:`, 'bot');
           }

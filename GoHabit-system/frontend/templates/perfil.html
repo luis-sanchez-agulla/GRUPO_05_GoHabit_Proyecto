@@ -51,13 +51,17 @@
 
       <section class="perfil-profile-section">
         <div class="perfil-avatar-wrapper">
-          <div class="perfil-avatar" data-user-avatar>
-            <span class="material-symbols-outlined perfil-avatar__placeholder">account_circle</span>
+          <div class="perfil-avatar" data-user-avatar id="perfilAvatarEl">
+            <span class="material-symbols-outlined perfil-avatar__placeholder" id="perfilAvatarPlaceholder">account_circle</span>
           </div>
 
-          <div class="perfil-avatar-edit" aria-label="Editar avatar (no implementado)">
-            <span class="material-symbols-outlined perfil-avatar-edit__icon">edit</span>
+          <div class="perfil-avatar-edit" id="perfilAvatarEdit" aria-label="Cambiar foto de perfil" title="Cambiar foto de perfil" style="cursor:pointer;">
+            <span class="material-symbols-outlined perfil-avatar-edit__icon">photo_camera</span>
           </div>
+
+          <!-- Hidden file input for image pick -->
+          <input type="file" id="perfilImageInput" accept="image/*" aria-hidden="true"
+                 style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
         </div>
 
         <div class="perfil-user-info">
@@ -65,6 +69,7 @@
           <p class="perfil-user-info__email" data-user-email>sin-email</p>
         </div>
       </section>
+
 
       <section class="perfil-stats-section">
         <div class="perfil-stats-grid">
@@ -165,6 +170,7 @@
   <script src="../js/router.js" defer></script>
   <script src="../js/session-user.js" defer></script>
   <script src="../js/app.js" defer></script>
+  <script src="../js/pages/perfil.js" defer></script>
   <script src="../js/chatbot.js" defer></script>
 </body>
-</html>
+</html>

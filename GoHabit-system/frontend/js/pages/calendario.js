@@ -108,8 +108,19 @@ document.addEventListener('DOMContentLoaded', () => {
       d.setDate(weekStart.getDate() + i);
       const dateKey = dk(d);
       const isToday = dateKey === todayDk;
+      const isPast  = d < new Date(new Date().setHours(0,0,0,0));
       const dayState = state?.[dateKey] || {};
       const dueHabits = habits.filter((h) => isScheduledForDate(h, d));
+      const completed = dueHabits.filter(h => !!(dayState[String(h.id)])).length;
+      const total     = dueHabits.length;
+
+      // Traffic-light colour only for past days with scheduled habits
+      let colorClass = '';
+      if (total > 0 && isPast) {
+        if (completed >= total)    colorClass = ' cal-green';
+        else if (completed > 0)    colorClass = ' cal-yellow';
+        else                       colorClass = ' cal-red';
+      }
 
       const dots = dueHabits.slice(0, 3).map(h => {
         const done = !!(dayState[String(h.id)]);
@@ -117,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }).join('') || '<div class="calendario-habit-dot"></div>';
 
       return `
-        <div class="calendario-week-day${isToday ? ' today' : ''}">
+        <div class="calendario-week-day${isToday ? ' today' : ''}${colorClass}">
           <div class="calendario-week-day__header">
             <span class="calendario-week-day__name">${name}</span>
             <span class="calendario-week-day__date">${d.getDate()}</span>
@@ -174,18 +185,27 @@ document.addEventListener('DOMContentLoaded', () => {
       const d       = new Date(year, month, day);
       const dateKey = dk(d);
       const isToday = dateKey === todayDk;
+      const isPast  = d < new Date(new Date().setHours(0,0,0,0));
       const dayState = state?.[dateKey] || {};
       const dueHabits = habits.filter((h) => isScheduledForDate(h, d));
       const completed = dueHabits.filter((h) => !!dayState[String(h.id)]).length;
       const total     = dueHabits.length;
 
-      let indicator = '';
+      let colorClass = '';
+      let indicator  = '';
       if (total > 0) {
-        if (completed >= total)  indicator = '<div class="calendario-month-day__indicator full"></div>';
-        else if (completed > 0)  indicator = '<div class="calendario-month-day__indicator partial"></div>';
+        if (completed >= total) {
+          indicator  = '<div class="calendario-month-day__indicator full"></div>';
+          if (isPast) colorClass = ' cal-green';
+        } else if (completed > 0) {
+          indicator  = '<div class="calendario-month-day__indicator partial"></div>';
+          if (isPast) colorClass = ' cal-yellow';
+        } else {
+          if (isPast) colorClass = ' cal-red';
+        }
       }
 
-      html += `<div class="calendario-month-day${isToday ? ' today' : ''}">
+      html += `<div class="calendario-month-day${isToday ? ' today' : ''}${colorClass}">
         <span class="calendario-month-day__number">${day}</span>${indicator}
       </div>`;
     }

@@ -5,35 +5,61 @@
 document.addEventListener('DOMContentLoaded', () => {
   if(!window.GoHabit) return;
 
-  // Cada evolución tiene su versión normal y su versión de noche.
-  const STAGES = [
-    { min: 1, name: 'Brote', img: '../assets/avatar/lv1.png', imgDark: '../assets/avatar/lv1_noche.jpeg' },
-    { min: 2, name: 'Evolucion II', img: '../assets/avatar/lv2.png', imgDark: '../assets/avatar/lv2_noche.png' },
-    { min: 3, name: 'Evolucion III', img: '../assets/avatar/lv3.png', imgDark: '../assets/avatar/lv3_noche.png' },
-    { min: 4, name: 'Evolucion IV', img: '../assets/avatar/lv4.png', imgDark: '../assets/avatar/lv4_noche.png' },
-    { min: 5, name: 'Evolucion V', img: '../assets/avatar/lv5.png', imgDark: '../assets/avatar/lv5_noche.png' },
-    { min: 6, name: 'Evolucion VI', img: '../assets/avatar/lv6.png', imgDark: '../assets/avatar/lv6_noche.png' },
-    { min: 7, name: 'Evolucion VII', img: '../assets/avatar/lv7.png', imgDark: '../assets/avatar/lv7_noche.png' },
-    { min: 8, name: 'Evolucion VIII', img: '../assets/avatar/lv8.png', imgDark: '../assets/avatar/lv8_noche.png' },
-  ];
+  // 1) Pon tus imágenes en: front/assets/avatar/
+  // 2) Cambia las rutas en esta lista (img)
+  // 3) Ajusta los rangos de nivel si quieres
+  const STAGES = {
+    1: { 
+        name: 'Semilla', 
+        img: '../assets/avatar/lvl1.jpeg', 
+        img_night: '../assets/avatar/lvl1_noche.jpeg' 
+    },
+    2: { 
+        name: 'Brote', 
+        img: '../assets/avatar/lv2.png', 
+        img_night: '../assets/avatar/lv2_noche.png' 
+    },
+    3: { 
+        name: 'Tallo', 
+        img: '../assets/avatar/lv3.png', 
+        img_night: '../assets/avatar/lv3_noche.png' 
+    },
+    4: { 
+        name: 'Planta Joven', 
+        img: '../assets/avatar/lv4.png', 
+        img_night: '../assets/avatar/lv4_noche.png' 
+    },
+    5: { 
+        name: 'Árbol Pequeño', 
+        img: '../assets/avatar/lv5.png', 
+        img_night: '../assets/avatar/lv5_noche.png' 
+    },
+    6: { 
+        name: 'Árbol Mediano', 
+        img: '../assets/avatar/lv6.png', 
+        img_night: '../assets/avatar/lv6_noche.png' 
+    },
+    7: { 
+        name: 'Gran Árbol', 
+        img: '../assets/avatar/lv7.png', 
+        img_night: '../assets/avatar/lv7_noche.png' 
+    },
+    8: { 
+        name: 'Árbol Sabio', 
+        img: '../assets/avatar/lv8.png', 
+        img_night: '../assets/avatar/lv8_noche.png' 
+    },
+  };
 
   const FALLBACK_IMG = '../assets/logo.png';
 
-  function getStageForLevel(level){
-    // Pick the last stage where min <= level (capped at lv8 image).
-    return STAGES
-      .slice()
-      .sort((a,b) => a.min - b.min)
-      .reduce((acc, s) => (level >= s.min ? s : acc), STAGES[0]);
-  }
+  const level = GoHabit.getLevel();
+  const hours = new Date().getHours();
+  const isNight = hours >= 20 || hours < 7;
 
-  function isDarkModeActive(){
-    return document.body.classList.contains('dark') || document.documentElement.classList.contains('dark');
-  }
-
-  function getStageImage(stage){
-    return isDarkModeActive() ? (stage.imgDark || stage.img) : stage.img;
-  }
+  // Pick the stage. If level is higher than 8, stay at 8 (Gran Árbol Sabio).
+  const stage = STAGES[level] || (level > 8 ? STAGES[8] : STAGES[1]);
+  let chosenImg = isNight && stage.img_night ? stage.img_night : stage.img;
 
   function preload(src){
     return new Promise((resolve, reject) => {
@@ -44,28 +70,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function updateAvatarEvolution(){
-    const level = GoHabit.getLevel();
-    const stage = getStageForLevel(level);
-    const stageImage = getStageImage(stage);
-
-    Promise.resolve()
-      .then(() => preload(stageImage))
-      .then(({ src, width, height }) => {
-        const ratio = height ? (width / height) : 1;
-        const isWide = ratio > 1.3;
-        document.querySelectorAll('[data-avatar-image]').forEach(el => {
-          el.style.backgroundImage = `url("${src}")`;
-          el.classList.toggle('gh-avatar-wide', isWide);
-          el.classList.add('gh-avatar-live');
-        });
-      })
-      .catch(() => {
-        document.querySelectorAll('[data-avatar-image]').forEach(el => {
-          el.style.backgroundImage = `url("${FALLBACK_IMG}")`;
-          el.classList.remove('gh-avatar-wide');
-          el.classList.add('gh-avatar-live');
-        });
+  // Apply image with fallback so avatar is always visible.
+  Promise.resolve()
+    .then(() => preload(chosenImg))
+    .then((src) => {
+      document.querySelectorAll('[data-avatar-image]').forEach(el => {
+        el.style.backgroundImage = `url("${src}")`;
+        el.classList.add('gh-avatar-live');
       });
 
     const levelLabel = document.querySelector('[data-avatar-level]');
@@ -74,16 +85,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const nameLabel = document.querySelector('[data-avatar-name]');
     if(nameLabel) nameLabel.textContent = stage.name;
 
-    const levelNumber = document.querySelector('[data-avatar-level-number]');
-    if(levelNumber) levelNumber.textContent = String(level);
+  const levelNumber = document.querySelector('[data-avatar-level-number]');
+  if(levelNumber) levelNumber.textContent = String(level);
+
+  // Evolución (Popup)
+  const lastLevelKey = 'gohabit_last_level_' + GoHabit.getUser().id;
+  let lastSeenLevel = localStorage.getItem(lastLevelKey);
+  
+  if (lastSeenLevel === null) {
+      localStorage.setItem(lastLevelKey, String(level));
+      lastSeenLevel = level;
+  } else {
+      lastSeenLevel = parseInt(lastSeenLevel, 10);
   }
 
-  updateAvatarEvolution();
+  if (level > lastSeenLevel) {
+    localStorage.setItem(lastLevelKey, String(level));
 
-  // Re-renderiza el avatar cuando cambia la clase de tema.
-  const observer = new MutationObserver(updateAvatarEvolution);
-  observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.inset = '0';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = '9999';
+    overlay.style.color = '#fff';
 
-  window.addEventListener('gohabit:progress-changed', updateAvatarEvolution);
-  window.addEventListener('storage', updateAvatarEvolution);
+    overlay.innerHTML = `
+      <h2 style="font-size: 2.5rem; margin-bottom: 20px; text-shadow: 0 0 10px rgba(76, 175, 80, 0.8);">¡Tu Árbol ha evolucionado!</h2>
+      <div style="width:200px; height:200px; background-image: url('${chosenImg}'); background-size: contain; background-repeat: no-repeat; background-position: center; filter: drop-shadow(0 0 20px #4caf50);"></div>
+      <p style="margin-top: 20px; font-size: 1.5rem;">Nuevo estado: <strong>${stage.name}</strong></p>
+      <button style="margin-top: 30px; padding: 10px 30px; font-size: 1.2rem; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer;">¡Genial!</button>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('button').addEventListener('click', () => {
+      overlay.remove();
+    });
+  } else {
+    // Si no evoucionó igual guardamos el actual para estar seguros
+    sessionStorage.setItem(lastLevelKey, String(level));
+    localStorage.setItem(lastLevelKey, String(level));
+  }
+
+  // Render pets/cosmetics
+  GoHabit.renderEquippedOnAvatar('.index-tree-container');
 });

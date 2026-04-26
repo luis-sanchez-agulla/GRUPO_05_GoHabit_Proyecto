@@ -36,12 +36,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const item = map[String(itemId)];
       if (!item) return;
 
-      const pet = document.createElement('img');
-      pet.className = `avatar-cosmetic avatar-cosmetic--image ${SLOT_CLASS[item.slot] || ''} avatar-cosmetic--${item.rarity || 'common'}`;
-      pet.src = item.image;
-      pet.alt = item.name || 'Mascota';
-      pet.title = item.name || 'Mascota';
-      container.appendChild(pet);
+      if (item.image) {
+        const img = document.createElement('img');
+        img.src = item.image;
+        img.className = `avatar-cosmetic ${SLOT_CLASS[item.slot] || ''}`;
+        img.style.width = '64px';
+        img.style.height = '64px';
+        img.style.objectFit = 'contain';
+        img.alt = item.name;
+        container.appendChild(img);
+      } else {
+        const icon = document.createElement('span');
+        icon.className = `material-symbols-outlined avatar-cosmetic ${SLOT_CLASS[item.slot] || ''} avatar-cosmetic--${item.rarity || 'common'}`;
+        icon.textContent = item.icon || 'star';
+        icon.title = item.name || 'Objeto';
+        container.appendChild(icon);
+      }
     });
   }
 
@@ -73,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const isEquipped = equipped[item.slot] === item.id;
       return `
         <article class="avatar-item avatar-item--${item.rarity || 'common'}">
-          <img class="avatar-item__pet" src="${item.image}" alt="${item.name}">
+          ${item.image ? `<img src="${item.image}" class="avatar-item__icon" style="width:40px;height:40px;object-fit:contain;background:none;line-height:0;">` : `<span class="material-symbols-outlined avatar-item__icon">${item.icon}</span>`}
           <div class="avatar-item__meta">
             <p class="avatar-item__name">${item.name}</p>
             <p class="avatar-item__rarity">${rarityLabel[item.rarity] || 'Común'} · Mascota</p>
@@ -105,6 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  renderEquippedOnAvatar();
+  window.GoHabit.renderEquippedOnAvatar('.avatar-tree-container');
   renderInventoryPanel();
 });

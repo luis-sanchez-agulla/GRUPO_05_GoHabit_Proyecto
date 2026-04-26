@@ -427,102 +427,235 @@ body.dark .habit-card--completed .habit-card__title {
 }
 
 /* ================================================
-   HABIT MANAGE MODAL
+   HABIT MANAGE OVERLAY (new design)
    ================================================ */
 
-.habit-manage-modal {
+.habit-manage-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.46);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 12000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.habit-manage-overlay.is-open {
+  opacity: 1;
+}
+
+.habit-manage-panel {
+  width: min(560px, 100%);
+  max-height: 82vh;
+  border-radius: 24px 24px 0 0;
+  background: #ffffff;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(40px);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.habit-manage-overlay.is-open .habit-manage-panel {
+  transform: translateY(0);
+}
+
+body.dark .habit-manage-panel {
+  background: #1a2130;
+}
+
+.habit-manage-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1.2rem 1.2rem 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.habit-manage-panel__header-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(114, 135, 100, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 12000;
-  padding: 1rem;
+  flex-shrink: 0;
+  color: var(--primary);
 }
 
-.habit-manage-modal__panel {
-  width: min(520px, 100%);
-  max-height: 80vh;
-  overflow: auto;
-  border-radius: 0.85rem;
-  background: #ffffff;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.22);
-  padding: 1rem;
+.habit-manage-panel__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
 }
 
-body.dark .habit-manage-modal__panel {
-  background: #17202d;
-  border-color: rgba(148, 163, 184, 0.22);
+body.dark .habit-manage-panel__title {
+  color: #f1f5f9;
 }
 
-.habit-manage-modal__title {
-  margin: 0 0 0.7rem;
-  font-size: 1.1rem;
+.habit-manage-panel__sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: #64748b;
 }
 
-.habit-manage-modal__list {
-  display: grid;
-  gap: 0.5rem;
+.habit-manage-panel__close {
+  margin-left: auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(148, 163, 184, 0.15);
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.habit-manage-panel__close:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.habit-manage-panel__list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0.85rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
 .habit-manage-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.7rem;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  border-radius: 0.65rem;
-  padding: 0.55rem;
-  background: rgba(248, 250, 252, 0.88);
+  gap: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  padding: 0.7rem 0.85rem;
+  background: rgba(248, 250, 252, 0.9);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.habit-manage-item:hover {
+  border-color: rgba(114, 135, 100, 0.4);
+  box-shadow: 0 2px 10px rgba(114, 135, 100, 0.1);
 }
 
 body.dark .habit-manage-item {
-  background: rgba(30, 41, 59, 0.55);
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(148, 163, 184, 0.12);
+}
+
+.habit-manage-item__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: rgba(114, 135, 100, 0.12);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.habit-manage-item__meta {
+  flex: 1;
+  min-width: 0;
 }
 
 .habit-manage-item__title {
   margin: 0;
   font-weight: 700;
+  font-size: 0.9rem;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.dark .habit-manage-item__title {
+  color: #f1f5f9;
 }
 
 .habit-manage-item__sub {
-  margin: 0.2rem 0 0;
-  font-size: 0.8rem;
+  margin: 0.1rem 0 0;
+  font-size: 0.75rem;
   color: #64748b;
 }
 
 .habit-manage-item__delete {
   border: none;
-  border-radius: 0.5rem;
-  background: #dc2626;
-  color: #fff;
-  padding: 0.35rem 0.65rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.habit-manage-modal__footer {
-  margin-top: 0.85rem;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  width: 36px;
+  height: 36px;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
 }
 
-.habit-manage-modal__close {
-  border: none;
-  border-radius: 0.5rem;
+.habit-manage-item__delete:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.habit-manage-item__delete .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.habit-manage-panel__footer {
+  padding: 0.85rem 1.2rem 1.2rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.habit-manage-panel__add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
   background: var(--primary);
-  color: #fff;
-  padding: 0.45rem 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 14px;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(114, 135, 100, 0.35);
+}
+
+.habit-manage-panel__add-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
 }
 
 .habit-manage-empty {
   margin: 0;
   color: #64748b;
+  text-align: center;
+  padding: 1.5rem 0;
+  line-height: 1.6;
+  font-size: 0.9rem;
 }
+
+/* Keep legacy classes for backwards compat */
+.habit-manage-modal { display: none !important; }
 
 body.dark .habit-card__icon-container--primary {
   background-color: rgba(46, 79, 50, 0.2);
