@@ -493,31 +493,19 @@ body.dark .product-card__name {
 }
 
 .chest-card--wood .product-card__image {
-  background-image: url('../assets/cofres/Bronce.png');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
   background-color: #f8f9fb;
 }
 
 .chest-card--silver .product-card__image {
-  background-image: url('../assets/cofres/Plata.png');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
   background-color: #f8f9fb;
 }
 
 .chest-card--gold .product-card__image {
-  background-image: url('../assets/cofres/Oro.png');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
   background-color: #f8f9fb;
 }
 
 .chest-card .product-card__icon {
-  display: none;
+  /* Ya no ocultamos el icono porque es la imagen real */
 }
 
 .chest-card__hint {
