@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function preload(src){
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.onload = () => resolve({ src, width: img.naturalWidth || img.width, height: img.naturalHeight || img.height });
+      img.onload = () => resolve(src);
       img.onerror = reject;
       img.src = src;
     });
@@ -78,12 +78,20 @@ document.addEventListener('DOMContentLoaded', () => {
         el.style.backgroundImage = `url("${src}")`;
         el.classList.add('gh-avatar-live');
       });
+    })
+    .catch(() => {
+      document.querySelectorAll('[data-avatar-image]').forEach(el => {
+        el.style.backgroundImage = `url("${FALLBACK_IMG}")`;
+        el.classList.add('gh-avatar-live');
+      });
+    });
 
-    const levelLabel = document.querySelector('[data-avatar-level]');
-    if(levelLabel) levelLabel.textContent = `Nivel ${level}`;
+  // Update labels (if present)
+  const levelLabel = document.querySelector('[data-avatar-level]');
+  if(levelLabel) levelLabel.textContent = `Nivel ${level}`;
 
-    const nameLabel = document.querySelector('[data-avatar-name]');
-    if(nameLabel) nameLabel.textContent = stage.name;
+  const nameLabel = document.querySelector('[data-avatar-name]');
+  if(nameLabel) nameLabel.textContent = stage.name;
 
   const levelNumber = document.querySelector('[data-avatar-level-number]');
   if(levelNumber) levelNumber.textContent = String(level);
