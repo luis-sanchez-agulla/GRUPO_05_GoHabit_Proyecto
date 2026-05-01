@@ -512,6 +512,82 @@ body.dark .avatar-inventory__title {
   color: #64748b;
 }
 
+/* Banner de bonus activo */
+.avatar-bonus-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(114,135,100,0.15), rgba(114,135,100,0.05));
+  border: 1px solid rgba(114,135,100,0.35);
+  border-radius: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--primary-dark);
+}
+
+body.dark .avatar-bonus-banner {
+  background: rgba(114,135,100,0.12);
+  color: #86efac;
+  border-color: rgba(114,135,100,0.3);
+}
+
+.avatar-bonus-banner__icon {
+  font-size: 1rem;
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+/* Acciones por item (equipar + vender) */
+.avatar-item__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+/* Texto de bonus por rareza */
+.avatar-item__bonus {
+  margin: 0.2rem 0 0;
+  font-size: 0.72rem;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+body.dark .avatar-item__bonus {
+  color: #86efac;
+}
+
+/* Botón de venta */
+.avatar-item__sell-btn {
+  border: 1px solid rgba(217,119,6,0.4);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #b45309;
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.avatar-item__sell-btn:hover {
+  background: #d97706;
+  color: #fff;
+  border-color: #d97706;
+}
+
+body.dark .avatar-item__sell-btn {
+  color: #fbbf24;
+  border-color: rgba(251,191,36,0.35);
+}
+
+body.dark .avatar-item__sell-btn:hover {
+  background: #d97706;
+  color: #fff;
+}
+
 .avatar-stat-card__subtitle {
   color: #94a3b8;
   font-size: 0.75rem;

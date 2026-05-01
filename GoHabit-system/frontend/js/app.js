@@ -12,6 +12,14 @@
     level: 'nivelArbol',
   };
 
+  const PET_BONUS = {
+    common: { type: 'seeds', pct: 0.05, label: '+5% Semillas' },
+    rare:   { type: 'xp',    pct: 0.10, label: '+10% XP' },
+    epic:   { type: 'both',  pct: 0.15, label: '+15% Semillas y XP' },
+  };
+
+  const CHEST_COSTS = { madera: 80, plata: 180, oro: 320 };
+
   function getCurrentUserId() {
     try {
       const raw = localStorage.getItem('gohabit_user');
@@ -186,10 +194,15 @@
     }
     const next = true;
     setHabitDone(habitId, next, dateKey);
-    const total = addSeeds(reward);
+
+    const petBonus = getEquippedCompanionBonus();
+    const bonusSeeds = petBonus && (petBonus.type === 'seeds' || petBonus.type === 'both') ? Math.round(reward * petBonus.pct) : 0;
+    const bonusXp    = petBonus && (petBonus.type === 'xp'    || petBonus.type === 'both') ? Math.round(reward * petBonus.pct) : 0;
+
+    const total = addSeeds(reward + bonusSeeds);
 
     const progress = getProgress();
-    const nextPoints = Math.max(0, progress.points + (next ? reward : -reward));
+    const nextPoints = Math.max(0, progress.points + reward + bonusXp);
 
     // SYNC COMPLETION TO BACKEND
     const habit = getHabitsList()?.find(h => String(h.id) === String(habitId));
@@ -222,6 +235,8 @@
 
     toast(toastGood, 'good', { icon: 'eco' });
     toast(`+${reward} XP`, 'good', { icon: 'bolt' });
+    if (bonusSeeds > 0) toast(`+${bonusSeeds} semillas (mascota)`, 'good', { icon: 'pets' });
+    if (bonusXp   > 0) toast(`+${bonusXp} XP (mascota)`,           'good', { icon: 'auto_awesome' });
     if (typeof onChange === 'function') onChange(next, total);
     return { done: next, total };
   }
@@ -496,6 +511,29 @@
     return equipped;
   }
 
+  function getEquippedCompanionBonus() {
+    const equipped = getCosmeticsEquipped();
+    const companionId = equipped['companion'];
+    if (!companionId) return null;
+    const companion = getCosmeticsInventory().find((i) => String(i.id) === String(companionId));
+    if (!companion) return null;
+    const bonus = PET_BONUS[companion.rarity] || PET_BONUS.common;
+    return { ...bonus, companion };
+  }
+
+  function sellCosmetic(itemId) {
+    const inventory = getCosmeticsInventory();
+    const item = inventory.find((i) => String(i.id) === String(itemId));
+    if (!item) return null;
+    const chestCost = CHEST_COSTS[item.sourceChest] || CHEST_COSTS.madera;
+    const sellValue = Math.floor(chestCost * 0.20);
+    const equipped = getCosmeticsEquipped();
+    if (equipped[item.slot] === item.id) unequipCosmetic(item.slot);
+    setCosmeticsInventory(inventory.filter((i) => String(i.id) !== String(itemId)));
+    addSeeds(sellValue);
+    return { item, sellValue };
+  }
+
   // Level (very simple for the prototype; later you can compute from XP)
   function getLevel() {
     const progress = getProgress();
@@ -717,6 +755,8 @@
     hasCosmetic, unlockCosmetic,
     getCosmeticsEquipped, setCosmeticsEquipped,
     equipCosmetic, unequipCosmetic,
+    getEquippedCompanionBonus, sellCosmetic,
+    PET_BONUS, CHEST_COSTS,
     // ui
     toast, confirmModal, renderEquippedOnAvatar,
     // level
