@@ -3,16 +3,88 @@
  * __tests__/sql-injection.test.ts
  * ═══════════════════════════════════════════════════════════════
  *
- * Tests de seguridad contra SQL Injection en endpoints críticos.
- *
- * Ejecutar con: npm test -- sql-injection.test
- *
- * Casos de prueba:
- * - Login/Register con payloads SQL injection
- * - Update de perfil con columnas inyectadas
- * - Update de tareas/hábitos con valores maliciosos
+ * Unit tests for validation against SQL injection-style payloads.
  */
 
+import { loginSchema, registerSchema } from '../validations/auth.schema';
+import { updateProfileSchema } from '../validations/user.schema';
+import { updateTaskSchema } from '../validations/task.schema';
+import { updateHabitSchema } from '../validations/habit.schema';
+
 describe('SQL Injection Prevention', () => {
-    // Payloads comunes de SQL injection para pruebas
-    const SQL_INJECTION_PAYLOADS = [\n        \"' OR '1'='1\",\n        \"admin' --\",\n        \"1' OR 1=1 --\",\n        \"'; DROP TABLE users; --\",\n        \"1' UNION SELECT * FROM users --\",\n        \"' OR 'a'='a\",\n        \"1; DELETE FROM users WHERE 1=1; --\",\n    ];\n\n    const COLUMN_INJECTION_PAYLOADS = [\n        { \"role = 'ADMIN'\": \"test\" },\n        { \"id = 999\": \"test\" },\n        { \"password = '123'\": \"test\" },\n        { \"__proto__\": \"test\" },\n        { \"constructor\": \"test\" },\n    ];\n\n    describe('POST /api/auth/login', () => {\n        it('debe rechazar payload SQL injection en email', async () => {\n            for (const payload of SQL_INJECTION_PAYLOADS) {\n                const response = await fetch('http://localhost:3000/api/auth/login', {\n                    method: 'POST',\n                    headers: { 'Content-Type': 'application/json' },\n                    body: JSON.stringify({\n                        email: payload,\n                        password: 'test123',\n                    }),\n                });\n\n                // Esperamos 400 (validación fallida), no 500 (error de servidor)\n                expect([400, 422]).toContain(response.status);\n                const body = await response.json();\n                // No debe haber error SQL crudo\n                expect(body.error?.message).not.toMatch(/SQL|syntax|database/i);\n            }\n        });\n\n        it('debe rechazar payload SQL injection en password', async () => {\n            for (const payload of SQL_INJECTION_PAYLOADS) {\n                const response = await fetch('http://localhost:3000/api/auth/login', {\n                    method: 'POST',\n                    headers: { 'Content-Type': 'application/json' },\n                    body: JSON.stringify({\n                        email: 'test@example.com',\n                        password: payload,\n                    }),\n                });\n\n                // Esperamos 400 (validación fallida) o 401 (credenciales inválidas intencionalmente)\n                expect([400, 401, 422]).toContain(response.status);\n                const body = await response.json();\n                expect(body.error?.message).not.toMatch(/SQL|syntax|database/i);\n            }\n        });\n    });\n\n    describe('POST /api/auth/register', () => {\n        it('debe rechazar payload SQL injection en email', async () => {\n            for (const payload of SQL_INJECTION_PAYLOADS.slice(0, 3)) {\n                const response = await fetch('http://localhost:3000/api/auth/register', {\n                    method: 'POST',\n                    headers: { 'Content-Type': 'application/json' },\n                    body: JSON.stringify({\n                        email: payload,\n                        username: 'testuser',\n                        password: 'SecurePass123!',\n                    }),\n                });\n\n                expect([400, 422]).toContain(response.status);\n                const body = await response.json();\n                expect(body.error?.message).not.toMatch(/SQL|syntax|database/i);\n            }\n        });\n\n        it('debe rechazar payload SQL injection en username', async () => {\n            const response = await fetch('http://localhost:3000/api/auth/register', {\n                method: 'POST',\n                headers: { 'Content-Type': 'application/json' },\n                body: JSON.stringify({\n                    email: 'test@example.com',\n                    username: \"test'; DROP TABLE users; --\",\n                    password: 'SecurePass123!',\n                }),\n            });\n\n            expect([400, 422]).toContain(response.status);\n        });\n    });\n\n    describe('PUT /api/users/profile', () => {\n        it('debe ignorar columnas inyectadas en update de perfil', async () => {\n            // Mock token (en un test real, usar token válido)\n            const token = 'Bearer mock-jwt-token';\n\n            const response = await fetch('http://localhost:3000/api/users/profile', {\n                method: 'PUT',\n                headers: {\n                    'Content-Type': 'application/json',\n                    'Authorization': token,\n                },\n                body: JSON.stringify({\n                    firstName: 'Luis',\n                    // Intentar inyectar columnas no permitidas\n                    \"role = 'ADMIN'\": 'x',\n                    \"password = 'hacked'\": 'x',\n                    \"id = 999\": 'x',\n                }),\n            });\n\n            // Esperamos 200 si el usuario es válido, 401/403 si no\n            expect([200, 401, 403]).toContain(response.status);\n            const body = await response.json();\n            // No debe haber cambios no autorizados si es exitoso\n            if (response.ok && body.data?.user) {\n                expect(body.data.user.role).not.toBe('ADMIN');\n            }\n        });\n    });\n\n    describe('PUT /api/tasks/[taskId]', () => {\n        it('debe rechazar keys no autorizadas en update de tarea', async () => {\n            const token = 'Bearer mock-jwt-token';\n            const taskId = '12345';\n\n            const response = await fetch(`http://localhost:3000/api/tasks/${taskId}`, {\n                method: 'PUT',\n                headers: {\n                    'Content-Type': 'application/json',\n                    'Authorization': token,\n                },\n                body: JSON.stringify({\n                    title: 'New Title',\n                    // Intentar cambiar userId (no permitido)\n                    userId: 'hacker-id',\n                    // Intentar inyectar columnas\n                    \"1=1; DELETE FROM tasks WHERE 1=1; --\": 'x',\n                }),\n            });\n\n            // Esperamos 200, 401, 403 o 404\n            expect([200, 400, 401, 403, 404]).toContain(response.status);\n            const body = await response.json();\n            expect(body.error?.message).not.toMatch(/SQL|syntax|database/i);\n        });\n    });\n\n    describe('PUT /api/habits/[habitId]', () => {\n        it('debe rechazar columnas inyectadas en update de hábito', async () => {\n            const token = 'Bearer mock-jwt-token';\n            const habitId = '12345';\n\n            const response = await fetch(`http://localhost:3000/api/habits/${habitId}`, {\n                method: 'PUT',\n                headers: {\n                    'Content-Type': 'application/json',\n                    'Authorization': token,\n                },\n                body: JSON.stringify({\n                    title: 'Updated Habit',\n                    // Intentar inyectar\n                    \"isActive = false\": 'x',\n                    \"createdAt = NOW()\": 'x',\n                }),\n            });\n\n            expect([200, 400, 401, 403, 404]).toContain(response.status);\n        });\n    });\n\n    describe('Validation Schema Tests', () => {\n        it('debe normalizar emails en login (trim y lowercase)', async () => {\n            const response = await fetch('http://localhost:3000/api/auth/login', {\n                method: 'POST',\n                headers: { 'Content-Type': 'application/json' },\n                body: JSON.stringify({\n                    email: '  USER@EXAMPLE.COM  ', // Espacios y mayúsculas\n                    password: 'test123',\n                }),\n            });\n\n            // Debe normalizar y validar correctamente\n            expect([401, 422]).toContain(response.status);\n        });\n\n        it('debe rechazar request con campos extra (.strict())', async () => {\n            const response = await fetch('http://localhost:3000/api/auth/register', {\n                method: 'POST',\n                headers: { 'Content-Type': 'application/json' },\n                body: JSON.stringify({\n                    email: 'test@example.com',\n                    username: 'testuser',\n                    password: 'SecurePass123!',\n                    // Campo extra no permitido\n                    isAdmin: true,\n                    role: 'ADMIN',\n                }),\n            });\n\n            // Debe rechazar por campos adicionales\n            expect([400, 422]).toContain(response.status);\n        });\n    });\n});\n
+    const SQL_INJECTION_PAYLOADS = [
+        "' OR '1'='1",
+        "admin' --",
+        "1' OR 1=1 --",
+        "'; DROP TABLE users; --",
+        "1' UNION SELECT * FROM users --",
+        "' OR 'a'='a",
+        "1; DELETE FROM users WHERE 1=1; --",
+    ];
+
+    test('loginSchema rejects malicious emails and normalizes case', () => {
+        for (const payload of SQL_INJECTION_PAYLOADS) {
+            const result = loginSchema.safeParse({ email: payload, password: 'test123' });
+            expect(result.success).toBe(false);
+        }
+
+        const normalized = loginSchema.parse({ email: 'USER@EXAMPLE.COM', password: 'test123' });
+        expect(normalized.email).toBe('user@example.com');
+    });
+
+    test('registerSchema rejects extra fields and malicious payloads', () => {
+        const malicious = registerSchema.safeParse({
+            email: "admin' --",
+            username: 'testuser',
+            password: 'SecurePass123!',
+            role: 'ADMIN',
+        });
+        expect(malicious.success).toBe(false);
+
+        const extraFields = registerSchema.safeParse({
+            email: 'test@example.com',
+            username: 'testuser',
+            password: 'SecurePass123!',
+            isAdmin: true,
+        });
+        expect(extraFields.success).toBe(false);
+    });
+
+    test('updateProfileSchema strips injected keys and validates usernames', () => {
+        const parsed = updateProfileSchema.parse({
+            firstName: 'Luis',
+            'role = "ADMIN"': 'x',
+            'password = "hacked"': 'x',
+        } as Record<string, unknown>);
+
+        expect(parsed).toEqual({ firstName: 'Luis' });
+
+        const invalidUsername = updateProfileSchema.safeParse({
+            username: "bad'; DROP TABLE users; --",
+        });
+        expect(invalidUsername.success).toBe(false);
+    });
+
+    test('updateTaskSchema and updateHabitSchema strip injected keys', () => {
+        const taskResult = updateTaskSchema.parse({
+            title: 'New Title',
+            userId: 'hacker-id',
+            '1=1; DELETE FROM tasks WHERE 1=1; --': 'x',
+        } as Record<string, unknown>);
+        expect(taskResult).toMatchObject({
+            title: 'New Title',
+            priority: 'MEDIUM',
+        });
+
+        const habitResult = updateHabitSchema.parse({
+            title: 'Updated Habit',
+            'isActive = false': 'x',
+            'createdAt = NOW()': 'x',
+        } as Record<string, unknown>);
+        expect(habitResult).toMatchObject({
+            title: 'Updated Habit',
+            frequency: 'DAILY',
+            targetCount: 1,
+        });
+    });
+});

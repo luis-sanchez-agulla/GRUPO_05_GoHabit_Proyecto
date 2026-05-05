@@ -12,6 +12,9 @@ export const createRewardSchema = z.object({
     description: z.string().max(500).optional(),
     cost: z.number().int().min(1, "Coste mínimo: 1"),  // Coste en monedas (entero positivo)
     icon: z.string().max(30).optional(),
+    type: z.string().max(50).optional(),
+    slot: z.string().max(50).optional(),
+    imageUrl: z.string().max(2048).optional(),
 });
 
 /** updateRewardSchema — body de PUT /api/admin/rewards. */

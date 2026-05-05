@@ -16,6 +16,9 @@
     "noEmit": true,
     "incremental": true,
     "allowJs": true,
+    "types": [
+      "node"
+    ],
     "paths": {
       "@/*": [
         "./src/*"

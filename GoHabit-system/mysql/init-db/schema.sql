@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS LootBox (
     rareza VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Accesorio (
+CREATE TABLE IF NOT EXISTS Mascota (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     tipo VARCHAR(100) NOT NULL,
@@ -61,12 +61,12 @@ CREATE TABLE IF NOT EXISTS Accesorio (
     activo INT DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS Avatar_Accesorio (
+CREATE TABLE IF NOT EXISTS Avatar_Mascota (
     id INT AUTO_INCREMENT PRIMARY KEY,
     avatar_id INT NOT NULL,
-    accesorio_id INT NOT NULL,
+    mascota_id INT NOT NULL,
     FOREIGN KEY (avatar_id) REFERENCES Avatar(id) ON DELETE CASCADE,
-    FOREIGN KEY (accesorio_id) REFERENCES Accesorio(id) ON DELETE CASCADE
+    FOREIGN KEY (mascota_id) REFERENCES Mascota(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Accesorio_LootBox (
@@ -89,7 +89,8 @@ CREATE TABLE IF NOT EXISTS Amigo (
 );
 
 -- ======================================================
--- Esquema usado por el backend actual (tabla/columnas EN)
+-- Esquema usado por el backend actual
+-- La tienda/recompensas se modela como mascotas coleccionables.
 -- ======================================================
 
 CREATE TABLE IF NOT EXISTS users (
@@ -173,6 +174,9 @@ CREATE TABLE IF NOT EXISTS rewards (
     description TEXT NULL,
     cost INT NOT NULL,
     icon VARCHAR(100) NULL,
+    type VARCHAR(50) NOT NULL DEFAULT 'pet',
+    slot VARCHAR(50) NOT NULL DEFAULT 'companion',
+    imageUrl LONGTEXT NULL,
     rarity VARCHAR(30) NULL,
     isActive TINYINT(1) NOT NULL DEFAULT 1,
     createdAt TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
@@ -182,6 +186,8 @@ CREATE TABLE IF NOT EXISTS user_rewards (
     id INT AUTO_INCREMENT PRIMARY KEY,
     userId VARCHAR(36) NOT NULL,
     rewardId INT NOT NULL,
+    sourceChest VARCHAR(50) NULL,
+    equipped TINYINT(1) NOT NULL DEFAULT 0,
     redeemedAt TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     INDEX idx_user_rewards_user (userId),
     INDEX idx_user_rewards_reward (rewardId)

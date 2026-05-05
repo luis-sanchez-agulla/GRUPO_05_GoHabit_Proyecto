@@ -108,6 +108,37 @@ export const userService = {
         };
     },
 
+    async setXpAndCoins(userId: string, points: number, coins: number) {
+        const user = await userRepository.findById(userId);
+        if (!user) throw new NotFoundError('User');
+
+        const updatedPoints = Math.max(0, Number(points) || 0);
+        const updatedCoins = Math.max(0, Number(coins) || 0);
+
+        let currentLevel = 1;
+        let xpTarget = 50;
+        let remainingXp = updatedPoints;
+        while (remainingXp >= xpTarget) {
+            remainingXp -= xpTarget;
+            currentLevel++;
+            xpTarget += 50;
+        }
+
+        const newStage = TREE_STAGE_LEVELS.find(
+            lvl => updatedPoints >= lvl.min && updatedPoints <= lvl.max
+        )?.stage ?? 0;
+
+        await userRepository.updateStats(userId, updatedPoints, updatedCoins, currentLevel);
+        await userRepository.updateTreeStage(userId, newStage);
+
+        return {
+            points: updatedPoints,
+            coins: updatedCoins,
+            level: currentLevel,
+            stage: newStage
+        };
+    },
+
     async getTreeStage(userId: string) {
         const stage = await userRepository.getTreeStage(userId);
         if (!stage) throw new NotFoundError('User or Avatar');

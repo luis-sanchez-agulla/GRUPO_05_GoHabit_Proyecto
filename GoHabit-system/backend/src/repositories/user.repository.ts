@@ -117,13 +117,30 @@ export const userRepository = {
     },
 
     async findUserAccessories(userId: string): Promise<any[]> {
-        const [rows]: any = await query(`SELECT id FROM Accesorio AS a INNER JOIN Avatar_Accesorio AS aa ON a.id = aa.accesorioId WHERE aa.userId = ?`, [userId]);
+        const [rows]: any = await query(
+            `SELECT
+                r.id,
+                r.name,
+                r.description,
+                r.icon,
+                r.type,
+                r.slot,
+                r.imageUrl,
+                r.rarity,
+                ur.sourceChest,
+                ur.equipped,
+                ur.redeemedAt
+            FROM user_rewards AS ur
+            INNER JOIN rewards AS r ON r.id = ur.rewardId
+            WHERE ur.userId = ?`,
+            [userId]
+        );
         return rows || [];
     },
 
     async addAccessoryToUser(userId: string, accessoryId: string): Promise<void> {
         await execute(
-            'INSERT INTO Avatar_Accesorio (userId, accesorioId) VALUES (?, ?)',
+            'INSERT INTO user_rewards (userId, rewardId, equipped) VALUES (?, ?, 0)',
             [userId, accessoryId]
         );
     },

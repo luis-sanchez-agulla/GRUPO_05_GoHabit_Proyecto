@@ -38,15 +38,23 @@ export const adminRepository = {
 
     async createReward(data: any): Promise<number> {
         const [result]: any = await execute(
-            'INSERT INTO rewards (name, description, cost, icon) VALUES (?, ?, ?, ?)',
-            [data.name, data.description || null, data.cost, data.icon || null]
+            'INSERT INTO rewards (name, description, cost, icon, type, slot, imageUrl) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [
+                data.name,
+                data.description || null,
+                data.cost,
+                data.icon || null,
+                data.type || 'pet',
+                data.slot || 'companion',
+                data.imageUrl || null,
+            ]
         );
         return result.insertId;
     },
 
     async updateReward(id: string, data: any): Promise<void> {
         const ALLOWED_COLUMNS = new Set([
-            'name', 'description', 'cost', 'icon', 'isActive',
+            'name', 'description', 'cost', 'icon', 'type', 'slot', 'imageUrl', 'isActive',
         ]);
 
         const allowed = Object.keys(data).filter(key => ALLOWED_COLUMNS.has(key));

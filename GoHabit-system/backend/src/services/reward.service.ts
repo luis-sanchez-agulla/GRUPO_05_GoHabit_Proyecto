@@ -53,21 +53,21 @@ export const rewardService = {
             throw new ValidationError('No tienes suficientes monedas para canjear esta recompensa');
         }
 
-        const userAccessories = await userRepository.findUserAccessories(userId);
-        const allAccessories = await rewardRepository.findAllActiveByRarity(rarity);
+        const userPets = await userRepository.findUserAccessories(userId);
+        const allPets = await rewardRepository.findAllActiveByRarity(rarity);
 
-        // Filtrar accesorios que el usuario no posee
-        const availableAccessories = allAccessories.filter(accessory =>
-            !userAccessories.some(userAccessory => userAccessory.id === accessory.id)
+        // Filtrar mascotas que el usuario no posee
+        const availablePets = allPets.filter(pet =>
+            !userPets.some(userPet => userPet.id === pet.id)
         );
 
-        if (availableAccessories.length === 0) {
-            throw new ValidationError('No hay accesorios disponibles para canjear de esta rareza.');
+        if (availablePets.length === 0) {
+            throw new ValidationError('No hay mascotas disponibles para canjear de esta rareza.');
         }
 
-        // Seleccionar un accesorio aleatorio
-        const randomIndex = randomInt(0, availableAccessories.length);
-        const selectedAccessory = availableAccessories[randomIndex];
+        // Seleccionar una mascota aleatoria
+        const randomIndex = randomInt(0, availablePets.length);
+        const selectedPet = availablePets[randomIndex];
 
         // Iniciar transacción para el canje
         const connection = await pool.getConnection();
@@ -78,10 +78,10 @@ export const rewardService = {
             await userRepository.subtractCoins(userId, cost, connection);
 
             // 2. Añadir accesorio
-            await userRepository.addAccessoryToUser(userId, selectedAccessory.id);
+            await userRepository.addAccessoryToUser(userId, selectedPet.id);
 
             await connection.commit();
-            return selectedAccessory;
+            return selectedPet;
         } catch (error) {
             await connection.rollback();
             throw error;

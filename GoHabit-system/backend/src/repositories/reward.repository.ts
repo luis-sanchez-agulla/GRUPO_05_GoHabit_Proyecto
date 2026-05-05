@@ -31,7 +31,7 @@ export const rewardRepository = {
 
     async ownAccessorys(userId: string, accessoryId: string): Promise<boolean> {
         const [rows]: any = await query(
-            'SELECT * FROM Avatar_Accesorio WHERE userId = ? AND accesorioId = ?',
+            'SELECT ur.id FROM user_rewards ur WHERE ur.userId = ? AND ur.rewardId = ?',
             [userId, accessoryId]
         );
         return rows && rows.length > 0;
