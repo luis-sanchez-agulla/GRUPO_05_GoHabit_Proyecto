@@ -128,22 +128,27 @@
     return full || user.username || user.email || "Usuario";
   }
 
-  function bindUser(user) {
+  function bindUser(user, { skipName = false } = {}) {
     const displayName = pickDisplayName(user);
-    const firstName = (user?.firstName || user?.username || "Usuario").trim();
+    // Nombre de saludo: usa username (identificador único de cuenta).
+    // Si no hay username, cae a firstName. Nunca usa datos de caché que pueden
+    // pertenecer a otra cuenta de prueba (ej. residuos de sesiones anteriores).
+    const firstName = (user?.username || user?.firstName || "Usuario").trim();
 
-    document.querySelectorAll("[data-user-full-name]").forEach((el) => {
-      el.textContent = displayName;
-    });
+    if (!skipName) {
+      document.querySelectorAll("[data-user-full-name]").forEach((el) => {
+        el.textContent = displayName;
+      });
 
-    document.querySelectorAll("[data-user-first-name]").forEach((el) => {
-      el.textContent = firstName;
-    });
+      document.querySelectorAll("[data-user-first-name]").forEach((el) => {
+        el.textContent = firstName;
+      });
 
-    // Fallback for any old static heading markup still cached in some templates.
-    const indexTitle = document.querySelector('.index-header__title');
-    if (indexTitle) {
-      indexTitle.textContent = `Hola, ${firstName}`;
+      // Fallback for any old static heading markup still cached in some templates.
+      const indexTitle = document.querySelector('.index-header__title');
+      if (indexTitle) {
+        indexTitle.textContent = `Hola, ${firstName}`;
+      }
     }
 
     document.querySelectorAll("[data-user-email]").forEach((el) => {
@@ -196,7 +201,9 @@
 
     const cached = window.GoHabitAPI.getSessionUser();
     if (cached) {
-      bindUser(getMergedUser(cached));
+      // skipName: true — no mostrar nombre de la caché; puede ser de otra cuenta de prueba.
+      // El nombre solo se actualiza cuando la API confirma el usuario real (más abajo).
+      bindUser(getMergedUser(cached), { skipName: true });
     }
 
     try {
@@ -236,11 +243,12 @@
             if (!mergedHabits[i].backendId) {
               try {
                 console.log("[Sync] Pushing viejo hábito local al servidor...", mergedHabits[i].titulo);
+                const isHex = /^#[0-9a-fA-F]{6}$/.test(mergedHabits[i].color);
                 const res = await window.GoHabitAPI.post('/habits', {
                   title: mergedHabits[i].titulo,
                   frequency: (mergedHabits[i].frecuencia || []).join(','),
                   targetCount: mergedHabits[i].metaValor || 1,
-                  color: mergedHabits[i].color || 'primary',
+                  ...(isHex ? { color: mergedHabits[i].color } : {}),
                   icon: mergedHabits[i].icono || 'star'
                 });
                 if (res?.data?.id) {

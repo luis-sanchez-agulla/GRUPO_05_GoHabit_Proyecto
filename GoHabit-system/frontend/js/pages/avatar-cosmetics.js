@@ -31,6 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     container.querySelectorAll('.avatar-cosmetic').forEach((el) => el.remove());
 
+    const companionSlot = document.getElementById('avatar-companion-slot');
+    if (companionSlot) {
+      companionSlot.querySelectorAll('.avatar-companion-slot__img, .avatar-companion-slot__icon').forEach((el) => el.remove());
+    }
+
     const equipped = window.GoHabit.getCosmeticsEquipped();
     const inventory = window.GoHabit.getCosmeticsInventory();
     const map = inventory.reduce((acc, item) => {
@@ -43,23 +48,47 @@ document.addEventListener('DOMContentLoaded', () => {
       const item = map[String(itemId)];
       if (!item) return;
 
-      if (item.image) {
-        const img = document.createElement('img');
-        img.src = item.image;
-        img.className = `avatar-cosmetic ${SLOT_CLASS[item.slot] || ''}`;
-        img.style.width = '64px';
-        img.style.height = '64px';
-        img.style.objectFit = 'contain';
-        img.alt = item.name;
-        container.appendChild(img);
+      if (item.slot === 'companion' && companionSlot) {
+        const emptyIcon = companionSlot.querySelector('.avatar-companion-slot__empty');
+        if (emptyIcon) emptyIcon.style.display = 'none';
+
+        if (item.image) {
+          const img = document.createElement('img');
+          img.src = item.image;
+          img.className = 'avatar-companion-slot__img';
+          img.alt = item.name;
+          companionSlot.appendChild(img);
+        } else {
+          const icon = document.createElement('span');
+          icon.className = `material-symbols-outlined avatar-companion-slot__icon avatar-cosmetic--${item.rarity || 'common'}`;
+          icon.textContent = item.icon || 'pets';
+          icon.title = item.name || 'Mascota';
+          companionSlot.appendChild(icon);
+        }
       } else {
-        const icon = document.createElement('span');
-        icon.className = `material-symbols-outlined avatar-cosmetic ${SLOT_CLASS[item.slot] || ''} avatar-cosmetic--${item.rarity || 'common'}`;
-        icon.textContent = item.icon || 'star';
-        icon.title = item.name || 'Objeto';
-        container.appendChild(icon);
+        if (item.image) {
+          const img = document.createElement('img');
+          img.src = item.image;
+          img.className = `avatar-cosmetic ${SLOT_CLASS[item.slot] || ''}`;
+          img.style.width = '64px';
+          img.style.height = '64px';
+          img.style.objectFit = 'contain';
+          img.alt = item.name;
+          container.appendChild(img);
+        } else {
+          const icon = document.createElement('span');
+          icon.className = `material-symbols-outlined avatar-cosmetic ${SLOT_CLASS[item.slot] || ''} avatar-cosmetic--${item.rarity || 'common'}`;
+          icon.textContent = item.icon || 'star';
+          icon.title = item.name || 'Objeto';
+          container.appendChild(icon);
+        }
       }
     });
+
+    if (companionSlot && !equipped['companion']) {
+      const emptyIcon = companionSlot.querySelector('.avatar-companion-slot__empty');
+      if (emptyIcon) emptyIcon.style.display = '';
+    }
   }
 
   function renderInventoryPanel() {

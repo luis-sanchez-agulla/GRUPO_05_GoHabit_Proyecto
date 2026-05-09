@@ -63,7 +63,9 @@ export const registerSchema = z.object({
     password: z
         .string()
         .min(LIMITS.PASSWORD_MIN_LENGTH, `Mínimo ${LIMITS.PASSWORD_MIN_LENGTH} caracteres`)
-        .max(128, "Contraseña muy larga"),
+        .max(128, "Contraseña muy larga")
+        .regex(/[A-Z]/, "Debe contener al menos una letra mayúscula")
+        .regex(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/, "Debe contener al menos un carácter especial (!@#$%...)"),
     firstName: z.string().max(50, "Nombre muy largo").optional().nullable(),
     lastName: z.string().max(50, "Apellido muy largo").optional().nullable(),
 }).strict();  // Rechaza campos adicionales inesperados

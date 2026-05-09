@@ -38,6 +38,18 @@ body {
   color: var(--text);
 }
 
+/* Mascota equipada sobre el avatar */
+.gh-pet-live {
+  animation: ghPetFloat 3.8s ease-in-out infinite;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
+  pointer-events: none;
+}
+
+@keyframes ghPetFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-5px) scale(1.04); }
+}
+
 body.dark {
   --bg: #141711;
   --surface: rgba(42, 48, 37, 1);
